@@ -50,7 +50,8 @@
     --warn:#e0a45c;
     --sb:#4a443c; --sb-hover:#6a6157;
 }
-*{box-sizing:border-box; scrollbar-width:thin; scrollbar-color:var(--sb) transparent}
+*{box-sizing:border-box; scrollbar-width:thin; scrollbar-color:var(--sb) transparent;
+  -webkit-tap-highlight-color:transparent}
 ::-webkit-scrollbar{width:11px; height:11px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{
@@ -58,21 +59,41 @@
 }
 ::-webkit-scrollbar-thumb:hover{background:var(--sb-hover); background-clip:content-box}
 ::-webkit-scrollbar-corner{background:transparent}
+/* App shell（2026-08-21 手機流暢工程第一段）：html/body 固定滿版、永不捲動，
+   真正會捲的只有 .panel（清單）／.trip .sheet（行程站列）兩個內部容器——
+   下面各自有 overflow-y:auto + overscroll-behavior:contain。這裡的
+   overscroll-behavior:none 是外層防線，擋 iOS Safari 在頁面本身沒東西可捲時
+   仍可能出現的下拉重整／過捲回彈。UI 文字預設不可選（原生 app 手感），
+   景點描述文字例外開回可選，見 .detail .desc。 */
+html{height:100%; overflow:hidden; overscroll-behavior:none}
 body{
-  margin:0; background:var(--bg); color:var(--ink); font-size:15px; line-height:1.6;
+  margin:0; height:100dvh; overflow:hidden; overscroll-behavior:none;
+  background:var(--bg); color:var(--ink); font-size:15px; line-height:1.6;
   font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
   -webkit-text-size-adjust:100%;
+  -webkit-user-select:none; user-select:none;
 }
 button{font:inherit; color:inherit; cursor:pointer}
+/* 消雙擊縮放延遲。四個都是 #map 的手足或再上層手足、不是它的祖先——
+   touch-action 沿祖先鏈做交集，這樣設不會波及 Leaflet 自己在
+   .leaflet-container 管的地圖手勢。.trip 底下 .stop／.grip 既有更嚴格的
+   pan-y／none（橫滑刪除、長按拖曳排序用），交集只會取更嚴格那個，跟這裡的
+   manipulation 不衝突。 */
+.bar, .panel, .trip, .totop, .mapbtns, .mapcard{touch-action:manipulation}
 .num{font-family:var(--mono); font-size:.92em; letter-spacing:-.01em}
 .ic{width:14px; height:14px; flex:none; stroke:currentColor; fill:none; stroke-width:1.5;
     stroke-linecap:round; stroke-linejoin:round; vertical-align:-2px; margin-right:4px}
 
-/* ── 版面 ── */
-.app{display:flex; flex-direction:column; min-height:100dvh; padding-bottom:var(--barh)}
+/* ── 版面 ──
+   .app 固定 100dvh、overflow:hidden——它本身不是捲動容器，只是把可用高度分給
+   .bar（頁首，內容自身高度）與 .main（flex:1，吃剩下全部）。padding-bottom
+   留一條 var(--barh) 高的空白給底部固定的 .trip 收合狀態，清單捲到底也不會被
+   蓋住（跟原本桌機版同一招，現在窄畫面也套用）。 */
+.app{display:flex; flex-direction:column; height:100dvh; overflow:hidden; padding-bottom:var(--barh)}
 .bar{
-  position:sticky; top:0; z-index:900; display:flex; align-items:center; gap:10px;
-  padding:8px 14px; background:var(--panel); border-bottom:1px solid var(--line); flex-wrap:wrap;
+  flex:none; display:flex; align-items:center; gap:10px;
+  padding:max(8px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) 8px max(14px,env(safe-area-inset-left));
+  background:var(--panel); border-bottom:1px solid var(--line); flex-wrap:wrap;
 }
 .logo{font-weight:700; white-space:nowrap}
 .logo small{display:block; font-weight:400; font-size:11px; color:var(--ink3); letter-spacing:.06em}
@@ -102,9 +123,21 @@ button{font:inherit; color:inherit; cursor:pointer}
   #q{flex:1 1 80px; min-width:80px; max-width:none}
 }
 
-.main{flex:1; display:block}
-.panel{background:var(--panel); border-top:1px solid var(--line)}
-.stage{position:relative; height:min(50vh,440px); min-height:220px; background:var(--sunk)}
+/* .main／.panel／.stage 三者現在永遠是一組 flex：窄畫面直欄（面板疊在地圖
+   上方或單獨佔滿）、桌機橫排（見 900px 斷點覆寫 flex-direction:row）。.panel
+   永遠是自己的捲動容器（overflow-y:auto）——不再有「窄畫面整頁捲、桌機面板
+   自己捲」兩套邏輯，JS 端的捲動目標也因此只剩 .panel 一個（見 renderPanel／
+   updateTotop／totop 按鈕）。flex:0 1 auto＋min-height:0＋overflow-y:auto
+   讓它預設吃自己內容的高度（地圖模式時只有篩選列那一小塊），內容多到超過
+   可用空間才會被壓縮並改成自己內部捲（不會把 .stage 擠出畫面）；清單模式
+   （.nomap）改用 flex:1 讓它固定吃滿整個 .main，見下面 .main.nomap .panel。 */
+.main{flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden}
+.panel{
+  background:var(--panel); border-top:1px solid var(--line);
+  flex:0 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.stage{position:relative; flex:1 1 auto; min-height:220px; background:var(--sunk)}
 #map{position:absolute; inset:0}
 .mapnote{
   position:absolute; left:10px; bottom:10px; z-index:500; display:none; max-width:calc(100% - 20px);
@@ -146,7 +179,9 @@ button{font:inherit; color:inherit; cursor:pointer}
    手機地圖模式（清單隱藏）完全不出現，用 [hidden] 而不是只調透明度，避免它
    還能被 tab 到或被螢幕報讀器唸出來。 */
 .totop{
-  position:fixed; z-index:550; right:16px; bottom:16px; width:40px; height:40px;
+  position:fixed; z-index:550;
+  right:calc(16px + env(safe-area-inset-right)); bottom:calc(16px + env(safe-area-inset-bottom));
+  width:40px; height:40px;
   border-radius:50%; display:flex; align-items:center; justify-content:center;
   background:var(--panel); border:1px solid var(--line2); color:var(--ink2);
   box-shadow:0 2px 10px rgba(0,0,0,.22); opacity:0; pointer-events:none;
@@ -156,7 +191,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .totop svg{width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
 .totop:hover{border-color:var(--accent); color:var(--accent)}
 .totop.show{opacity:1; pointer-events:auto}
-.totop.docked{right:calc(100vw - 394px)}
+.totop.docked{right:calc(100vw - 394px + env(safe-area-inset-right))}
 /* 手機地圖模式沒有清單可看，點圖釘就從底部滑出這張卡：辨識＋常用動作都在上面，
    不用被丟出地圖。要完整資訊（描述、季節、順路可搭）才按「看詳細」切到清單。 */
 .mapcard{
@@ -185,36 +220,38 @@ button{font:inherit; color:inherit; cursor:pointer}
   cursor:pointer;   /* 點名字跟點圖釘同一件事——標籤在 .pin 裡，點擊會冒泡到 marker */
 }
 .main.nomap .stage{display:none}
+/* 清單模式（沒有地圖可以分高度）：.panel 從「吃自己內容高度」改成 flex:1，
+   固定撐滿整個 .main，不管清單長短，捲軸行為才會跟桌機版一致（一個固定高度
+   的框，內容用內部捲動）。 */
+.main.nomap .panel{flex:1 1 auto}
 /* 窄畫面的「地圖」模式＝真的只看地圖。原本這個模式是地圖與清單都顯示，而地圖
    排在 520 筆清單後面——實測要捲 41.9 個畫面才到得了，那顆按鈕等於名不副實。
-   篩選列留著（它決定地圖上出現哪些點），收起來的只有清單本體與它的附屬說明。 */
+   篩選列留著（它決定地圖上出現哪些點），收起來的只有清單本體與它的附屬說明。
+   .stage 的高度不用再手算：.panel 是 flex:0 1 auto（吃自己內容），.stage 是
+   flex:1（吃剩下全部），flexbox 自己會算出正確高度，只留一個 min-height 底線
+   防止篩選展開內容太多時把地圖擠沒了。 */
 @media (max-width:899px), (max-height:559px){
   .main:not(.nomap) .results,
   .main:not(.nomap) .legend,
   .main:not(.nomap) .foot,
   .main:not(.nomap) .sec.toplevel{display:none}
-  .main:not(.nomap) .stage{
-    height:calc(100dvh - var(--topbarh,52px) - var(--panelh,46px) - var(--barh));
-    min-height:280px;
-  }
+  .main:not(.nomap) .stage{min-height:280px}
 }
+/* 桌機：.main 改橫排，.panel 固定寬側欄、.stage 吃剩下寬度——兩者都還是
+   flex:0 1 auto／flex:1 1 auto 那套（見基礎規則），只是方向從直欄變橫排，
+   捲動容器（.panel 內部捲）沒有變。 */
 @media (min-width:900px) and (min-height:560px){
-  body{overflow:hidden}
-  .app{height:100dvh}
-  .main{display:flex; min-height:0}
-  .panel{width:410px; flex:none; border-top:0; border-right:1px solid var(--line);
-         overflow-y:auto; overscroll-behavior:contain}
-  .stage{flex:1; height:auto}
-  .main.nomap .panel{width:auto; flex:1}
+  .main{flex-direction:row}
+  .panel{width:410px; flex:0 0 410px; border-top:0; border-right:1px solid var(--line)}
+  .main.nomap .panel{width:auto; flex:1 1 auto}
 }
 
 /* ── 篩選列 ── */
+/* .fbar 黏在 .panel 捲動內容的最上面——.panel 現在任何寬度都是自己的捲動容器
+   （見上面版面那節），.fbar 的 sticky 祖先永遠是它，不再有「窄畫面文件捲、
+   桌機面板捲」兩種情境要分別對付，top:0 到哪個寬度都對，不用再量 .bar 高度。 */
 .fbar{
-  /* top 預設吃 JS 量出來的 .bar 實際高度（--topbarh）：窄畫面下 .bar 跟 .fbar
-     是同一份文件捲軸上的兩個 sticky 元素，都釘 top:0 會疊在一起、.fbar 被蓋住。
-     桌機版（見下面 900px 斷點）改回 top:0——那裡捲的是 .panel 自己，跟 .bar 不共用
-     同一個捲動容器，.fbar 的 top:0 本來就是對的，不該套用頁首高度。 */
-  position:sticky; top:var(--topbarh,0px); z-index:400; display:flex; align-items:center; gap:8px;
+  position:sticky; top:0; z-index:400; display:flex; align-items:center; gap:8px;
   padding:8px 14px; background:var(--panel); border-bottom:1px solid var(--line);
 }
 .fbtn{
@@ -248,12 +285,6 @@ button{font:inherit; color:inherit; cursor:pointer}
 #sort{
   flex:none; border:1px solid var(--line); border-radius:999px; background:var(--bg); color:var(--ink2);
   font:inherit; font-size:12.5px; padding:3px 10px; max-width:120px;
-}
-/* 桌機版 .fbar 釘在 .panel 自己的捲動框裡（不是整頁），跟 .bar 不共用捲動容器，
-   top:0 本來就對，不套用 --topbarh（那是量給窄畫面「整頁捲」那種情境用的）。
-   這條要寫在 .fbar 的基礎規則「之後」才壓得過去——同特異度時，來源順序晚的贏。 */
-@media (min-width:900px) and (min-height:560px){
-  .fbar{top:0}
 }
 
 /* ── 篩選面板：三層 ──
@@ -379,7 +410,9 @@ button{font:inherit; color:inherit; cursor:pointer}
 .facts{display:grid; grid-template-columns:auto 1fr; gap:2px 14px; font-size:13px; margin:0 0 10px}
 .facts dt{color:var(--ink3)}
 .facts dd{margin:0}
-.detail .desc{font-size:14px; margin:0 0 9px}
+/* UI 文字預設不可選（見 body 的 user-select:none），景點描述是內容不是介面，
+   開回可選——想複製一段描述去查證或分享，是合理的需求。 */
+.detail .desc{font-size:14px; margin:0 0 9px; -webkit-user-select:text; user-select:text}
 .flag{font-size:12.5px; color:var(--ink2); background:var(--panel); border-radius:8px; padding:7px 10px; margin:0 0 8px}
 .flag.season{color:var(--warn); background:none; padding:0 0 0 1px}
 .acts{display:flex; gap:7px; flex-wrap:wrap; margin:10px 0 4px}
@@ -409,6 +442,7 @@ button{font:inherit; color:inherit; cursor:pointer}
   position:fixed; left:0; right:0; bottom:0; z-index:1100; background:var(--panel);
   border-top:1px solid var(--line2); box-shadow:0 -2px 14px rgba(0,0,0,.10);
   padding-bottom:env(safe-area-inset-bottom);
+  padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right);
 }
 .trip .head{
   display:flex; align-items:center; gap:10px; min-height:var(--barh); padding:8px 14px;
@@ -419,7 +453,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .trip .head .hint.none{color:var(--ink3)}
 .trip .head .right{flex:none; display:flex; align-items:center; gap:8px}
 .trip .head .clock{font-family:var(--mono); font-size:12.5px; color:var(--ink2); white-space:nowrap}
-.trip .sheet{display:none; max-height:min(60vh,520px); overflow-y:auto; padding:0 14px 14px; border-top:1px solid var(--line)}
+.trip .sheet{display:none; max-height:min(60vh,520px); overflow-y:auto; overscroll-behavior:contain; padding:0 14px 14px; border-top:1px solid var(--line)}
 .trip.open .sheet{display:block}
 .setrow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 0 4px}
 .setrow .lab{font-size:12px; color:var(--ink3); letter-spacing:.06em}
@@ -606,6 +640,14 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 @media (prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important} }
 </style>
+<!-- PWA（2026-08-22 掛載，資產在 docs/hsinchu-map/pwa/，見 HANDOFF §6.16）。
+     相對路徑：發布時 manifest/sw.js/icons 與 index.html 同層（publish.py 負責複製）。 -->
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#5c5449">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="新竹一日">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 </head>
 <body>
 <div class="app">
@@ -2176,17 +2218,14 @@ function renderPanel(){
       "本頁僅供行程參考，不保證資訊正確或即時。底圖與圖磚為 OpenStreetMap 貢獻者所有。";
     panel.appendChild(f);
   }
-  // 桌機是 .panel 自己捲、窄畫面是整頁捲（見 CSS 的 900px 斷點），所以兩邊都要歸零
+  // .panel 現在任何寬度都是唯一的捲動容器（app-shell 化，2026-08-21），
+  // 不用再分桌機／窄畫面兩套
   if (SCROLL_RESET){
     panel.scrollTop = 0;
-    scrollTo(0, 0);
     SCROLL_RESET = false;
   } else {
     panel.scrollTop = keep;
   }
-  // 面板重繪後高度就變了，而 ResizeObserver 在「清空再重建、淨高度相同」時同一幀
-  // 內看不到變化、不會觸發，所以這裡直接量一次（手機地圖模式靠它算地圖高度）。
-  syncBarHeight();
   if (SCROLL_GROUP){
     // 「只看同路線所有點」之後從第一條路線的標題開始看，不是停在原本的捲動位置
     const g=panel.querySelector(".ghead");
@@ -2194,9 +2233,7 @@ function renderPanel(){
       const bar=document.querySelector(".fbar");
       const r=g.getBoundingClientRect();
       const target=(bar?bar.getBoundingClientRect().bottom:r.top)+10;
-      const scroller=getComputedStyle(panel).overflowY==="auto" ? panel
-                    : (document.scrollingElement || document.documentElement);
-      scroller.scrollTop += (r.top-target);
+      panel.scrollTop += (r.top-target);
     }
     SCROLL_GROUP=false;
   }
@@ -2205,13 +2242,11 @@ function renderPanel(){
     if (el){
       // 從地圖點選是特意的一次性動作，位置固定貼在篩選列下方一點點，不是螢幕
       // 正中央——「今天的行程」展開時是 position:fixed 貼在畫面下緣，擺在正中央
-      // 容易被它蓋住。桌機是 .panel 自己捲、窄畫面是整頁捲，兩種捲動容器都要認。
+      // 容易被它蓋住。
       const bar=document.querySelector(".fbar");
       const r=el.getBoundingClientRect();
       const target=(bar?bar.getBoundingClientRect().bottom:r.top)+10;
-      const scroller=getComputedStyle(panel).overflowY==="auto" ? panel
-                    : (document.scrollingElement || document.documentElement);
-      scroller.scrollTop += (r.top-target);
+      panel.scrollTop += (r.top-target);
     }
     SCROLL_TO=null;
   }
@@ -2243,33 +2278,13 @@ function syncViews(){
   document.querySelectorAll("#views button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.v===S.view));
   document.getElementById("main").classList.toggle("nomap", S.view!=="map");
 }
-/* 窄畫面下 .fbar 要知道 .bar 實際多高，才能 sticky 停在它正下方而不是疊在上面
-   （見 .fbar 的 CSS 註解）。.bar 內容用 flex-wrap，會不會換行隨寬度變，所以只能量、
-   不能寫死數字；resize／轉向都要重量一次。 */
-/* .fbar 要黏在 .bar 底下，所以得知道 .bar 有多高。這個高度不是只跟視窗寬度有關——
-   .bar 會換行（窄螢幕變兩行）、字體載入完會變、計數文字變長也會變，只聽 window 的
-   resize 會漏掉後面那幾種，fbar 就會有一截被壓在 bar 底下。用 ResizeObserver 直接
-   盯著那個元素，不管高度為什麼變都會補上。 */
-function syncBarHeight(){
-  const bar=document.querySelector(".bar");
-  if (bar) document.documentElement.style.setProperty("--topbarh", bar.getBoundingClientRect().height+"px");
-  // 手機的「地圖」模式要讓地圖吃滿剩下的高度，得知道上面那塊面板多高。量整個
-  // .panel 而不是只量 .fbar——篩選展開時 .filters 也在裡面，只算篩選列的話地圖
-  // 會被推到畫面外。它每次重繪都會變，所以用 ResizeObserver 盯著。
-  const pn=document.getElementById("panel");
-  if (pn) document.documentElement.style.setProperty("--panelh", pn.getBoundingClientRect().height+"px");
-}
-if (window.ResizeObserver){
-  const bar=document.querySelector(".bar");
-  if (bar) new ResizeObserver(syncBarHeight).observe(bar);
-  const pn=document.getElementById("panel");
-  if (pn) new ResizeObserver(syncBarHeight).observe(pn);
-}
-addEventListener("resize", syncBarHeight);
+/* app-shell 化之後（2026-08-21）.stage／.panel 的高度全部交給 flexbox 自己算
+   （見 CSS 版面那節），不再需要量 .bar／.panel 實際高度寫回 --topbarh／
+   --panelh 給 calc() 用——原本的 syncBarHeight() 與它掛的兩個 ResizeObserver、
+   resize listener 因此整支拿掉，不是遺漏。 */
 /* 回頂鈕：可見度（手機地圖模式不出現）、淡入門檻（捲過約 1.75 個畫面高）、
    水平定位（桌機地圖檢視要收窄到面板右下，其餘固定視窗右下）都靠這支重算。
-   捲動容器有兩種、判法跟 SCROLL_GROUP／SCROLL_TO 那幾處一致：桌機是 .panel
-   自己捲，窄畫面是整頁捲。 */
+   捲動容器只剩 .panel 一個，不用再判斷是不是文件在捲。 */
 function updateTotop(){
   const btn=document.getElementById("totop");
   if (!btn) return;
@@ -2280,19 +2295,13 @@ function updateTotop(){
                  main && !main.classList.contains("nomap");
   btn.classList.toggle("docked", docked);
   const panel=document.getElementById("panel");
-  const sc = getComputedStyle(panel).overflowY==="auto" ? panel
-           : (document.scrollingElement || document.documentElement);
-  const vh = sc.clientHeight || innerHeight;
-  btn.classList.toggle("show", (sc.scrollTop||0) > vh*1.75);
+  const vh = panel.clientHeight || innerHeight;
+  btn.classList.toggle("show", panel.scrollTop > vh*1.75);
 }
 document.getElementById("panel").addEventListener("scroll", updateTotop, {passive:true});
-addEventListener("scroll", updateTotop, {passive:true});
 addEventListener("resize", updateTotop);
 document.getElementById("totop").onclick=()=>{
-  const panel=document.getElementById("panel");
-  const sc = getComputedStyle(panel).overflowY==="auto" ? panel
-           : (document.scrollingElement || document.documentElement);
-  sc.scrollTo({top:0, behavior: RM.matches ? "auto" : "smooth"});
+  document.getElementById("panel").scrollTo({top:0, behavior: RM.matches ? "auto" : "smooth"});
 };
 function render(){
   refreshNearSet();
@@ -2306,12 +2315,8 @@ document.querySelectorAll("#views button").forEach(b=>{
   b.onclick=()=>{
     if (b.dataset.v===S.view){
       // 再點一次目前已選中的檢視＝把清單捲回最頂端（filters 可見的位置），不做
-      // 其他事。捲動容器有兩種：窄畫面下 .bar／.fbar 是同一份文件捲軸上的兩個
-      // sticky（見 .fbar 的 CSS 註解），捲的是 window；桌機的 .panel 自己有
-      // 捲軸（見那條 media query）。兩種都捲一次，沒有效果的那個呼叫是無害的。
-      const pn=document.getElementById("panel");
-      if (pn) pn.scrollTo({top:0, behavior:"smooth"});
-      window.scrollTo({top:0, behavior:"smooth"});
+      // 其他事。.panel 是唯一的捲動容器，不用再兼顧 window。
+      document.getElementById("panel").scrollTo({top:0, behavior:"smooth"});
       return;
     }
     S.view=b.dataset.v; syncViews();
@@ -2341,10 +2346,19 @@ document.getElementById("theme").onclick=()=>{
   applyTheme(); save(); render();
 };
 syncViews();
-syncBarHeight();
 loadOSM("");
 render();
 save();
+</script>
+<script>
+/* PWA service worker 註冊——file:// 或不支援的環境靜默跳過，不擋首屏。 */
+(function () {
+  if (!("serviceWorker" in navigator)) return;
+  if (location.protocol === "file:") return;
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(function () {});
+  });
+})();
 </script>
 </body>
 </html>
