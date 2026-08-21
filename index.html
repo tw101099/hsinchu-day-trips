@@ -2,7 +2,11 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- maximum-scale=1／user-scalable=no（本人 2026-08-22 二輪回報後明講要上重錘）：
+     standalone（已加到主畫面）模式完全尊重，雙擊放大與雙指縮放都關掉；瀏覽器
+     分頁模式 iOS 為無障礙會忽略雙指縮放那部分（Apple 自 iOS 10 起的政策），
+     雙擊放大仍需要下面 JS 攔截層補一刀——這個取捨是本人已知、要的。 -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>新竹一日｜出發前挑地方</title>
 <meta name="description" content="從新竹市出發、當天來回的步道、老街、海岸與吃的：520 個點，依路線、時間、費力與主題篩選，可以直接排成一天的行程。">
 <meta property="og:type" content="website">
@@ -679,9 +683,11 @@ button{font:inherit; color:inherit; cursor:pointer}
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 </head>
 <body>
-<div class="app">
+<div class="app" id="app">
   <header class="bar">
-    <div class="logo">新竹一日</div>
+    <!-- id="logo" 供下面「真機診斷模式」長按偵測用（長按 3 秒開關，standalone
+         沒網址列不能走 query 參數，見診斷模式那段 script）。 -->
+    <div class="logo" id="logo">新竹一日</div>
     <div class="seg" id="views">
       <button data-v="map" aria-pressed="true">地圖</button>
       <button data-v="list" aria-pressed="false">清單</button>
@@ -2396,6 +2402,181 @@ save();
   window.addEventListener("load", function () {
     navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(function () {});
   });
+})();
+</script>
+<script>
+/* 雙擊放大 JS 攔截層（本人 2026-08-22 二輪實機回報：CSS touch-action:manipulation
+   在真機仍擋不住，這裡上重錘）。判準：#map 內完全不攔（Leaflet 自己管雙擊縮放，
+   用 closest("#map") 排除，不是排除祖先，是排除「這次點擊落在地圖裡」）；
+   #map 外，前後兩次 touchend 間隔 <300ms 視為快速連續操作——瀏覽器原生行為會把
+   這個間隔讀成雙擊放大手勢，這裡搶在瀏覽器判定前 preventDefault 擋掉那個放大。
+   但正常的「快速連點兩下不同項目」操作語意要保留：對 touchend 呼叫
+   preventDefault 會連帶吃掉瀏覽器原本要合成的 click 事件（這是 Touch Events
+   規範行為，iOS/Android 一致），所以攔下來之後手動對原始 target 補呼叫一次
+   .click()——目標元素還是原來那個（跟瀏覽器原生合成 click 用的 target 相同：
+   touchstart 落點），泡起（bubble）走正常 DOM 路徑，所以無論是 li 列直接掛
+   onclick 還是點到裡面的 icon/文字，該觸發的處理常式一樣會觸發，兩次快速點擊
+   兩個不同項目都各自有反應。註冊在 document、{passive:false}，preventDefault
+   才有效。 */
+(function(){
+  let lastTouchEnd = 0;
+  document.addEventListener("touchend", function(e){
+    if (e.target && e.target.closest && e.target.closest("#map")) return;
+    const now = Date.now();
+    const dt = now - lastTouchEnd;
+    lastTouchEnd = now;
+    if (dt > 0 && dt < 300){
+      e.preventDefault();
+      const t = e.target;
+      if (t && typeof t.click === "function") t.click();
+    }
+  }, {passive:false});
+})();
+</script>
+<script>
+/* 真機診斷模式（本人 2026-08-22 二輪回報後新增，臨時工具——不是交付物，等
+   行程面板留白／回頂鈕兩項問題定案後下一輪拆掉，見 HANDOFF §6.18）。
+   啟用：長按 topbar 的「新竹一日」logo 3 秒（standalone 模式沒網址列，不能靠
+   query 參數切換）。啟用後半透明浮層顯示：innerWidth/innerHeight、
+   visualViewport.height、100dvh 實測 px（量一個隱藏的 100dvh 探測 div，不是
+   讀常數）、safe-area-inset-top/bottom 實測 px（讀一個帶 env() padding 的探測
+   div 的 computed padding，同樣道理——這個環境的行動裝置模擬 env() 恆為 0，
+   真機才有意義）、--barh／--tripup 目前值、display-mode 是否 standalone、
+   .app／.main／.panel／.trip 各自 getBoundingClientRect() 的 top/bottom/height。
+   同時給這四個容器套 2px outline（用 outline 不用 border，不占版面、
+   box-sizing 也無感；outline-offset:-2px 避免被 overflow:hidden 的祖先裁掉），
+   浮層上有圖例對照顏色，誰蓋誰一眼看出來。浮層本身從 .bar 下緣開始（不是
+   inset:0 蓋滿全螢幕），刻意留出 topbar／logo 沒被蓋住，這樣才能再長按一次
+   logo 關閉——不然浮層蓋住 logo，開得了關不了。不啟動時只掛了 logo 上幾個
+   輕量事件監聽，零額外成本（無 timer、無常駐 DOM）。 */
+(function(){
+  let diagOn = false, diagTimer = null, overlay = null;
+  const OUTLINE = {
+    app:   ["#e33", "紅"],
+    main:  ["#2a2", "綠"],
+    panel: ["#39f", "藍"],
+    trip:  ["#f90", "橙"],
+  };
+
+  function measureDvh(){
+    const p = document.createElement("div");
+    p.style.cssText = "position:fixed;visibility:hidden;pointer-events:none;left:0;top:0;width:0;height:100dvh;";
+    document.body.appendChild(p);
+    const h = p.getBoundingClientRect().height;
+    document.body.removeChild(p);
+    return h;
+  }
+  function measureSafeArea(){
+    const p = document.createElement("div");
+    p.style.cssText = "position:fixed;visibility:hidden;pointer-events:none;left:0;top:0;" +
+      "padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);";
+    document.body.appendChild(p);
+    const cs = getComputedStyle(p);
+    const top = parseFloat(cs.paddingTop) || 0;
+    const bottom = parseFloat(cs.paddingBottom) || 0;
+    document.body.removeChild(p);
+    return {top:top, bottom:bottom};
+  }
+  function rectLine(id){
+    const el = document.getElementById(id);
+    if (!el) return id + ": (找不到元素)";
+    const r = el.getBoundingClientRect();
+    return id + ": top=" + r.top.toFixed(1) + " bottom=" + r.bottom.toFixed(1) +
+           " height=" + r.height.toFixed(1) + "  [" + OUTLINE[id][1] + "框]";
+  }
+  function refresh(){
+    if (!overlay) return;
+    const bar = document.querySelector(".bar");
+    overlay.style.top = (bar ? bar.getBoundingClientRect().bottom : 0) + "px";
+    const dvh = measureDvh();
+    const sa = measureSafeArea();
+    const rootCS = getComputedStyle(document.documentElement);
+    const vv = window.visualViewport;
+    const standalone = matchMedia("(display-mode: standalone)").matches;
+    const lines = [
+      "== 真機診斷（長按 logo 3 秒關閉）==",
+      "innerWidth/innerHeight: " + innerWidth + " / " + innerHeight,
+      "visualViewport.height: " + (vv ? vv.height.toFixed(1) : "(不支援)"),
+      "100dvh 實測: " + dvh.toFixed(1) + "px",
+      "safe-area-inset-top 實測: " + sa.top.toFixed(1) + "px",
+      "safe-area-inset-bottom 實測: " + sa.bottom.toFixed(1) + "px",
+      "display-mode standalone: " + standalone,
+      "--barh: " + rootCS.getPropertyValue("--barh").trim(),
+      "--tripup: " + (rootCS.getPropertyValue("--tripup").trim() || "(未設定)"),
+      "",
+      rectLine("app"),
+      rectLine("main"),
+      rectLine("panel"),
+      rectLine("trip"),
+    ];
+    overlay.querySelector("#diagText").textContent = lines.join("\n");
+  }
+  function applyOutlines(on){
+    Object.keys(OUTLINE).forEach(function(id){
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.outline = on ? ("2px solid " + OUTLINE[id][0]) : "";
+      el.style.outlineOffset = on ? "-2px" : "";
+    });
+  }
+  function open(){
+    diagOn = true;
+    applyOutlines(true);
+    overlay = document.createElement("div");
+    overlay.id = "diagOverlay";
+    overlay.style.cssText =
+      "position:fixed;left:0;right:0;bottom:0;top:0;z-index:99999;" +
+      "background:rgba(10,10,10,.88);color:#9f9;" +
+      "font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.6;" +
+      "padding:10px 14px 14px;overflow:auto;-webkit-user-select:text;user-select:text;";
+    const legend = document.createElement("div");
+    legend.style.cssText = "margin-bottom:8px;color:#fff;";
+    legend.innerHTML = "圖例：<span style='color:#e33'>■app</span> " +
+      "<span style='color:#2a2'>■main</span> <span style='color:#39f'>■panel</span> " +
+      "<span style='color:#f90'>■trip</span>　（長按 logo 3 秒關閉）";
+    const pre = document.createElement("pre");
+    pre.id = "diagText";
+    pre.style.cssText = "margin:0;white-space:pre-wrap;word-break:break-all;";
+    overlay.appendChild(legend);
+    overlay.appendChild(pre);
+    document.body.appendChild(overlay);
+    refresh();
+    diagTimer = setInterval(refresh, 400);
+    addEventListener("resize", refresh);
+  }
+  function close(){
+    diagOn = false;
+    applyOutlines(false);
+    clearInterval(diagTimer); diagTimer = null;
+    removeEventListener("resize", refresh);
+    if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    overlay = null;
+  }
+  function toggleDiag(){ if (diagOn) close(); else open(); }
+
+  const logo = document.getElementById("logo");
+  if (logo){
+    let pressTimer = null, sx = 0, sy = 0, moved = false;
+    const HOLD_MS = 3000, TOL = 14;
+    function begin(x, y){
+      moved = false; sx = x; sy = y;
+      clearTimeout(pressTimer);
+      pressTimer = setTimeout(function(){ if (!moved) toggleDiag(); }, HOLD_MS);
+    }
+    function trackMove(x, y){
+      if (Math.abs(x - sx) > TOL || Math.abs(y - sy) > TOL){ moved = true; clearTimeout(pressTimer); }
+    }
+    function cancelPress(){ clearTimeout(pressTimer); }
+    logo.addEventListener("touchstart", function(e){ const t = e.touches[0]; begin(t.clientX, t.clientY); }, {passive:true});
+    logo.addEventListener("touchmove", function(e){ const t = e.touches[0]; trackMove(t.clientX, t.clientY); }, {passive:true});
+    logo.addEventListener("touchend", cancelPress);
+    logo.addEventListener("touchcancel", cancelPress);
+    logo.addEventListener("mousedown", function(e){ begin(e.clientX, e.clientY); });
+    logo.addEventListener("mousemove", function(e){ if (pressTimer) trackMove(e.clientX, e.clientY); });
+    logo.addEventListener("mouseup", cancelPress);
+    logo.addEventListener("mouseleave", cancelPress);
+    logo.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+  }
 })();
 </script>
 </body>
