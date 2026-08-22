@@ -1491,8 +1491,29 @@ function renderMapBtns(){
 }
 function resizeMap(){
   if (!ready) return;
-  setTimeout(()=>map.invalidateSize(),60);
+  setTimeout(()=>map.invalidateSize({animate:false}),60);
 }
+/* #map 容器尺寸監控——通用解（2026-08-22，本人真機回報「地圖下半截灰帶未
+   載入」，根因是 Leaflet 初始化後容器尺寸變了卻沒補呼叫 invalidateSize()）。
+   會讓 #map 容器尺寸改變的時機不只「切到地圖檢視」一種：iOS standalone 高度
+   修正 JS、visualViewport 變化（鍵盤/工具列）、轉向、篩選面板展開收合改變
+   .main 高度……與其在每個時機各自補一次 invalidateSize()，這裡對 #map 本身
+   掛 ResizeObserver，尺寸一變就（debounce 後）補一次，一次覆蓋全部來源；
+   下面 resizeMap() 在檢視切換時的呼叫、iOS standalone 修正 JS 內的呼叫都繼續
+   保留，屬於同一件事的多層防線，不互斥。debounce 純粹是避免同一輪連續多次
+   ResizeObserver 回呼時重複呼叫，不依賴 requestAnimationFrame（這個工具的
+   環境裡 rAF 不觸發，見 HANDOFF §6.15，改用 setTimeout）。*/
+(function(){
+  const mapEl = document.getElementById("map");
+  if (!mapEl || typeof ResizeObserver === "undefined") return;
+  let t = null;
+  new ResizeObserver(function(){
+    if (t) clearTimeout(t);
+    t = setTimeout(function(){
+      if (ready && map) map.invalidateSize({animate:false});
+    }, 100);
+  }).observe(mapEl);
+})();
 function emphasize(id,on){
   const m=marks[id];
   if (!m) return;
@@ -2575,6 +2596,12 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
       state.active = false;
       state.appliedH = null;
     }
+    // 改寫／清掉 html／body／#app 的行內高度後，#map 容器的實際尺寸會跟著變——
+    // 上面新掛的 ResizeObserver 理論上會自己補一次 invalidateSize()，這裡額外
+    // 主動呼叫一次是第二層防線（本人指示「iOS standalone 高度修正 JS 設定高度
+    // 後主動再叫一次，含 orientationchange 分支」）：orientationchange／resize
+    // 都會呼叫這支 apply()，兩種分支都在此統一觸發，不用各自另外處理。
+    resizeMap();
   }
   apply();
   window.addEventListener("orientationchange", function(){ setTimeout(apply, 250); });
