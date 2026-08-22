@@ -45,8 +45,20 @@
      --rv-line＝鄉鎮界線虛線（紫，本人 2026-08-22 指定，與地圖底色及五方位路線色區隔）、--rv-flag＝交棒點旗標（洋紅）、
      --rv-road＝道路查詢高亮（淺水藍，本人 2026-08-22 指定：全圖層未用色，且置頂 pane 不被路線幾何蓋住）。JS 端用
      getComputedStyle 讀這三個變數，不是寫死 hex——理由跟其餘元件一致：
-     單一色值來源，深淺模式各自覆寫即可，不必在 CSS／JS 兩處各記一份。 */
+     單一色值來源，深淺模式各自覆寫即可，不必在 CSS／JS 兩處各記一份。
+     單路線審查視圖新增四色（2026-08-22 同日追加，本人核可設計）：
+     --rv-line-strong＝服務區域強調界線（跟 --rv-line 同色系加深，不是新色相）、
+     --rv-hi＝交棒點強調光圈＋常駐標籤（橘，跟既有三色區隔）、
+     --rv-corridor／--rv-shared＝過境走廊／刻意共域的淡色斜紋填色（金／青綠，
+     彼此再跟前面幾色區隔開，六色合計仍全部避開 DIRS 彩虹五色與 hubpin 紫）。 */
   --rv-line:#7b2fbf; --rv-flag:#be185d; --rv-road:#19aee6;
+  --rv-line-strong:#5b1f94; --rv-hi:#ea580c; --rv-corridor:#b9770e; --rv-shared:#0d9488;
+  /* 第四開關「代審標記」（2026-08-22 再追加，另一位代審 agent 產
+     review_annotations.json）六類分色，跟上面六色再分開一組獨立色域：
+     紅＝建議移除、橘＝建議移交、藍＝建議補畫、灰＝建議接受清單、
+     綠＝建議正常銷案、紫＝問題／未分類。 */
+  --rv-a-remove:#dc2626; --rv-a-transfer:#d97706; --rv-a-add:#2563eb;
+  --rv-a-accept:#6b7280; --rv-a-ok:#16a34a; --rv-a-q:#9333ea;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -58,6 +70,9 @@
     --danger:#c17167;
     --sb:#4a443c; --sb-hover:#6a6157;
     --rv-line:#c9a3f2; --rv-flag:#f9a8d4; --rv-road:#7fdbff;
+    --rv-line-strong:#b784f5; --rv-hi:#fb923c; --rv-corridor:#e8b34d; --rv-shared:#5eead4;
+    --rv-a-remove:#f87171; --rv-a-transfer:#fbbf24; --rv-a-add:#60a5fa;
+    --rv-a-accept:#9ca3af; --rv-a-ok:#4ade80; --rv-a-q:#c084fc;
   }
 }
 :root[data-theme="dark"]{
@@ -67,6 +82,9 @@
     --accent:#bcb2a2; --accent-soft:#2c2822; --on-accent:#17150f;
     --warn:#e0a45c;
     --rv-line:#c9a3f2; --rv-flag:#f9a8d4; --rv-road:#7fdbff;
+    --rv-line-strong:#b784f5; --rv-hi:#fb923c; --rv-corridor:#e8b34d; --rv-shared:#5eead4;
+    --rv-a-remove:#f87171; --rv-a-transfer:#fbbf24; --rv-a-add:#60a5fa;
+    --rv-a-accept:#9ca3af; --rv-a-ok:#4ade80; --rv-a-q:#c084fc;
     --danger:#c17167;
     --sb:#4a443c; --sb-hover:#6a6157;
 }
@@ -775,7 +793,11 @@ button{font:inherit; color:inherit; cursor:pointer}
 /* 審查模式（2026-08-22 新增，本人裁可，為路線驗收設計）：長按 topbar logo
    3 秒開出的選單，新增鄉鎮界線／交棒點／道路查詢三個開關，跟既有真機診斷
    共用同一個長按入口——見對應的最後一支 script。公開介面完全不受影響：
-   這層 DOM 只在長按觸發後才由 JS 建立，平常零成本（不在首屏 HTML 裡）。 */
+   這層 DOM 只在長按觸發後才由 JS 建立，平常零成本（不在首屏 HTML 裡）。
+   同日追加：①「從路線找」恰好選中一條路線時，鄉鎮界線／交棒點兩層自動切換
+   成單路線審查視圖（服務區域強調／過境走廊底紋／分段道路標籤），取消選取或
+   多選回全域畫法；②第四開關「代審標記」讀另一位代審 agent 產出的
+   review_annotations.json，與單路線視圖聯動（選中路線只顯示該路線的標記）。 */
 .review-menu{
   position:fixed; z-index:40000; top:calc(var(--barh, 56px) + 8px); left:8px;
   width:240px; max-width:calc(100vw - 16px); max-height:calc(100vh - var(--barh, 56px) - 16px);
@@ -828,6 +850,33 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 .rvflag{display:grid; place-items:center; width:20px; height:20px}
 .rvflag svg{width:18px; height:18px; filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}
+/* 單路線審查視圖——交棒點強調／淡化（2026-08-22 追加，本人核可設計）：
+   emphasize 用光圈（同色 drop-shadow 疊兩層），dim 只降不透明度，兩者互斥，
+   一般（無單路線選取）情況兩個 class 都不會被加上，圖示維持原樣。 */
+.rvflag-hi svg{filter:drop-shadow(0 1px 2px rgba(0,0,0,.45)) drop-shadow(0 0 5px var(--rv-hi)) drop-shadow(0 0 2px var(--rv-hi))}
+.rvflag-dim{opacity:.38}
+/* 交棒點常駐標籤（單路線視圖才會 bindTooltip permanent:true）：拿掉 Leaflet
+   預設的方向箭頭與底色，換成跟旗標同色的小膠囊。 */
+.leaflet-tooltip.rv-hoff-tip{
+  background:var(--panel); color:var(--rv-hi); border:1px solid var(--rv-hi);
+  border-radius:999px; padding:2px 8px; font-size:11px; font-weight:700;
+  box-shadow:0 2px 6px rgba(0,0,0,.25);
+}
+.leaflet-tooltip.rv-hoff-tip::before{display:none}
+/* 分段道路標籤（單路線審查視圖，本人 2026-08-22 追加指示）：純 HTML 小膠囊，
+   同 .rvtownlabel 的「直接吃 CSS 變數」做法，跟服務區域強調界線同一個
+   --rv-line-strong 色，視覺上讀成「這條被選中路線自己的資訊」。 */
+.rvseglabel{
+  font-size:10.5px; font-weight:700; white-space:nowrap; pointer-events:none;
+  color:var(--rv-line-strong); background:var(--panel); border:1px solid var(--rv-line-strong);
+  border-radius:999px; padding:1px 7px; box-shadow:0 1px 3px rgba(0,0,0,.25);
+}
+/* 代審標記圓標（第四開關，2026-08-22 再追加）：純 HTML divIcon，六類顏色
+   由 JS 端依分類挑一個 --rv-a-* 變數塞進 inline style，同樣不必 getComputedStyle。 */
+.rvanno-dot{
+  display:block; width:14px; height:14px; border-radius:50%;
+  border:2px solid var(--panel); box-shadow:0 1px 3px rgba(0,0,0,.4);
+}
 
 @media (prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important} }
 </style>
@@ -2987,7 +3036,7 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
 </script>
 <script>
 /* 審查模式（2026-08-22 新增，本人裁可，為路線驗收設計——見任務指示與
-   HANDOFF §6.35）。長按 topbar logo 3 秒開出的小選單，三個開關：
+   HANDOFF §6.35／§6.36）。長按 topbar logo 3 秒開出的小選單，四個開關：
 
      ①鄉鎮界線：從 review_layers.json 的 town_rings 畫虛線描邊多邊形，
        縮放到 TOWN_LABEL_ZOOM 以上才疊字（避免縮小時糊成一片）。
@@ -3000,32 +3049,70 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
        寫法），畫成高對比色（--rv-road）疊在地圖上；再查一次先清掉上一次
        結果；逾時（15 秒）或失敗只在選單裡顯示一行訊息，不拋錯、不擋其他
        功能。這項要連網，Overpass 被限流時會查不到。
+     ④代審標記（2026-08-22 再追加）：另一位代審 agent 產出的
+       review_annotations.json，依分類著色的小圓標，點開看現象／建議／依據／
+       信心。跟①②同一種「本地靜態檔＋載不到就 disable」路數，檔案不存在時
+       (產出中還沒寫檔)選單顯示不可用、不拋錯、不擋其他三項。
 
-   ①②的資料是本地靜態檔（fetch('./review_layers.json')，跟 index.html
-   同層，build.py／publish.py 複製過去）；載不到就把這兩個開關 disable
-   掉、選單裡留一行說明，③不受影響（它本來就是另一條網路路徑）。
+   ①②④的資料是本地靜態檔（fetch，跟 index.html 同層，build.py／publish.py
+   複製過去）；載不到就把對應開關 disable 掉、選單裡留一行說明，③不受影響
+   （它本來就是另一條網路路徑）。
+
+   **單路線審查視圖**（同日追加，本人核可設計）：「從路線找」恰好選中一條
+   路線時（S.route.size===1），①②④自動切換成「這條路線」的強調畫法——
+   ①選中路線的服務鄉鎮界線實線加粗、其餘鄉鎮界線極淡虛線（保留參照不隱藏），
+   外加過境走廊／刻意共域的淡色底紋、分段道路名標籤；②屬於這條路線的交棒點
+   放大＋橘色光圈＋常駐標籤，其餘縮小淡化；④只顯示這條路線的代審標記。
+   取消選取或多選，回到原本的全域畫法。偵測沿用 S.route（主程式 script #1
+   的既有篩選狀態，不新開一份），做法是把主程式的 render()（每次任何狀態變動
+   都會呼叫，見該檔「狀態」節附近的呼叫慣例）包一層：原函式照樣執行，執行完
+   多呼叫一次 syncSingleRouteView() 比對 S.route 有沒有變成「恰好一條」，變了
+   才重繪，沒變就是一次 Set size 比較，對一般模式／其餘篩選操作是可忽略的
+   額外成本，且完全不改動 render() 本體或任一個既有呼叫點。
 
    公開介面不變：這裡的 DOM／圖層一律等使用者長按 logo 才建立，一般模式
-   （不長按）完全不會碰到這支 script 的任何一行副作用。跟真機診斷共用同一個
-   長按入口，見上一支 script 尾端「logo 長按」那段——這支負責選單本身跟三個
+   （不長按）完全不會碰到這支 script 的任何一行副作用（render() 的包裝雖然
+   永遠生效，但 rvActivated 在從未開過選單時恆為 false，包裝函式進來只做一次
+   布林判斷就返回，不建立任何 DOM／不發任何網路請求）。跟真機診斷共用同一個
+   長按入口，見上一支 script 尾端「logo 長按」那段——這支負責選單本身跟四個
    審查圖層，真機診斷維持原本那支 script 的實作，本支只透過 window.__toggleDiag
    呼叫它。
 
-   全域變數 map／L／engine／ready／DARK／esc／SYS 直接沿用主程式 script
-   （script #1）——同一份文件內多個 <script> 標籤的頂層 let/const 本來就共享
-   同一個全域字彙範圍，這裡不必也不應該再用 window.__ 橋接一次（已用一個
-   最小的內嵌測試頁核實過這件事）；只有要跨「IIFE 內部」的東西（例如上一支
-   script 的 toggleDiag）才需要掛 window.__，這是本檔既有的慣例
-   （window.__iosStandaloneFix 同理）。 */
+   全域變數 map／L／engine／ready／DARK／esc／SYS／S／render 直接沿用主程式
+   script（script #1）——同一份文件內多個 <script> 標籤的頂層 let/const／
+   function 宣告本來就共享同一個全域字彙範圍，這裡不必也不應該再用 window.__
+   橋接一次（已用一個最小的內嵌測試頁核實過這件事）；只有要跨「IIFE 內部」的
+   東西（例如上一支 script 的 toggleDiag）才需要掛 window.__，這是本檔既有的
+   慣例（window.__iosStandaloneFix 同理）。 */
 (function(){
   let menu = null, menuOpen = false;
   let rvData = null, rvDataPromise = null, rvDataFailed = false;
-  let rvTownOn = false, rvHandoffOn = false, rvRoadOn = false;
+  let rvAnnoData = null, rvAnnoPromise = null, rvAnnoFailed = false;
+  let rvTownOn = false, rvHandoffOn = false, rvRoadOn = false, rvAnnoOn = false;
   let rvTownLayer = null, rvTownLabelLayer = null, rvHandoffLayer = null, rvRoadLayer = null;
+  let rvCorridorLayer = null, rvSegLabelLayer = null, rvAnnoLayer = null;
   let rvZoomHooked = false;
   let rvRoadAbort = null;
+  // 單路線審查視圖狀態：rvSingleRoute 是目前鎖定的路線 id 或 null（未選／多選）；
+  // rvActivated 記「使用者是否至少開過一次審查選單」——見 buildMenu() 設它為
+  // true，render() 包裝函式靠它決定要不要跑任何比對（見檔頭說明）。
+  let rvSingleRoute = null, rvActivated = false;
   const TOWN_LABEL_ZOOM = 12;
+  const SEG_LABEL_ZOOM = 14;      // 分段道路標籤縮放門檻（本人 2026-08-22 追加指示，
+                                    // 建議 z<12 全隱藏，自行調到觀感對）：實測 hsinpu
+                                    // （11 段裡 9 段通過長度閘門）在 z13 時最近的一對
+                                    // 標籤（縣118／竹13）中心距僅 ~51px、兩個膠囊邊緣
+                                    // 只剩 ~11px 空隙，偏擠；z14 同一對中心距 ~105px、
+                                    // 邊緣空隙 ~65px，讀起來舒服。比鄉鎮名門檻(12)高
+                                    // 兩級是因為路名標籤密度天生比鄉鎮名高（一條路線
+                                    // 十幾段 vs 一顆鄉鎮一個名字），見 HANDOFF §6.36。
+  const SEG_MIN_KM = 0.5;          // 防花閘門②：合併後段長 <500m 不標
+  const SEG_MERGE_KM = 0.08;       // 防花閘門①：相鄰同標籤段合併只標一次
+                                    // （端點距離門檻，約 80m，跟本地索引比對半徑
+                                    // 50m 同量級再放寬一點，容納 simplify 造成的
+                                    // 端點小幅位移）
   const REVIEW_JSON_URL = "./review_layers.json";
+  const REVIEW_ANNO_URL = "./review_annotations.json";
   const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
 
   function cssVar(name){
@@ -3041,11 +3128,15 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
       rvTownLayer = L.layerGroup();
       rvTownLabelLayer = L.layerGroup();
       rvHandoffLayer = L.layerGroup();
+      rvCorridorLayer = L.layerGroup();
+      rvSegLabelLayer = L.layerGroup();
+      rvAnnoLayer = L.layerGroup();
       if (!map.getPane("rvroad")) { map.createPane("rvroad").style.zIndex = 660; }
       rvRoadLayer = L.layerGroup();
     }
     if (!rvZoomHooked){
       map.on("zoomend", updateTownLabelVisibility);
+      map.on("zoomend", updateSegLabelVisibility);
       rvZoomHooked = true;
     }
     return true;
@@ -3058,24 +3149,56 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
       rvDataPromise = fetch(REVIEW_JSON_URL).then(function(r){
         if (!r.ok) throw new Error("http " + r.status);
         return r.json();
-      }).then(function(d){ rvData = d; return d; }).catch(function(err){
+      }).then(function(d){
+        rvData = d;
+        // 資料剛到位時，若使用者已經選好單路線（在資料還沒載完前就選了），
+        // 順便補畫一次——不然要等下一次 render() 觸發的 syncSingleRouteView()
+        // 才會發現「原來已經有資料了」，多等一輪使用者感覺得到的延遲。
+        applySingleRouteView();
+        return d;
+      }).catch(function(err){
         rvDataFailed = true; rvDataPromise = null; throw err;
       });
     }
     return rvDataPromise;
   }
 
+  function loadAnnotations(){
+    if (rvAnnoData) return Promise.resolve(rvAnnoData);
+    if (rvAnnoFailed) return Promise.reject(new Error("review_annotations.json 先前已載入失敗"));
+    if (!rvAnnoPromise){
+      rvAnnoPromise = fetch(REVIEW_ANNO_URL).then(function(r){
+        if (!r.ok) throw new Error("http " + r.status);
+        return r.json();
+      }).then(function(d){ rvAnnoData = d; applySingleRouteView(); return d; }).catch(function(err){
+        rvAnnoFailed = true; rvAnnoPromise = null; throw err;
+      });
+    }
+    return rvAnnoPromise;
+  }
+
   function renderTowns(data){
     rvTownLayer.clearLayers(); rvTownLabelLayer.clearLayers();
     const color = cssVar("--rv-line");
     const rings = data.town_rings || {};
+    // 單路線審查視圖：rvSingleRoute 非 null 時，選中路線的服務鄉鎮（service_towns）
+    // 界線實線加粗（同色系加深，--rv-line-strong），其餘鄉鎮界線極淡虛線（保留
+    // 參照，不隱藏）；rvSingleRoute 為 null（一般情況）畫法跟改動前逐位元組相同。
+    const svc = rvSingleRoute && data.routes && data.routes[rvSingleRoute]
+      ? new Set(data.routes[rvSingleRoute].service_towns || []) : null;
+    const strong = svc ? cssVar("--rv-line-strong") : null;
     Object.keys(rings).forEach(function(name){
+      let style;
+      if (!svc){
+        style = {color: color, weight: 1.5, dashArray: "6 5", fill: false};
+      } else if (svc.has(name)){
+        style = {color: strong, weight: 3, fill: false};
+      } else {
+        style = {color: color, weight: 1, dashArray: "2 6", opacity: .2, fill: false};
+      }
       (rings[name] || []).forEach(function(ring){
         if (!ring || ring.length < 3) return;
-        L.polygon(ring, {
-          color: color, weight: 1.5, dashArray: "6 5", fill: false,
-          interactive: false, bubblingMouseEvents: false,
-        }).addTo(rvTownLayer);
+        L.polygon(ring, Object.assign({interactive: false, bubblingMouseEvents: false}, style)).addTo(rvTownLayer);
       });
       const first = (rings[name] || [])[0];
       if (first && first.length){
@@ -3094,21 +3217,39 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
   function renderHandoffs(data){
     rvHandoffLayer.clearLayers();
     const color = cssVar("--rv-flag");
-    (data.handoffs || []).forEach(function(h){
+    // 單路線審查視圖：屬於選中路線的交棒點（data.routes[route].handoff_ids，
+    // export_review_layers.py 已算好，雙向都算）放大＋橘色光圈＋常駐標籤；
+    // 其餘縮小淡化。rvSingleRoute 為 null 時逐位元組維持原本畫法。
+    const hi = rvSingleRoute ? cssVar("--rv-hi") : null;
+    const relevant = rvSingleRoute && data.routes && data.routes[rvSingleRoute]
+      ? new Set(data.routes[rvSingleRoute].handoff_ids || []) : null;
+    (data.handoffs || []).forEach(function(h, idx){
       if (!h.point) return;
+      const emph = !!(relevant && relevant.has(idx));
+      const dim = !!(relevant && !emph);
+      const size = emph ? 26 : (dim ? 13 : 20);
+      const iconColor = emph ? hi : color;
+      const cls = "rvflag" + (emph ? " rvflag-hi" : "") + (dim ? " rvflag-dim" : "");
       const icon = L.divIcon({
         className: "",
-        html: '<div class="rvflag" style="color:' + color + '">' +
+        html: '<div class="' + cls + '" style="width:' + size + 'px;height:' + size + 'px;color:' + iconColor + '">' +
               '<svg viewBox="0 0 16 16"><path d="M3 14.5V1.5h9.5l-2.3 3.3 2.3 3.3H3" ' +
               'fill="currentColor" stroke="none"/></svg></div>',
-        iconSize: [20, 20], iconAnchor: [2, 20],
+        iconSize: [size, size], iconAnchor: [size * 0.1, size],
       });
-      const m = L.marker(h.point, {icon: icon, zIndexOffset: 600});
+      const m = L.marker(h.point, {icon: icon, zIndexOffset: emph ? 900 : 600});
       const road = h.road ? esc(h.road) : "（未記道路名）";
       m.bindPopup(
         '<b>' + esc(h.route_name || h.route) + ' ↔ ' + esc(h.neighbor_name || h.neighbor) + '</b>' +
         '<br>' + road + (h.name ? '<br><span style="color:var(--ink3);font-size:11.5px">' + esc(h.name) + '</span>' : "")
       );
+      if (emph){
+        // 常駐標籤：不用等點擊，直接標出「↔對方路線名（道路）」——對方路線是
+        // route／neighbor 哪一側取決於選中的是哪一邊（去重後每筆只留一側記帳）。
+        const otherName = (h.route === rvSingleRoute) ? (h.neighbor_name || h.neighbor) : (h.route_name || h.route);
+        m.bindTooltip('↔ ' + esc(otherName) + (h.road ? '（' + road + '）' : ''),
+          {permanent: true, direction: "top", offset: [0, -size + 4], className: "rv-hoff-tip"});
+      }
       m.addTo(rvHandoffLayer);
     });
   }
@@ -3123,10 +3264,16 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
 
   // 主題切換／系統跟隨切換時只重繪顏色，不重建整層——applyTheme() 更新的
   // DARK 跟這裡的 cssVar() 讀值是同一份 CSS 變數，兩邊各自更新互不干涉。
+  // 過境走廊／刻意共域底紋（renderCorridors）一樣是 JS 讀 cssVar() 塞進 SVG
+  // inline style，理由跟 renderTowns／renderHandoffs 相同，一併補上重繪；分段
+  // 道路標籤（.rvseglabel）跟代審標記圓標（.rvanno-dot）是純 HTML 直接吃
+  // var()，主題切換時瀏覽器自己重新算 CSS，不需要 JS 介入重繪。
   function reapplyColors(){
-    if (!rvData) return;
-    if (rvTownOn) renderTowns(rvData);
-    if (rvHandoffOn) renderHandoffs(rvData);
+    if (rvData){
+      if (rvTownOn) renderTowns(rvData);
+      if (rvHandoffOn) renderHandoffs(rvData);
+      if (rvSingleRoute) renderCorridors(rvData);
+    }
   }
   const themeBtn = document.getElementById("theme");
   if (themeBtn) themeBtn.addEventListener("click", reapplyColors);
@@ -3141,6 +3288,252 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     });
     const note = document.getElementById("rvNote");
     if (note) note.textContent = msg;
+  }
+
+  function disableAnnoToggle(msg){
+    const b = document.getElementById("rvAnnoBtn");
+    if (b) b.disabled = true;
+    const note = document.getElementById("rvAnnoNote");
+    if (note) note.textContent = msg;
+  }
+
+  // ════════ 過境走廊／刻意共域底紋（單路線審查視圖，任務③） ════════
+  function renderCorridors(data){
+    if (!rvCorridorLayer) return;
+    rvCorridorLayer.clearLayers();
+    if (!rvSingleRoute || !data.routes) return;
+    const rv = data.routes[rvSingleRoute];
+    if (!rv) return;
+    const rings = data.town_rings || {};
+    const corridorColor = cssVar("--rv-corridor");
+    const sharedColor = cssVar("--rv-shared");
+    function drawArea(town, color, popupHtml){
+      (rings[town] || []).forEach(function(ring){
+        if (!ring || ring.length < 3) return;
+        L.polygon(ring, {
+          color: color, weight: 1, dashArray: "3 5", fillColor: color, fillOpacity: .16,
+          bubblingMouseEvents: false,
+        }).bindPopup(popupHtml).addTo(rvCorridorLayer);
+      });
+    }
+    (rv.corridors || []).forEach(function(c){
+      if (!c.town) return;
+      drawArea(c.town, corridorColor,
+        '<b>過境走廊・' + esc(c.town) + '</b><br>' + esc(c.reason || "（無記錄理由）"));
+    });
+    (rv.shared_area || []).forEach(function(s){
+      if (!s.town) return;
+      const withName = (data.routes[s.with] && data.routes[s.with].name) || s.with;
+      drawArea(s.town, sharedColor,
+        '<b>刻意共域・' + esc(s.town) + '</b><br>與「' + esc(withName) + '」共域，不是查詢範圍設錯。' +
+        (s.reason ? '<br>' + esc(s.reason) : ""));
+    });
+  }
+
+  // ════════ 分段道路名標籤（單路線審查視圖，2026-08-22 本人追加指示） ════════
+  // review_layers.json 的 route_segments[route] 是每一段（road_geom.json 的
+  // chain）各自的標籤／中點／端點／長度，「相鄰同標籤段合併只標一次」這件事
+  // 留在前端做（見任務指示）：export_review_layers.py 只給原始每段資料，
+  // 這裡用端點距離判斷是否接續（同標籤＋端點夠近），Union-Find 分組。
+  function segDist(p, q){
+    const R = 6371, toRad = Math.PI / 180;
+    const dLat = (q[0] - p[0]) * toRad, dLon = (q[1] - p[1]) * toRad;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(p[0] * toRad) * Math.cos(q[0] * toRad) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+  function mergeSegments(segs){
+    const n = segs.length;
+    const parent = segs.map(function(_, i){ return i; });
+    function find(i){ while (parent[i] !== i){ parent[i] = parent[parent[i]]; i = parent[i]; } return i; }
+    function union(i, j){ const a = find(i), b = find(j); if (a !== b) parent[a] = b; }
+    for (let i = 0; i < n; i++){
+      for (let j = i + 1; j < n; j++){
+        if (segs[i].label !== segs[j].label) continue;
+        const endsI = [segs[i].a, segs[i].b], endsJ = [segs[j].a, segs[j].b];
+        let near = false;
+        endsI.forEach(function(p){ endsJ.forEach(function(q){ if (segDist(p, q) <= SEG_MERGE_KM) near = true; }); });
+        if (near) union(i, j);
+      }
+    }
+    const groups = {};
+    segs.forEach(function(s, i){
+      const r = find(i);
+      (groups[r] = groups[r] || []).push(s);
+    });
+    return Object.keys(groups).map(function(k){
+      const members = groups[k];
+      const totalKm = members.reduce(function(s, m){ return s + m.km; }, 0);
+      let latSum = 0, lonSum = 0;
+      members.forEach(function(m){ latSum += m.mid[0] * m.km; lonSum += m.mid[1] * m.km; });
+      const mid = totalKm > 0 ? [latSum / totalKm, lonSum / totalKm] : members[0].mid;
+      return {label: members[0].label, km: totalKm, mid: mid};
+    });
+  }
+  function renderSegLabels(data){
+    if (!rvSegLabelLayer) return;
+    rvSegLabelLayer.clearLayers();
+    if (!rvSingleRoute) return;
+    const segs = (data.route_segments && data.route_segments[rvSingleRoute]) || [];
+    if (!segs.length) return;
+    const merged = mergeSegments(segs).filter(function(g){ return g.km >= SEG_MIN_KM; });
+    merged.forEach(function(g){
+      L.marker(g.mid, {
+        icon: L.divIcon({
+          className: "", html: '<span class="rvseglabel">' + esc(g.label) + '</span>', iconSize: [0, 0],
+        }),
+        interactive: false,
+      }).addTo(rvSegLabelLayer);
+    });
+  }
+  function updateSegLabelVisibility(){
+    if (!mapReady() || !rvSegLabelLayer) return;
+    const show = !!rvSingleRoute && map.getZoom() >= SEG_LABEL_ZOOM;
+    const has = map.hasLayer(rvSegLabelLayer);
+    if (show && !has) map.addLayer(rvSegLabelLayer);
+    else if (!show && has) map.removeLayer(rvSegLabelLayer);
+  }
+
+  // ════════ 代審標記（第四開關，2026-08-22 再追加） ════════
+  // 另一位代審 agent 產出 review_annotations.json：真實 schema（2026-08-23
+  // 核對過實際檔案）是 {routes:{route_id:{route_name,summary,counts,
+  // findings:[{id,route,route_name,kind,coords,road,observation,
+  // recommendation,basis,confidence,color}]}}}——coords 是 1～2 點的陣列
+  // （單點 finding 或一段邊的兩端點），分類看 recommendation／color（中文
+  // 字面值，跟 color_legend 一致：紅／橘／藍／灰／綠／紫問號）。kind 是
+  // 「這是哪種檢查器抓到的」（edges/coverage/visual_gap/adjacency…），
+  // **不是**分類色，容易跟 category 系欄位混淆，取值時刻意排在最後備援。
+  // 主線對準這個真實 schema，同時保留幾個防禦性 fallback 欄位名，避免格式
+  // 之後小調時整批消失或報錯。
+  function flattenAnnotations(data){
+    if (Array.isArray(data)) return data;
+    if (data.routes && typeof data.routes === "object" && !Array.isArray(data.routes)){
+      const out = [];
+      Object.keys(data.routes).forEach(function(rid){
+        const rv = data.routes[rid];
+        (rv && rv.findings || []).forEach(function(f){ out.push(f); });
+      });
+      return out;
+    }
+    return data.annotations || data.items || data.rows || data.records || [];
+  }
+  function annoLatLng(a){
+    if (Array.isArray(a.coords) && a.coords.length){
+      if (a.coords.length === 1) return a.coords[0];
+      // 兩點（邊／缺口型 finding）：取中點當標記位置，足夠指出約略地點，
+      // 不需要真的畫一條線。
+      let sLat = 0, sLon = 0;
+      a.coords.forEach(function(p){ sLat += p[0]; sLon += p[1]; });
+      return [sLat / a.coords.length, sLon / a.coords.length];
+    }
+    if (Array.isArray(a.point) && a.point.length === 2) return a.point;
+    if (Array.isArray(a.coord) && a.coord.length === 2) return a.coord;
+    if (Array.isArray(a.latlng) && a.latlng.length === 2) return a.latlng;
+    if (typeof a.lat === "number" && typeof a.lng === "number") return [a.lat, a.lng];
+    if (typeof a.lat === "number" && typeof a.lon === "number") return [a.lat, a.lon];
+    return null;
+  }
+  function classifyAnno(raw){
+    const s = String(raw || "");
+    const rules = [
+      [/移除|^red$|紅/i, "--rv-a-remove", "建議移除"],
+      [/移交|^orange$|橘/i, "--rv-a-transfer", "建議移交"],
+      [/補畫|補繪|^blue$|藍/i, "--rv-a-add", "建議補畫"],
+      [/接受|^gray$|^grey$|灰/i, "--rv-a-accept", "建議接受清單"],
+      [/正常|銷案|^green$|綠/i, "--rv-a-ok", "建議正常銷案"],
+      [/問題|^purple$|紫|\?/, "--rv-a-q", "問題"],
+    ];
+    for (let i = 0; i < rules.length; i++){
+      if (rules[i][0].test(s)) return {css: rules[i][1], label: rules[i][2]};
+    }
+    return {css: "--rv-a-q", label: s || "（未分類）"};
+  }
+  function renderAnnotations(data){
+    if (!rvAnnoLayer) return;
+    rvAnnoLayer.clearLayers();
+    const list = flattenAnnotations(data);
+    list.forEach(function(a){
+      const route = a.route || a.route_id || a.rid || a.rt || "";
+      // 與單路線視圖聯動：選中路線只顯示該路線的標記，未選（rvSingleRoute
+      // 為 null）顯示全部——沒有 route 欄位的記錄視為「不特定路線」，兩種
+      // 情況都放行顯示，不因為欄位缺失而消失。
+      if (rvSingleRoute && route && route !== rvSingleRoute) return;
+      const pt = annoLatLng(a);
+      if (!pt) return;
+      // recommendation／color 是真實 schema 的分類欄位，優先讀；kind 是
+      // 「哪種檢查器」而非分類色，排最後備援，避免把它誤讀成分類。
+      const rawCat = a.recommendation || a.color || a.category || a.type || a.cls || a.mark || a.classification || a.kind || "";
+      const cat = classifyAnno(rawCat);
+      const icon = L.divIcon({
+        className: "",
+        html: '<span class="rvanno-dot" style="background:var(' + cat.css + ');border-color:var(--panel)"></span>',
+        iconSize: [14, 14], iconAnchor: [7, 7],
+      });
+      const m = L.marker(pt, {icon: icon, zIndexOffset: 700});
+      const routeName = a.route_name
+        || (rvData && rvData.routes && rvData.routes[route] && rvData.routes[route].name) || route;
+      const road = a.road || a.road_name || a.name || "";
+      const kindHtml = a.kind ? '<br><span style="color:var(--ink3);font-size:11px">類型：' + esc(a.kind) + '</span>' : "";
+      m.bindPopup(
+        '<b>' + esc(cat.label) + '</b>' +
+        (routeName ? '<br>路線：' + esc(routeName) : "") +
+        (road ? '<br>路名：' + esc(road) : "") +
+        '<br>現象：' + esc(a.observation || a.phenomenon || a.issue || a.finding || "（無記錄）") +
+        '<br>建議：' + esc(a.recommendation || a.suggestion || a.recommend || a.advice || "（無記錄）") +
+        '<br>依據：' + esc(a.basis || a.evidence || a.reason || "（無記錄）") +
+        '<br>信心：' + esc(String(a.confidence != null && a.confidence !== "" ? a.confidence : "（無記錄）")) +
+        kindHtml
+      );
+      m.addTo(rvAnnoLayer);
+    });
+  }
+  function onToggleAnno(){
+    if (!ensureLayers()) return;
+    rvAnnoOn = !rvAnnoOn;
+    const btn = document.getElementById("rvAnnoBtn");
+    setPressed(btn, rvAnnoOn);
+    if (rvAnnoOn){
+      loadAnnotations().then(function(d){
+        renderAnnotations(d);
+        map.addLayer(rvAnnoLayer);
+      }).catch(function(){
+        rvAnnoOn = false; setPressed(btn, false);
+        disableAnnoToggle("代審標記資料尚未產出或載入失敗（review_annotations.json），這項暫時不可用，不影響其他功能。");
+      });
+    } else {
+      map.removeLayer(rvAnnoLayer);
+    }
+  }
+
+  // ════════ 單路線審查視圖：偵測與套用 ════════
+  // syncSingleRouteView() 由檔尾 render() 包裝函式每次呼叫；rvActivated 是
+  // 「使用者開過選單」的旗標（見 buildMenu()），沒開過選單這支整支提早返回，
+  // 對一般模式零成本。sel 沒變化也提早返回，避免 render() 高頻呼叫時每次都
+  // 重繪審查圖層。
+  function syncSingleRouteView(){
+    if (!rvActivated || !mapReady()) return;
+    const sel = (typeof S !== "undefined" && S && S.route && S.route.size === 1) ? [...S.route][0] : null;
+    if (sel === rvSingleRoute) return;
+    rvSingleRoute = sel;
+    applySingleRouteView();
+  }
+  function applySingleRouteView(){
+    if (!ensureLayers()) return;
+    if (rvData){
+      if (rvTownOn){ renderTowns(rvData); if (!map.hasLayer(rvTownLayer)) map.addLayer(rvTownLayer); updateTownLabelVisibility(); }
+      if (rvHandoffOn){ renderHandoffs(rvData); if (!map.hasLayer(rvHandoffLayer)) map.addLayer(rvHandoffLayer); }
+      renderCorridors(rvData);
+      if (rvSingleRoute){
+        if (!map.hasLayer(rvCorridorLayer)) map.addLayer(rvCorridorLayer);
+      } else if (map.hasLayer(rvCorridorLayer)){
+        map.removeLayer(rvCorridorLayer);
+      }
+      renderSegLabels(rvData);
+      updateSegLabelVisibility();
+    }
+    if (rvAnnoOn && rvAnnoData){
+      renderAnnotations(rvAnnoData);
+      if (!map.hasLayer(rvAnnoLayer)) map.addLayer(rvAnnoLayer);
+    }
   }
 
   function onToggleTown(){
@@ -3257,6 +3650,9 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
   }
 
   function buildMenu(){
+    // 使用者至少開過一次選單——單路線審查視圖從這一刻起才會在 render() 裡
+    // 動作（見 syncSingleRouteView() 開頭的 rvActivated 判斷）。
+    rvActivated = true;
     menu = document.createElement("div");
     menu.className = "review-menu";
     menu.innerHTML =
@@ -3264,13 +3660,18 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
       '<button type="button" class="rvdiag" id="rvDiagBtn">真機診斷（量測浮層）</button>' +
       '<hr>' +
       '<div class="rvrow">' +
-        '<div class="rvlabel">鄉鎮界線<span class="rvsub">虛線描邊，放大後顯示鄉鎮名</span></div>' +
+        '<div class="rvlabel">鄉鎮界線<span class="rvsub">虛線描邊，放大後顯示鄉鎮名；選中單一路線時強調服務區域</span></div>' +
         '<button type="button" class="rvtoggle" id="rvTownBtn" aria-pressed="false">開</button>' +
       '</div>' +
       '<div class="rvrow">' +
         '<div class="rvlabel">交棒點<span class="rvsub">路線接棒的旗標，點擊看兩側路線</span></div>' +
         '<button type="button" class="rvtoggle" id="rvHandoffBtn" aria-pressed="false">開</button>' +
       '</div>' +
+      '<div class="rvrow">' +
+        '<div class="rvlabel">代審標記<span class="rvsub">依分類著色的小圓標，點開看完整內容</span></div>' +
+        '<button type="button" class="rvtoggle" id="rvAnnoBtn" aria-pressed="false">開</button>' +
+      '</div>' +
+      '<div class="rvnote" id="rvAnnoNote"></div>' +
       '<div class="rvrow">' +
         '<div class="rvlabel">道路查詢<span class="rvsub">查目前視野內的道路（需連網）</span></div>' +
         '<button type="button" class="rvtoggle" id="rvRoadBtn" aria-pressed="false">開</button>' +
@@ -3290,6 +3691,7 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     };
     document.getElementById("rvTownBtn").onclick = onToggleTown;
     document.getElementById("rvHandoffBtn").onclick = onToggleHandoff;
+    document.getElementById("rvAnnoBtn").onclick = onToggleAnno;
     document.getElementById("rvRoadBtn").onclick = onToggleRoad;
     document.getElementById("rvRoadGo").onclick = runRoadQuery;
     document.getElementById("rvRoadInput").addEventListener("keydown", function(e){
@@ -3299,6 +3701,7 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     // 選單關掉重開，圖層開關狀態不歸零——套回目前實際狀態，不是每次都重置。
     setPressed(document.getElementById("rvTownBtn"), rvTownOn);
     setPressed(document.getElementById("rvHandoffBtn"), rvHandoffOn);
+    setPressed(document.getElementById("rvAnnoBtn"), rvAnnoOn);
     setPressed(document.getElementById("rvRoadBtn"), rvRoadOn);
     document.getElementById("rvRoadBox").classList.toggle("on", rvRoadOn);
 
@@ -3313,6 +3716,20 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     } else if (rvDataFailed){
       disableDataToggles("鄉鎮界線／交棒點資料載不到（review_layers.json），這兩項暫時不可用；道路查詢不受影響。");
     }
+    // 代審標記是獨立檔案、獨立失敗模式，跟上面①②的探測平行、不互相影響——
+    // 那個代審 agent 併行產出 review_annotations.json，本輪收尾時檔案可能
+    // 還不存在，這裡的探測會 404 失敗，直接 disable 這一項並顯示說明，不報錯、
+    // 不影響其他三項；檔案之後補上時，下次長按重開選單會自動探測成功。
+    if (!rvAnnoData && !rvAnnoFailed){
+      loadAnnotations().catch(function(){
+        disableAnnoToggle("代審標記資料尚未產出或載入失敗（review_annotations.json），這項暫時不可用，不影響其他功能。");
+      });
+    } else if (rvAnnoFailed){
+      disableAnnoToggle("代審標記資料尚未產出或載入失敗（review_annotations.json），這項暫時不可用，不影響其他功能。");
+    }
+    // 選單一開，若地圖已就緒且已經恰好選中一條路線（例如使用者先選好路線
+    // 才想到要開審查模式），立刻套用單路線審查視圖，不用等下一次 render()。
+    if (mapReady()) syncSingleRouteView();
   }
 
   function closeMenu(){
@@ -3329,6 +3746,22 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
   // 在上一支 script 裡，那是另一個 IIFE，叫不到這裡的 toggleReviewMenu，
   // 得掛一份到 window。
   window.__toggleReviewMenu = toggleReviewMenu;
+
+  // 單路線審查視圖的偵測掛鉤（見檔頭說明）：包一層 script #1 的 render()——
+  // render 是那支 script 裡用 `function render(){...}` 宣告的頂層函式，跟
+  // map／L／S 等變數同一個共享全域字彙範圍，這裡可以直接讀到、也可以直接
+  // 重新賦值；render() 本體與 script #1 裡所有呼叫 render() 的地方（filter
+  // 變動／行程變動／檢視切換／主題切換…）完全沒有改一個字，因為 JS 對
+  // 識別字的查找是「呼叫當下」才解析，重新賦值後所有既有呼叫點下一次執行
+  // 時自然會叫到這個包裝版本。包裝函式本體只在 rvActivated 為 true（使用者
+  // 開過審查選單）時才做任何事，一般模式下多出的成本只有一次布林判斷。
+  if (typeof render === "function"){
+    const _renderCore = render;
+    render = function(){
+      _renderCore.apply(this, arguments);
+      syncSingleRouteView();
+    };
+  }
 })();
 </script>
 </body>

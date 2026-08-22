@@ -1,0 +1,2541 @@
+{
+ "_comment": "代審預判標記層——本人尚未裁決前的機器/agent預判，非最終判決。前端讀此檔畫標記，色碼見 color_legend。座標原樣未裁位數。",
+ "generated": "2026-08-23",
+ "generated_by": "代審 agent（本人裁決風格判例庫：HANDOFF.md 5 根因表、6.29~6.35、7 紅線）",
+ "method": "四律：邊界律／代表性律／連通律／容忍律；校準原則：忽略既有嚴重度標籤、從九支檢查器＋status.py 原始訊號重推，已審路線一併重掃比對是否退回；拿不準一律標「問題」不標「建議」。",
+ "color_legend": {
+  "建議移除": "紅",
+  "建議移交": "橘",
+  "建議補畫": "藍",
+  "建議接受清單": "灰",
+  "建議正常銷案": "綠",
+  "問題": "紫問號"
+ },
+ "totals": {
+  "正常銷案": 40,
+  "補畫": 2,
+  "問題": 54,
+  "移除": 3,
+  "移交": 2,
+  "接受清單": 4
+ },
+ "total_findings": 105,
+ "routes": {
+  "hsinpu": {
+   "route_name": "縣118｜竹北・新埔",
+   "summary": "4 筆建議、2 筆問題",
+   "counts": {
+    "正常銷案": 3,
+    "補畫": 1,
+    "問題": 2
+   },
+   "findings": [
+    {
+     "id": "F0001",
+     "route": "hsinpu",
+     "route_name": "縣118｜竹北・新埔",
+     "kind": "edges",
+     "coords": [
+      [
+       24.8429,
+       120.9903
+      ],
+      [
+       24.8406,
+       120.9848
+      ]
+     ],
+     "road": "118／中正西路",
+     "observation": "段[2]邊[11] 607m，1/13 取樣點不符，距中點僅 1m",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵、距中點 <30m",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0002",
+     "route": "hsinpu",
+     "route_name": "縣118｜竹北・新埔",
+     "kind": "edges",
+     "coords": [
+      [
+       24.8689,
+       121.0964
+      ],
+      [
+       24.8687,
+       121.0915
+      ]
+     ],
+     "road": "竹13／湖新路",
+     "observation": "段[4]邊[39] 498m，1/10 取樣點不符，距中點 6m",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵、距中點 <30m",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0003",
+     "route": "hsinpu",
+     "route_name": "縣118｜竹北・新埔",
+     "kind": "coverage",
+     "coords": [
+      [
+       24.82,
+       121.0126
+      ],
+      [
+       24.818,
+       121.0111
+      ]
+     ],
+     "road": "縣政二路南段",
+     "observation": "宣告0.30km/畫出0.03km/覆蓋率9%，缺269m——查證是興隆路一段密度修復後dedup判定重複移除，路廊本身仍畫著（透過興隆路一段）",
+     "recommendation": "正常銷案",
+     "basis": "已知記帳歸屬變動（HANDOFF §6.29），非真實缺口",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0004",
+     "route": "hsinpu",
+     "route_name": "縣118｜竹北・新埔",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.8474,
+       121.0216
+      ],
+      [
+       24.846,
+       121.02
+      ]
+     ],
+     "road": "竹22／興隆路二段一帶",
+     "observation": "段[4]起點↔段[2] 229m 雙向缺口，新補查詢與既有幾何縫合帶尚未磨合",
+     "recommendation": "補畫",
+     "basis": "連通律：兩端各報229m對稱缺口，像同一段真缺——需查此處實際連接道路",
+     "confidence": "中",
+     "color": "藍"
+    },
+    {
+     "id": "F0005",
+     "route": "hsinpu",
+     "route_name": "縣118｜竹北・新埔",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.8063,
+       121.0177
+      ]
+     ],
+     "road": "段[7]終點附近",
+     "observation": "段[7]終點↔段[8] 496m 缺口，逐輪未變",
+     "recommendation": "問題",
+     "basis": "缺口量級中等，尚無明確候選道路名，需人工查證",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0006",
+     "route": "hsinpu",
+     "route_name": "縣118｜竹北・新埔",
+     "kind": "adjacency",
+     "coords": [
+      [
+       24.844,
+       120.9426
+      ]
+     ],
+     "road": "與 coast-17km（543m）／coast-north（1399m）",
+     "observation": "D31 白地橋擴界後才出現的兩組近距離配對，幾乎同一座標，不在既有20條開放問題名單內",
+     "recommendation": "問題",
+     "basis": "連通律：座標新出現、尚未查證是否為同一真實缺口",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "tai3-guanxi": {
+   "route_name": "台3｜關西",
+   "summary": "0 筆建議、1 筆問題",
+   "counts": {
+    "問題": 1
+   },
+   "findings": [
+    {
+     "id": "F0007",
+     "route": "tai3-guanxi",
+     "route_name": "台3｜關西",
+     "kind": "visual_parallel",
+     "coords": [
+      [
+       24.9,
+       121.33
+      ],
+      [
+       24.92,
+       121.34
+      ]
+     ],
+     "road": "「3」與「name:中豐新路」共構路廊",
+     "observation": "段[0]與段[2] 並行729m——確認非本人親審118批次解決範圍，是獨立既有問題（route-audit.md 曾誤記為已解決，本輪重掃確認警報仍在）",
+     "recommendation": "問題",
+     "basis": "校準原則：歷史裁示當斷言驗證，發現退回標紅——此筆前手誤記已於HANDOFF §6.33修正，本輪重掃再次確認未解",
+     "confidence": "中",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "tai1-taidi": {
+   "route_name": "台1｜新豐・湖口・楊梅",
+   "summary": "2 筆建議、2 筆問題",
+   "counts": {
+    "正常銷案": 2,
+    "問題": 2
+   },
+   "findings": [
+    {
+     "id": "F0008",
+     "route": "tai1-taidi",
+     "route_name": "台1｜新豐・湖口・楊梅",
+     "kind": "edges",
+     "coords": [
+      [
+       24.9051,
+       121.1449
+      ],
+      [
+       24.9025,
+       121.1498
+      ]
+     ],
+     "road": "桃67／校前路",
+     "observation": "段[2]邊[4] 578m，1/12不符，距中點6m",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0009",
+     "route": "tai1-taidi",
+     "route_name": "台1｜新豐・湖口・楊梅",
+     "kind": "edges",
+     "coords": [
+      [
+       24.8958,
+       121.155
+      ],
+      [
+       24.892,
+       121.1574
+      ]
+     ],
+     "road": "桃67／老莊路",
+     "observation": "段[2]邊[9] 487m，1/10不符，距中點23m",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵，距中點<30m",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0010",
+     "route": "tai1-taidi",
+     "route_name": "台1｜新豐・湖口・楊梅",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.8686,
+       120.9948
+      ]
+     ],
+     "road": "段[3]終點附近",
+     "observation": "段[3]終點↔段[0] 88m 小缺口——本輪重跑新出現，之前版本未記載",
+     "recommendation": "問題",
+     "basis": "量級小（<100m），但屬新出現訊號，未查證成因",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0098",
+     "route": "tai1-taidi",
+     "route_name": "台1｜新豐・湖口・楊梅",
+     "kind": "adjacency",
+     "coords": [
+      [
+       24.9918,
+       121.301
+      ]
+     ],
+     "road": "與sanxia（台1/國3，開放問題0）",
+     "observation": "check_network最近距離約1380m，找不到連接段",
+     "recommendation": "問題",
+     "basis": "連通律：中壢/龍潭一帶人口稠密區，不像深山越嶺道那樣可直接判定「本來就不通」，需先查證是否有真實連接道路再決定登記接受清單或補畫",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "zhongli": {
+   "route_name": "國1／台66｜平鎮・中壢・桃園",
+   "summary": "2 筆建議、2 筆問題",
+   "counts": {
+    "移除": 1,
+    "正常銷案": 1,
+    "問題": 2
+   },
+   "findings": [
+    {
+     "id": "F0011",
+     "route": "zhongli",
+     "route_name": "國1／台66｜平鎮・中壢・桃園",
+     "kind": "visual_identity",
+     "coords": [
+      [
+       24.9592,
+       121.1958
+      ],
+      [
+       24.9628,
+       121.2012
+      ],
+      [
+       24.9657,
+       121.2041
+      ]
+     ],
+     "road": "三民路一段",
+     "observation": "段[4]（2.5km）60%抽樣點落在未宣告道路「三民路一段」；edges同段3條邊14/14、8/9、5/6高命中率；並伴隨2組平行重複（段4↔段11 1124m、段2↔段9 1107m）——`ROADS['zhongli']`目前5筆查詢完全沒查過此路名",
+     "recommendation": "移除",
+     "basis": "代表性律＋病灶B：與hsinpu已修復的D29（三民路）同型——從未被查過卻高命中率現形，且伴隨平行重複，是補縫器猜測橋接的典型特徵；比照D29做法加入ROUTE_FORBIDDEN_NAMES['zhongli']",
+     "confidence": "高",
+     "color": "紅"
+    },
+    {
+     "id": "F0012",
+     "route": "zhongli",
+     "route_name": "國1／台66｜平鎮・中壢・桃園",
+     "kind": "edges",
+     "coords": [
+      [
+       24.9357,
+       121.2338
+      ],
+      [
+       24.9286,
+       121.2417
+      ]
+     ],
+     "road": "112／龍岡路三段",
+     "observation": "段[5]邊[12] 1125m，1/23不符，距中點10m",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵、距中點<30m",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0013",
+     "route": "zhongli",
+     "route_name": "國1／台66｜平鎮・中壢・桃園",
+     "kind": "coverage",
+     "coords": [
+      [
+       25.001,
+       121.3141
+      ],
+      [
+       25.0062,
+       121.3122
+      ],
+      [
+       25.0123,
+       121.3098
+      ]
+     ],
+     "road": "「4」台4查詢",
+     "observation": "宣告6.81km/畫出5.58km/覆蓋率82%，5段缺口集中25.00~25.01,121.31一帶（桃園/蘆竹交界匝道附近）",
+     "recommendation": "問題",
+     "basis": "HANDOFF §6.34已記載：實測拉北界到25.06會讓check_geom從2群81%惡化成3群70%（新增2.1km無效孤兒碎片），刻意收在25.02不強行湊；桃園/蘆竹界本身留作開放問題",
+     "confidence": "中",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0014",
+     "route": "zhongli",
+     "route_name": "國1／台66｜平鎮・中壢・桃園",
+     "kind": "adjacency",
+     "coords": [],
+     "road": "與beiheng（開放問題20，台7/國1大溪一帶）",
+     "observation": "尚未查證精確交棒點",
+     "recommendation": "問題",
+     "basis": "連通律：仍缺具體座標候選，需先查真實動線",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "shimen": {
+   "route_name": "台4｜龍潭・大溪・石門水庫",
+   "summary": "2 筆建議、2 筆問題",
+   "counts": {
+    "問題": 2,
+    "正常銷案": 2
+   },
+   "findings": [
+    {
+     "id": "F0015",
+     "route": "shimen",
+     "route_name": "台4｜龍潭・大溪・石門水庫",
+     "kind": "visual_parallel",
+     "coords": [
+      [
+       24.8,
+       121.2
+      ],
+      [
+       24.81,
+       121.21
+      ]
+     ],
+     "road": "縣113／台3乙 交會處（石門水庫大壩一帶）",
+     "observation": "段[3]↔段[7] 1145m平行重複，重複比例約45%（總長2.5km）——join_route為接通3乙孤立700m支鏈（中正路三坑段）借道113已覆蓋的中正路佳安/三林段",
+     "recommendation": "問題",
+     "basis": "低於clean_route冗餘殘留清理60%整鏈門檻，紅線內（不動stitch/join/dedup判準）找不到不犧牲700m真實支鏈覆蓋率的乾淨修法，HANDOFF §6.30已誠實記為技術債",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0016",
+     "route": "shimen",
+     "route_name": "台4｜龍潭・大溪・石門水庫",
+     "kind": "edges",
+     "coords": [
+      [
+       24.8725,
+       121.2816
+      ],
+      [
+       24.8766,
+       121.276
+      ]
+     ],
+     "road": "4／崁津大橋",
+     "observation": "段[1]邊[24] 723m，1/15不符——本人已審：正常（HANDOFF §6.30裁示第10條）",
+     "recommendation": "正常銷案",
+     "basis": "容忍律，本人已裁示不再列為待審項",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0017",
+     "route": "shimen",
+     "route_name": "台4｜龍潭・大溪・石門水庫",
+     "kind": "edges",
+     "coords": [
+      [
+       24.8213,
+       121.214
+      ],
+      [
+       24.8228,
+       121.2122
+      ]
+     ],
+     "road": "3乙",
+     "observation": "段[0]邊[42] 245m，1/5不符——本人已審：正常",
+     "recommendation": "正常銷案",
+     "basis": "容忍律，本人已裁示不再列為待審項",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0018",
+     "route": "shimen",
+     "route_name": "台4｜龍潭・大溪・石門水庫",
+     "kind": "meta",
+     "coords": [],
+     "road": "八德埤塘自然生態公園",
+     "observation": "距shimen線最近7.07km，全站第二遠景點——本輪未動該點歸屬",
+     "recommendation": "問題",
+     "basis": "量測結果已交本人裁決是否改點歸屬或另立走廊，本輪僅重申現況",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "sanxia": {
+   "route_name": "國3｜鶯歌・三峽・土城",
+   "summary": "3 筆建議、1 筆問題",
+   "counts": {
+    "正常銷案": 3,
+    "問題": 1
+   },
+   "findings": [
+    {
+     "id": "F0019",
+     "route": "sanxia",
+     "route_name": "國3｜鶯歌・三峽・土城",
+     "kind": "edges",
+     "coords": [
+      [
+       24.8973,
+       121.337
+      ],
+      [
+       24.8998,
+       121.3406
+      ]
+     ],
+     "road": "3／中正路三段",
+     "observation": "段[1]邊[30] 454m，1/10不符，距中點25m——本人已審：正常",
+     "recommendation": "正常銷案",
+     "basis": "容忍律，本人已裁示",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0020",
+     "route": "sanxia",
+     "route_name": "國3｜鶯歌・三峽・土城",
+     "kind": "edges",
+     "coords": [
+      [
+       24.9199,
+       121.3677
+      ],
+      [
+       24.9206,
+       121.3702
+      ]
+     ],
+     "road": "3／中正路一段",
+     "observation": "段[2]邊[25] 259m，1/6不符，距中點18m——本人已審：正常",
+     "recommendation": "正常銷案",
+     "basis": "容忍律，本人已裁示",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0021",
+     "route": "sanxia",
+     "route_name": "國3｜鶯歌・三峽・土城",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.9,
+       121.35
+      ]
+     ],
+     "road": "1處小缺口 31m",
+     "observation": "本人已審：擱置，量級可忽略",
+     "recommendation": "正常銷案",
+     "basis": "本人已裁示擱置",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0022",
+     "route": "sanxia",
+     "route_name": "國3｜鶯歌・三峽・土城",
+     "kind": "meta",
+     "coords": [],
+     "road": "「北114」查詢",
+     "observation": "無clip，範圍外未處理",
+     "recommendation": "問題",
+     "basis": "病灶A候選但範圍外，留待下一輪比照做法評估",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "beiheng": {
+   "route_name": "台7｜大溪・復興",
+   "summary": "3 筆建議、1 筆問題",
+   "counts": {
+    "正常銷案": 3,
+    "問題": 1
+   },
+   "findings": [
+    {
+     "id": "F0023",
+     "route": "beiheng",
+     "route_name": "台7｜大溪・復興",
+     "kind": "edges",
+     "coords": [
+      [
+       24.676,
+       121.3592
+      ],
+      [
+       24.6769,
+       121.3636
+      ]
+     ],
+     "road": "桃113／武崙路",
+     "observation": "段[3]邊[16] 455m，1/10不符——本人已審：正常",
+     "recommendation": "正常銷案",
+     "basis": "容忍律，本人已裁示",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0024",
+     "route": "beiheng",
+     "route_name": "台7｜大溪・復興",
+     "kind": "edges",
+     "coords": [
+      [
+       24.8291,
+       121.3316
+      ],
+      [
+       24.8303,
+       121.3342
+      ]
+     ],
+     "road": "7／復興路三段",
+     "observation": "段[0]邊[51] 292m，1/6不符——本人已審：正常",
+     "recommendation": "正常銷案",
+     "basis": "容忍律，本人已裁示",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0025",
+     "route": "beiheng",
+     "route_name": "台7｜大溪・復興",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.6746,
+       121.3393
+      ]
+     ],
+     "road": "砂崙仔橋",
+     "observation": "段[3]起點距段[4] 420m——本人已審：可接受（一座橋的缺口）",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：橋樑缺口，本人已明確裁示可接受",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0105",
+     "route": "beiheng",
+     "route_name": "台7｜大溪・復興",
+     "kind": "meta",
+     "coords": [],
+     "road": "accepted.json 記帳漂移（不涉及本輪裁決，僅供知悉）",
+     "observation": "status.py本輪重驗：accepted.json裡beiheng↔zhongli這筆這次沒比對到任何待辦項",
+     "recommendation": "問題",
+     "basis": "校準原則：同上，僅供知悉，不建議本輪動accepted.json",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "zhudong": {
+   "route_name": "縣120｜芎林・竹東市區",
+   "summary": "1 筆建議、8 筆問題",
+   "counts": {
+    "移交": 1,
+    "問題": 8
+   },
+   "findings": [
+    {
+     "id": "F0026",
+     "route": "zhudong",
+     "route_name": "縣120｜芎林・竹東市區",
+     "kind": "ownership",
+     "coords": [
+      [
+       24.7214,
+       121.1364
+      ]
+     ],
+     "road": "120（跟neiwan交界一帶）",
+     "observation": "1段疑似越界，畫進neiwan認領的120，約696m——ROUTE-BOUNDARIES.md記載zhudong↔neiwan交界只有約略地標（經度約121.12），沒有精確座標",
+     "recommendation": "移交",
+     "basis": "邊界律：越界段是同一條120繼續延伸，屬合法動線（不是猜測橋接）——比照§6.29「越界段預設處置是移交不是刪除」，應先binary search核出精確鄉界座標再登記交棒點，不宜整段刪除",
+     "confidence": "高",
+     "color": "橘"
+    },
+    {
+     "id": "F0027",
+     "route": "zhudong",
+     "route_name": "縣120｜芎林・竹東市區",
+     "kind": "coverage",
+     "coords": [
+      [
+       24.8263,
+       120.9718
+      ],
+      [
+       24.8269,
+       120.9694
+      ],
+      [
+       24.8255,
+       120.9745
+      ],
+      [
+       24.8259,
+       120.9731
+      ],
+      [
+       24.8271,
+       120.9682
+      ]
+     ],
+     "road": "新竹一交流道",
+     "observation": "宣告1.36km/畫出0.59km/覆蓋率43%，4段小缺口",
+     "recommendation": "問題",
+     "basis": "HANDOFF根因表通則第五條：橋樑/交流道/多路交叉是結構性高發區，這是拼接未磨合非邊界問題，不建議貿然調鬆stitch/join容差",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0028",
+     "route": "zhudong",
+     "route_name": "縣120｜芎林・竹東市區",
+     "kind": "coverage",
+     "coords": [
+      [
+       24.7658,
+       121.082
+      ],
+      [
+       24.7629,
+       121.0887
+      ],
+      [
+       24.763,
+       121.0888
+      ],
+      [
+       24.7652,
+       121.0834
+      ],
+      [
+       24.7675,
+       121.0797
+      ]
+     ],
+     "road": "富林路二段",
+     "observation": "宣告3.62km/畫出1.73km/覆蓋率48%，5段缺口",
+     "recommendation": "問題",
+     "basis": "同上，竹東市區複雜路口高發區，非查詢範圍問題",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0029",
+     "route": "zhudong",
+     "route_name": "縣120｜芎林・竹東市區",
+     "kind": "coverage",
+     "coords": [
+      [
+       24.7733,
+       121.0749
+      ],
+      [
+       24.7675,
+       121.0796
+      ],
+      [
+       24.7681,
+       121.0792
+      ],
+      [
+       24.7734,
+       121.075
+      ]
+     ],
+     "road": "富林路三段",
+     "observation": "宣告3.90km/畫出2.07km/覆蓋率53%，4段缺口",
+     "recommendation": "問題",
+     "basis": "同上，竹東市區複雜路口高發區",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0030",
+     "route": "zhudong",
+     "route_name": "縣120｜芎林・竹東市區",
+     "kind": "coverage",
+     "coords": [
+      [
+       24.7512,
+       121.0786
+      ],
+      [
+       24.7526,
+       121.0776
+      ],
+      [
+       24.7553,
+       121.0758
+      ],
+      [
+       24.7558,
+       121.0748
+      ]
+     ],
+     "road": "68甲",
+     "observation": "宣告1.20km/畫出0.85km/覆蓋率71%，2段小缺口",
+     "recommendation": "問題",
+     "basis": "同上高發區成因，量級較小",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0031",
+     "route": "zhudong",
+     "route_name": "縣120｜芎林・竹東市區",
+     "kind": "visual_identity",
+     "coords": [
+      [
+       24.8301,
+       120.9586
+      ]
+     ],
+     "road": "公道五路四段",
+     "observation": "段[15]（1.9km）100%抽樣點命中「公道五路四段」——全站身分不符最高命中率之一",
+     "recommendation": "問題",
+     "basis": "代表性律候選（若是次要市街則建議移除），但需先確認公道五路四段是不是zhudong自己合法連接段（竹北市走廊，見route_boundaries.json corridors）——不排除是D9共畫範圍內的道路，貿然移除有錯殺風險，需人工核對",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0032",
+     "route": "zhudong",
+     "route_name": "縣120｜芎林・竹東市區",
+     "kind": "visual_identity",
+     "coords": [
+      [
+       24.791,
+       121.063
+      ]
+     ],
+     "road": "光明三路／博愛街424巷／博愛街486巷",
+     "observation": "段[9]（3.5km）50%抽樣點落在未宣告道路上",
+     "recommendation": "問題",
+     "basis": "巷弄型命名（代表性律指標），但命中率僅50%、非整段，且zhudong本身竹北端走廊本來就多筆窄範圍name查詢彼此重疊，難以單靠命中率判定，需人工核對是否為合法連接段還是補縫殘留",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0033",
+     "route": "zhudong",
+     "route_name": "縣120｜芎林・竹東市區",
+     "kind": "visual_parallel",
+     "coords": [
+      [
+       24.75,
+       121.08
+      ]
+     ],
+     "road": "段[2]↔段[5]",
+     "observation": "並行871m",
+     "recommendation": "問題",
+     "basis": "竹東市區密集查詢拼接痕跡，紅線內不動stitch/dedup判準，技術債",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0034",
+     "route": "zhudong",
+     "route_name": "縣120｜芎林・竹東市區",
+     "kind": "visual_parallel",
+     "coords": [
+      [
+       24.83,
+       120.99
+      ]
+     ],
+     "road": "段[5]↔段[14]",
+     "observation": "並行722m",
+     "recommendation": "問題",
+     "basis": "同上，竹科/新竹二交流道一帶",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "neiwan": {
+   "route_name": "縣120｜橫山・內灣",
+   "summary": "1 筆建議、2 筆問題",
+   "counts": {
+    "問題": 2,
+    "正常銷案": 1
+   },
+   "findings": [
+    {
+     "id": "F0035",
+     "route": "neiwan",
+     "route_name": "縣120｜橫山・內灣",
+     "kind": "extent",
+     "coords": [],
+     "road": "芎林鄉",
+     "observation": "進入芎林鄉約1.4km，沒有景點掛在這條，也未列入corridors——是zhudong↔neiwan模糊邊界的另一面",
+     "recommendation": "問題",
+     "basis": "邊界律：與zhudong ownership違規為同一組邊界模糊帶造成，需與zhudong的120交棒點一併核出精確座標後才能定案（正常過境登記corridor，或收邊）",
+     "confidence": "中",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0036",
+     "route": "neiwan",
+     "route_name": "縣120｜橫山・內灣",
+     "kind": "edges",
+     "coords": [
+      [
+       24.7175,
+       121.1624
+      ],
+      [
+       24.718,
+       121.1605
+      ]
+     ],
+     "road": "120／中山街一段",
+     "observation": "段[0]邊[20] 202m，1/5不符，距中點26m",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵，距中點<30m",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0037",
+     "route": "neiwan",
+     "route_name": "縣120｜橫山・內灣",
+     "kind": "visual_parallel",
+     "coords": [
+      [
+       24.71,
+       121.2
+      ]
+     ],
+     "road": "段[0]↔段[1]",
+     "observation": "並行1045m",
+     "recommendation": "問題",
+     "basis": "未查證具體成因，技術債候選",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "jianshi-120": {
+   "route_name": "縣120東／竹58｜尖石（新樂・八五山）",
+   "summary": "2 筆建議、2 筆問題",
+   "counts": {
+    "正常銷案": 1,
+    "問題": 2,
+    "接受清單": 1
+   },
+   "findings": [
+    {
+     "id": "F0038",
+     "route": "jianshi-120",
+     "route_name": "縣120東／竹58｜尖石（新樂・八五山）",
+     "kind": "edges",
+     "coords": [
+      [
+       24.716,
+       121.2699
+      ],
+      [
+       24.7149,
+       121.2761
+      ]
+     ],
+     "road": "120",
+     "observation": "段[0]邊[43] 645m，1/13不符，距中點僅1m——幾乎貼著120本身",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：距中點僅1m，極可能是取樣或簡化造成的假警報",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0039",
+     "route": "jianshi-120",
+     "route_name": "縣120東／竹58｜尖石（新樂・八五山）",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.704,
+       121.2013
+      ]
+     ],
+     "road": "段[0]起點附近",
+     "observation": "缺口483m",
+     "recommendation": "問題",
+     "basis": "深山路網碎片化，未查證具體連接道路",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0040",
+     "route": "jianshi-120",
+     "route_name": "縣120東／竹58｜尖石（新樂・八五山）",
+     "kind": "meta",
+     "coords": [],
+     "road": "查詢設計（病灶C）",
+     "observation": "兩筆查詢（120、竹58）都沒有clip也沒有交棒點記錄——純粹靠地理隔絕沒有實際重疊",
+     "recommendation": "問題",
+     "basis": "邊界律：目前無害但屬「運氣好非設計良好」類型，建議跟jianshi-front的宇老另一側交界一併找時間補上精確交棒點",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0102",
+     "route": "jianshi-120",
+     "route_name": "縣120東／竹58｜尖石（新樂・八五山）",
+     "kind": "adjacency",
+     "coords": [
+      [
+       24.7746,
+       121.2639
+      ]
+     ],
+     "road": "與tai3-guanxi（縣120東/台3，開放問題9，2830m）",
+     "observation": "尖石深山路線，尚無明確連接記錄",
+     "recommendation": "接受清單",
+     "basis": "連通律：與已核准的深山路線案例同型（>2.5km、無中間走廊記錄）",
+     "confidence": "中",
+     "color": "灰"
+    }
+   ]
+  },
+  "jianshi-front": {
+   "route_name": "竹60｜尖石前山（錦屏・那羅）",
+   "summary": "3 筆建議、0 筆問題",
+   "counts": {
+    "移除": 2,
+    "正常銷案": 1
+   },
+   "findings": [
+    {
+     "id": "F0041",
+     "route": "jianshi-front",
+     "route_name": "竹60｜尖石前山（錦屏・那羅）",
+     "kind": "ownership",
+     "coords": [
+      [
+       24.6262,
+       121.2862
+      ]
+     ],
+     "road": "秀巒道路（跟jianshi-back交界）",
+     "observation": "1段疑似越界，畫進jianshi-back認領的秀巒道路，約1676m——D20已明訂宇老(24.6677,121.282)為前後山分界，違規座標緯度比宇老低約5公里，已深入後山範圍",
+     "recommendation": "移除",
+     "basis": "邊界律：這不是新走廊，是同一條路在jianshi-back已合法畫出（違規段是jianshi-front自己的「竹60」查詢缺clip、bbox整條拉過分界）——比照根因表第1條，應收緊jianshi-front「竹60」查詢的bbox南界到宇老緯度或加clip，讓越界段收回，不需要移交（對方早已畫出）",
+     "confidence": "高",
+     "color": "紅"
+    },
+    {
+     "id": "F0042",
+     "route": "jianshi-front",
+     "route_name": "竹60｜尖石前山（錦屏・那羅）",
+     "kind": "edges",
+     "coords": [
+      [
+       24.7048,
+       121.2106
+      ],
+      [
+       24.7051,
+       121.2134
+      ]
+     ],
+     "road": "竹60",
+     "observation": "段[0]邊[6] 284m，1/6不符",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0043",
+     "route": "jianshi-front",
+     "route_name": "竹60｜尖石前山（錦屏・那羅）",
+     "kind": "edges",
+     "coords": [
+      [
+       24.6292,
+       121.2831
+      ],
+      [
+       24.6285,
+       121.2808
+      ]
+     ],
+     "road": "竹60／秀巒道路",
+     "observation": "段[0]邊[177] 247m，1/5不符——座標幾乎等於上面ownership違規座標，同一路段兩種偵測都命中",
+     "recommendation": "移除",
+     "basis": "同上ownership finding，同一根因，收邊後這條邊警報應一併消失",
+     "confidence": "高",
+     "color": "紅"
+    }
+   ]
+  },
+  "jianshi-back": {
+   "route_name": "竹60｜尖石後山（秀巒・玉峰）",
+   "summary": "3 筆建議、0 筆問題",
+   "counts": {
+    "正常銷案": 3
+   },
+   "findings": [
+    {
+     "id": "F0044",
+     "route": "jianshi-back",
+     "route_name": "竹60｜尖石後山（秀巒・玉峰）",
+     "kind": "edges",
+     "coords": [
+      [
+       24.6151,
+       121.2955
+      ],
+      [
+       24.6134,
+       121.2931
+      ]
+     ],
+     "road": "竹60／秀巒道路",
+     "observation": "段[0]邊[163] 307m，2/7不符，距中點25m",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：深山路段彎繞多，取樣容易貼到自己路廊邊緣",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0045",
+     "route": "jianshi-back",
+     "route_name": "竹60｜尖石後山（秀巒・玉峰）",
+     "kind": "edges",
+     "coords": [
+      [
+       24.6292,
+       121.2831
+      ],
+      [
+       24.6285,
+       121.2808
+      ]
+     ],
+     "road": "竹60／秀巒道路",
+     "observation": "段[0]邊[121] 247m，1/5不符——跟jianshi-front那條247m幾乎同一位置",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：與jianshi-front互為印證的同一路口臨界瑕疵，非新缺陷",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0046",
+     "route": "jianshi-back",
+     "route_name": "竹60｜尖石後山（秀巒・玉峰）",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.6583,
+       121.2747
+      ],
+      [
+       24.6154,
+       121.298
+      ],
+      [
+       24.613,
+       121.2994
+      ],
+      [
+       24.611,
+       121.2995
+      ]
+     ],
+     "road": "深山路網碎片",
+     "observation": "4處缺口73m~214m",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：深山部落路網碎片化正常量級，非新缺陷（HANDOFF §6.29已記載）",
+     "confidence": "高",
+     "color": "綠"
+    }
+   ]
+  },
+  "zhu37": {
+   "route_name": "竹37｜北埔・五指山",
+   "summary": "2 筆建議、0 筆問題",
+   "counts": {
+    "移交": 1,
+    "正常銷案": 1
+   },
+   "findings": [
+    {
+     "id": "F0047",
+     "route": "zhu37",
+     "route_name": "竹37｜北埔・五指山",
+     "kind": "visual_identity",
+     "coords": [
+      [
+       24.6509,
+       121.0792
+      ]
+     ],
+     "road": "竹67（貼近nanqing）",
+     "observation": "段[3]（1.4km）100%抽樣點命中「竹67」——竹67是ROADS['nanqing']已在查的路名（白蘭）",
+     "recommendation": "移交",
+     "basis": "連通律＋邊界律：這段完全貼著鄰線nanqing已查的道路走，高機率是zhu37↔nanqing之間的真實連接段——建議查證後在zhu37補一筆共畫查詢或直接移交nanqing記帳，比照D9（縣政二路）共畫模式",
+     "confidence": "中",
+     "color": "橘"
+    },
+    {
+     "id": "F0048",
+     "route": "zhu37",
+     "route_name": "竹37｜北埔・五指山",
+     "kind": "edges",
+     "coords": [
+      [
+       24.6509,
+       121.0792
+      ],
+      [
+       24.6514,
+       121.075
+      ]
+     ],
+     "road": "竹37",
+     "observation": "段[0]邊[44] 425m，1/9不符",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵",
+     "confidence": "高",
+     "color": "綠"
+    }
+   ]
+  },
+  "nanqing": {
+   "route_name": "縣122｜五峰（清泉・白蘭）",
+   "summary": "3 筆建議、1 筆問題",
+   "counts": {
+    "問題": 1,
+    "正常銷案": 2,
+    "接受清單": 1
+   },
+   "findings": [
+    {
+     "id": "F0049",
+     "route": "nanqing",
+     "route_name": "縣122｜五峰（清泉・白蘭）",
+     "kind": "extent",
+     "coords": [],
+     "road": "北埔鄉",
+     "observation": "進入北埔鄉約1.4km，沒有景點掛在這條，也未列入corridors",
+     "recommendation": "問題",
+     "basis": "邊界律：需先查是不是跟zhu37竹67那段連接段共用的走廊（見zhu37節），若是同一走廊建議一併登記corridor；若否才考慮收邊",
+     "confidence": "中",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0050",
+     "route": "nanqing",
+     "route_name": "縣122｜五峰（清泉・白蘭）",
+     "kind": "edges",
+     "coords": [
+      [
+       24.596,
+       121.0948
+      ],
+      [
+       24.5958,
+       121.0981
+      ],
+      [
+       24.5625,
+       121.0931
+      ],
+      [
+       24.5628,
+       121.0954
+      ],
+      [
+       24.5369,
+       121.0972
+      ],
+      [
+       24.5372,
+       121.095
+      ],
+      [
+       24.5535,
+       121.1553
+      ],
+      [
+       24.5539,
+       121.1536
+      ],
+      [
+       24.5848,
+       121.1172
+      ],
+      [
+       24.5837,
+       121.1184
+      ],
+      [
+       24.5922,
+       121.1088
+      ],
+      [
+       24.5915,
+       121.1075
+      ]
+     ],
+     "road": "竹67／竹專2（大鹿林道）／下杉本產業道路／喜翁道路／122南清公路",
+     "observation": "6條邊不符合，全部1/4~1/7取樣點不符的臨界案例",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：深山林道路網密集區正常量級假警報，無一達到高命中率門檻",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0051",
+     "route": "nanqing",
+     "route_name": "縣122｜五峰（清泉・白蘭）",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.5541,
+       121.1119
+      ]
+     ],
+     "road": "段[4]起點附近",
+     "observation": "缺口97m，可忽略",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：量級小可忽略",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0101",
+     "route": "nanqing",
+     "route_name": "縣122｜五峰（清泉・白蘭）",
+     "kind": "adjacency",
+     "coords": [
+      [
+       24.6662,
+       121.1164
+      ]
+     ],
+     "road": "與neiwan（縣122/縣120，開放問題7，2413m）",
+     "observation": "跟luoshan↔neiwan幾乎同一座標，可能是同一個真實地點",
+     "recommendation": "接受清單",
+     "basis": "連通律：同一組地理隔絕，比照luoshan↔neiwan同型判斷",
+     "confidence": "中",
+     "color": "灰"
+    }
+   ]
+  },
+  "luoshan": {
+   "route_name": "竹63｜羅山道路",
+   "summary": "2 筆建議、1 筆問題",
+   "counts": {
+    "問題": 1,
+    "接受清單": 2
+   },
+   "findings": [
+    {
+     "id": "F0052",
+     "route": "luoshan",
+     "route_name": "竹63｜羅山道路",
+     "kind": "meta",
+     "coords": [],
+     "road": "五筆查詢全部無clip",
+     "observation": "「竹63」bbox跨度lat0.130/lon0.100，超過病灶A門檻，但五支檢查器全部零警報",
+     "recommendation": "問題",
+     "basis": "邊界律：乾淨是地理隔絕的結果、不是查詢設計嚴謹——日後鄰線（neiwan/zhu37/jianshi-front）任一條擴大查詢範圍，這條可能第一個中招，建議留意但不急著現在動",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0099",
+     "route": "luoshan",
+     "route_name": "竹63｜羅山道路",
+     "kind": "adjacency",
+     "coords": [
+      [
+       24.6662,
+       121.1164
+      ]
+     ],
+     "road": "與neiwan（竹63/縣120，開放問題4，2179m）",
+     "observation": "深山越嶺道，可能本來就不與內灣直接相通",
+     "recommendation": "接受清單",
+     "basis": "連通律：跟已核准的baoshan↔hsinpu／baoshan↔zhu37同一種「深山路線＋2km量級」形狀，比照辦理",
+     "confidence": "中",
+     "color": "灰"
+    },
+    {
+     "id": "F0100",
+     "route": "luoshan",
+     "route_name": "竹63｜羅山道路",
+     "kind": "adjacency",
+     "coords": [
+      [
+       24.665,
+       121.1057
+      ]
+     ],
+     "road": "與zhu37（竹63/竹37，開放問題5，2921m）",
+     "observation": "同上，深山越嶺道",
+     "recommendation": "接受清單",
+     "basis": "連通律：同上，與已核准案例同型",
+     "confidence": "中",
+     "color": "灰"
+    }
+   ]
+  },
+  "baoshan": {
+   "route_name": "竹40／竹46｜寶山水庫近郊",
+   "summary": "1 筆建議、2 筆問題",
+   "counts": {
+    "正常銷案": 1,
+    "問題": 2
+   },
+   "findings": [
+    {
+     "id": "F0053",
+     "route": "baoshan",
+     "route_name": "竹40／竹46｜寶山水庫近郊",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.7444,
+       121.0376
+      ],
+      [
+       24.7416,
+       120.9613
+      ],
+      [
+       24.7339,
+       120.9641
+      ]
+     ],
+     "road": "既有孤兒群殘留",
+     "observation": "5處缺口（67m~288m）＋1組平行重複（段0↔段1 554m）——本人裁示擱置（B4）",
+     "recommendation": "正常銷案",
+     "basis": "本人已明確裁示擱置，量級不大",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0054",
+     "route": "baoshan",
+     "route_name": "竹40／竹46｜寶山水庫近郊",
+     "kind": "adjacency",
+     "coords": [],
+     "road": "與toufen-city（苗14，唯一接點，開放問題13）",
+     "observation": "本輪範圍外，accepted.json這輪只接受本人明確點名的三組，這組仍是待裁決的開放問題",
+     "recommendation": "問題",
+     "basis": "連通律：需要先找出苗14真正該收在哪裡的替代連接道路才能定案",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0103",
+     "route": "baoshan",
+     "route_name": "竹40／竹46｜寶山水庫近郊",
+     "kind": "meta",
+     "coords": [],
+     "road": "accepted.json 記帳漂移（不涉及本輪裁決，僅供知悉）",
+     "observation": "status.py本輪重驗：accepted.json裡baoshan↔nanzhuang這筆這次沒比對到任何待辦項（現行check_network 15組近距離名單裡已不含這組配對）",
+     "recommendation": "問題",
+     "basis": "校準原則：不代表accepted.json寫錯，多半是幾何微調後這組距離已超出status.py比對窗——僅供本人知悉，不建議本輪動accepted.json（紅線）",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "emei": {
+   "route_name": "竹43｜峨眉・獅頭山",
+   "summary": "2 筆建議、1 筆問題",
+   "counts": {
+    "正常銷案": 2,
+    "問題": 1
+   },
+   "findings": [
+    {
+     "id": "F0055",
+     "route": "emei",
+     "route_name": "竹43｜峨眉・獅頭山",
+     "kind": "edges",
+     "coords": [
+      [
+       24.6956,
+       120.9816
+      ],
+      [
+       24.6968,
+       120.9853
+      ],
+      [
+       24.6977,
+       121.0028
+      ],
+      [
+       24.6988,
+       121.0053
+      ]
+     ],
+     "road": "3／中豐公路",
+     "observation": "2條邊，1/9、1/6取樣點不符的臨界案例",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0056",
+     "route": "emei",
+     "route_name": "竹43｜峨眉・獅頭山",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.6878,
+       121.0244
+      ]
+     ],
+     "road": "段[1]起點附近",
+     "observation": "缺口146m，可忽略",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：量級小可忽略",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0057",
+     "route": "emei",
+     "route_name": "竹43｜峨眉・獅頭山",
+     "kind": "adjacency",
+     "coords": [
+      [
+       24.6826,
+       120.9639
+      ]
+     ],
+     "road": "與sanwan（台3「界線取24.66」舊裁示，開放問題10）",
+     "observation": "ROUTE-BOUNDARIES.md明確記載「這句話可能是較早的裁示，目前查詢設定看不出來已經照做」，check_network量到2485m，遠大於一般縫合重疊",
+     "recommendation": "問題",
+     "basis": "邊界律：需先查證24.66這一刀有沒有實作在任一路線clip/bbox裡，若沒有需確認是否仍要落實，或改記錄目前實際交棒方式——route-audit.md已標記優先查證",
+     "confidence": "中",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "toufen-city": {
+   "route_name": "台13｜竹南市區・頭份・造橋",
+   "summary": "2 筆建議、3 筆問題",
+   "counts": {
+    "補畫": 1,
+    "問題": 3,
+    "正常銷案": 1
+   },
+   "findings": [
+    {
+     "id": "F0058",
+     "route": "toufen-city",
+     "route_name": "台13｜竹南市區・頭份・造橋",
+     "kind": "extent",
+     "coords": [],
+     "road": "三灣鄉",
+     "observation": "進入三灣鄉約9.0km，沒有景點掛在這條，也未列入corridors——全站第二大過境警報",
+     "recommendation": "補畫",
+     "basis": "連通律：ROUTE-BOUNDARIES.md已記載這是苗14查詢若收緊會弄丟跟baoshan在寶山交流道一帶唯一接點的已知代價，非意外——建議登記為合法過境走廊（corridor），但9.0km量級偏大，需先查出苗14真正該收在哪裡的替代連接道路，不宜直接整段登記了事",
+     "confidence": "中",
+     "color": "藍"
+    },
+    {
+     "id": "F0059",
+     "route": "toufen-city",
+     "route_name": "台13｜竹南市區・頭份・造橋",
+     "kind": "coverage",
+     "coords": [
+      [
+       24.6772,
+       120.8748
+      ],
+      [
+       24.6785,
+       120.8703
+      ],
+      [
+       24.6765,
+       120.8772
+      ],
+      [
+       24.6772,
+       120.8749
+      ]
+     ],
+     "road": "真如路",
+     "observation": "宣告1.08km/畫出0.36km/覆蓋率33%，缺477m+242m，頭份市區內",
+     "recommendation": "問題",
+     "basis": "代表性律／連通律：覆蓋率過低但未查證是路名比對誤判還是真缺口，需人工核對頭份市區路網",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0060",
+     "route": "toufen-city",
+     "route_name": "台13｜竹南市區・頭份・造橋",
+     "kind": "coverage",
+     "coords": [
+      [
+       24.6565,
+       120.8655
+      ],
+      [
+       24.6575,
+       120.8624
+      ],
+      [
+       24.6571,
+       120.8637
+      ],
+      [
+       24.656,
+       120.8666
+      ]
+     ],
+     "road": "「1」造橋段（D58新增）",
+     "observation": "宣告9.57km/畫出8.49km/覆蓋率89%，6段缺口，其中5段集中在24.656~24.657一帶",
+     "recommendation": "問題",
+     "basis": "HANDOFF §6.32已記載D58新增此查詢會讓既有斷群多裂出0.7km一組（技術債，紅線內不動dedup/stitch/join判準），此覆蓋率缺口很可能是同一根因的下游症狀，非本輪能單筆修復",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0061",
+     "route": "toufen-city",
+     "route_name": "台13｜竹南市區・頭份・造橋",
+     "kind": "visual_identity",
+     "coords": [
+      [
+       24.622,
+       120.9137
+      ]
+     ],
+     "road": "龍山路三段",
+     "observation": "段[10]（1.0km）100%抽樣點命中「龍山路三段」，跟真如路覆蓋不足可能是同一區域拼接沒對齊",
+     "recommendation": "問題",
+     "basis": "代表性律候選（100%命中未宣告道路），但需先確認是否為頭份市區合法連接段還是補縫殘留，量級不大優先度中低",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0062",
+     "route": "toufen-city",
+     "route_name": "台13｜竹南市區・頭份・造橋",
+     "kind": "edges",
+     "coords": [
+      [
+       24.622,
+       120.9137
+      ],
+      [
+       24.6216,
+       120.9163
+      ]
+     ],
+     "road": "苗14／九車籠二寮坑道路",
+     "observation": "段[0]邊[38] 270m，1/6不符",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵",
+     "confidence": "高",
+     "color": "綠"
+    }
+   ]
+  },
+  "sanwan": {
+   "route_name": "台3｜三灣・獅潭",
+   "summary": "1 筆建議、0 筆問題",
+   "counts": {
+    "正常銷案": 1
+   },
+   "findings": [
+    {
+     "id": "F0063",
+     "route": "sanwan",
+     "route_name": "台3｜三灣・獅潭",
+     "kind": "edges",
+     "coords": [
+      [
+       24.5674,
+       120.9357
+      ],
+      [
+       24.5661,
+       120.9334
+      ]
+     ],
+     "road": "3／中豐公路",
+     "observation": "段[0]邊[60] 269m，1/6不符",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵",
+     "confidence": "高",
+     "color": "綠"
+    }
+   ]
+  },
+  "nanzhuang": {
+   "route_name": "縣124｜南庄・向天湖・神仙谷",
+   "summary": "2 筆建議、2 筆問題",
+   "counts": {
+    "正常銷案": 2,
+    "問題": 2
+   },
+   "findings": [
+    {
+     "id": "F0064",
+     "route": "nanzhuang",
+     "route_name": "縣124｜南庄・向天湖・神仙谷",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.6397,
+       120.9868
+      ]
+     ],
+     "road": "段[0]終點附近",
+     "observation": "379m缺口——本人已審：擱置",
+     "recommendation": "正常銷案",
+     "basis": "本人已明確裁示擱置，量級可忽略",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0065",
+     "route": "nanzhuang",
+     "route_name": "縣124｜南庄・向天湖・神仙谷",
+     "kind": "edges",
+     "coords": [
+      [
+       24.643,
+       120.9715
+      ],
+      [
+       24.6411,
+       120.9622
+      ],
+      [
+       24.5966,
+       121.0138
+      ],
+      [
+       24.5976,
+       121.0116
+      ],
+      [
+       24.5471,
+       121.0295
+      ],
+      [
+       24.5487,
+       121.0285
+      ]
+     ],
+     "road": "124乙／苗21南庄風美道",
+     "observation": "3條邊，1/20、1/6、1/5取樣點不符的臨界案例",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：臨界取樣瑕疵",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0066",
+     "route": "nanzhuang",
+     "route_name": "縣124｜南庄・向天湖・神仙谷",
+     "kind": "adjacency",
+     "coords": [
+      [
+       24.6311,
+       121.0756
+      ]
+     ],
+     "road": "與nanqing（開放問題8，2234m）",
+     "observation": "本輪範圍外，仍未解",
+     "recommendation": "問題",
+     "basis": "連通律：兩條都是深山路線，可能本來就經不同越嶺道不直接相通——建議查證或直接寫入accepted.json",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0104",
+     "route": "nanzhuang",
+     "route_name": "縣124｜南庄・向天湖・神仙谷",
+     "kind": "meta",
+     "coords": [],
+     "road": "accepted.json 記帳漂移（不涉及本輪裁決，僅供知悉）",
+     "observation": "status.py本輪重驗：accepted.json裡nanzhuang↔miaoli-hills這筆這次沒比對到任何待辦項",
+     "recommendation": "問題",
+     "basis": "校準原則：同上，僅供知悉，不建議本輪動accepted.json",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "miaoli-hills": {
+   "route_name": "台13／台72｜頭屋・公館・苗栗市",
+   "summary": "1 筆建議、3 筆問題",
+   "counts": {
+    "正常銷案": 1,
+    "問題": 3
+   },
+   "findings": [
+    {
+     "id": "F0067",
+     "route": "miaoli-hills",
+     "route_name": "台13／台72｜頭屋・公館・苗栗市",
+     "kind": "edges",
+     "coords": [
+      [
+       24.5876,
+       120.9147
+      ],
+      [
+       24.587,
+       120.9166
+      ]
+     ],
+     "road": "苗16／南岸道路",
+     "observation": "段[5]邊[35] 200m，1/4不符",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0068",
+     "route": "miaoli-hills",
+     "route_name": "台13／台72｜頭屋・公館・苗栗市",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.5201,
+       120.7881
+      ],
+      [
+       24.5168,
+       120.7877
+      ],
+      [
+       24.5893,
+       120.8428
+      ]
+     ],
+     "road": "多鄉聯集邊界縫合處",
+     "observation": "3處缺口137m/366m/435m",
+     "recommendation": "問題",
+     "basis": "多鄉聯集查詢彼此邊界重疊處常見縫合痕跡，量級中等，未逐一查證具體連接道路",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0069",
+     "route": "miaoli-hills",
+     "route_name": "台13／台72｜頭屋・公館・苗栗市",
+     "kind": "visual_parallel",
+     "coords": [
+      [
+       24.58,
+       120.85
+      ]
+     ],
+     "road": "段[0]↔段[7]／段[1]↔段[2]",
+     "observation": "2組平行重複1018m/819m",
+     "recommendation": "問題",
+     "basis": "多鄉聯集拼接的縫合痕跡，技術債",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0070",
+     "route": "miaoli-hills",
+     "route_name": "台13／台72｜頭屋・公館・苗栗市",
+     "kind": "adjacency",
+     "coords": [],
+     "road": "與toufen-city（台13造橋一帶，開放問題14，約略）",
+     "observation": "理論上該接續但沒有明確座標或clip邊界對照",
+     "recommendation": "問題",
+     "basis": "連通律：仍缺具體座標候選",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "xihu": {
+   "route_name": "縣119｜西湖",
+   "summary": "2 筆建議、2 筆問題",
+   "counts": {
+    "正常銷案": 2,
+    "問題": 2
+   },
+   "findings": [
+    {
+     "id": "F0071",
+     "route": "xihu",
+     "route_name": "縣119｜西湖",
+     "kind": "edges",
+     "coords": [
+      [
+       24.5199,
+       120.7581
+      ],
+      [
+       24.5204,
+       120.7623
+      ]
+     ],
+     "road": "苗34",
+     "observation": "段[2]邊[5] 434m，1/9不符",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0072",
+     "route": "xihu",
+     "route_name": "縣119｜西湖",
+     "kind": "edges",
+     "coords": [
+      [
+       24.5638,
+       120.7536
+      ],
+      [
+       24.5636,
+       120.7532
+      ]
+     ],
+     "road": "1／縱貫公路",
+     "observation": "段[4]邊[0] 42m，1/2不符，距中點0m",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：極短邊，多半是跟coast-south／台1交界處的取樣鋸齒",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0073",
+     "route": "xihu",
+     "route_name": "縣119｜西湖",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.5636,
+       120.7532
+      ],
+      [
+       24.5803,
+       120.755
+      ],
+      [
+       24.5801,
+       120.7501
+      ]
+     ],
+     "road": "3處小缺口",
+     "observation": "39m/487m/493m",
+     "recommendation": "問題",
+     "basis": "量級中等，未查證具體連接道路",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0074",
+     "route": "xihu",
+     "route_name": "縣119｜西湖",
+     "kind": "meta",
+     "coords": [],
+     "road": "交棒點記錄（病灶C）",
+     "observation": "四筆查詢全部clip:西湖鄉，設計嚴謹，但完全沒有交棒點記錄——理論上該跟coast-south在後龍交流道一帶有交界",
+     "recommendation": "問題",
+     "basis": "邊界律：ROUTE-BOUNDARIES.md §1確認是文件空白而非查過沒問題，建議補查跟coast-south的交界",
+     "confidence": "中",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "sanyi": {
+   "route_name": "台13｜銅鑼・三義",
+   "summary": "3 筆建議、2 筆問題",
+   "counts": {
+    "正常銷案": 3,
+    "問題": 2
+   },
+   "findings": [
+    {
+     "id": "F0075",
+     "route": "sanyi",
+     "route_name": "台13｜銅鑼・三義",
+     "kind": "edges",
+     "coords": [
+      [
+       24.4037,
+       120.741
+      ],
+      [
+       24.4054,
+       120.7371
+      ]
+     ],
+     "road": "130",
+     "observation": "段[2]邊[20] 433m，1/9不符，距中點12m——本人已審：正常（同一真實缺陷經130西段查詢調整後現改記在dajia名下）",
+     "recommendation": "正常銷案",
+     "basis": "容忍律，本人已裁示",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0076",
+     "route": "sanyi",
+     "route_name": "台13｜銅鑼・三義",
+     "kind": "coverage",
+     "coords": [
+      [
+       24.4665,
+       120.7833
+      ],
+      [
+       24.4862,
+       120.787
+      ],
+      [
+       24.4582,
+       120.7816
+      ],
+      [
+       24.4664,
+       120.7833
+      ]
+     ],
+     "road": "中正路",
+     "observation": "宣告5.48km/畫出2.34km/覆蓋率43%——本人已審：ok（缺口其實是新興路縣119路廊，被覆蓋率演算法誤判成中正路少畫，實際地圖上仍畫著）",
+     "recommendation": "正常銷案",
+     "basis": "本人已裁示ok，量測方法既有限制非真實缺陷",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0077",
+     "route": "sanyi",
+     "route_name": "台13｜銅鑼・三義",
+     "kind": "coverage",
+     "coords": [
+      [
+       24.477,
+       120.8083
+      ],
+      [
+       24.4729,
+       120.8049
+      ]
+     ],
+     "road": "119甲",
+     "observation": "宣告1.21km/畫出0.64km/覆蓋率53%，缺572m——本輪重掃新發現，route-audit.md現有文字未列此筆",
+     "recommendation": "問題",
+     "basis": "本輪比對發現：這是6.34批次新增119甲查詢後才出現的覆蓋率警報，尚未經人工核實是記帳歸屬問題（比照中正路43%那類）還是真實缺口，需優先查證",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0078",
+     "route": "sanyi",
+     "route_name": "台13｜銅鑼・三義",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.3462,
+       120.7651
+      ]
+     ],
+     "road": "段[2]終點附近",
+     "observation": "缺口379m，可忽略",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：量級小可忽略",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0079",
+     "route": "sanyi",
+     "route_name": "台13｜銅鑼・三義",
+     "kind": "visual_parallel",
+     "coords": [
+      [
+       24.47,
+       120.8
+      ]
+     ],
+     "road": "段[3]↔段[4]（客屬大橋口）",
+     "observation": "並行831m——119與119甲兩筆查詢在客屬大橋口一帶各自stitch出接近但不完全重合的鏈段",
+     "recommendation": "問題",
+     "basis": "已知技術債（HANDOFF §6.34誠實記錄），紅線內不動stitch/dedup判準",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "taian": {
+   "route_name": "苗62｜泰安・大湖",
+   "summary": "0 筆建議、2 筆問題",
+   "counts": {
+    "問題": 2
+   },
+   "findings": [
+    {
+     "id": "F0080",
+     "route": "taian",
+     "route_name": "苗62｜泰安・大湖",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.4078,
+       120.9719
+      ],
+      [
+       24.3796,
+       120.9119
+      ],
+      [
+       24.377,
+       120.9085
+      ]
+     ],
+     "road": "3處小缺口",
+     "observation": "132m/419m/449m，分布在24.38~24.41一帶，跟大通公路收邊無關的既有殘留",
+     "recommendation": "問題",
+     "basis": "本輪範圍外未處理，量級中等，未查證具體連接道路",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0081",
+     "route": "taian",
+     "route_name": "苗62｜泰安・大湖",
+     "kind": "adjacency",
+     "coords": [],
+     "road": "與houli（開放問題18，台3南界緯度約24.27卓蘭大橋，約略）",
+     "observation": "houli那端沒有對應的北端查詢明確銜接",
+     "recommendation": "問題",
+     "basis": "連通律：等本人裁決是否需要精確銜接查詢",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "houli": {
+   "route_name": "台13／國1｜后里・豐原",
+   "summary": "0 筆建議、1 筆問題",
+   "counts": {
+    "問題": 1
+   },
+   "findings": [
+    {
+     "id": "F0082",
+     "route": "houli",
+     "route_name": "台13／國1｜后里・豐原",
+     "kind": "coverage",
+     "coords": [
+      [
+       24.3144,
+       120.6892
+      ],
+      [
+       24.3131,
+       120.6969
+      ],
+      [
+       24.3126,
+       120.6999
+      ],
+      [
+       24.312,
+       120.7038
+      ],
+      [
+       24.311,
+       120.7096
+      ],
+      [
+       24.3115,
+       120.7066
+      ],
+      [
+       24.3127,
+       120.6999
+      ],
+      [
+       24.3131,
+       120.697
+      ],
+      [
+       24.3115,
+       120.7066
+      ],
+      [
+       24.3119,
+       120.7044
+      ]
+     ],
+     "road": "132",
+     "observation": "本輪重掃：覆蓋率降到66%（宣告6.06km/畫出3.98km，5段缺口），跟route-audit.md記載的87%不符——為漂移，需優先核實",
+     "recommendation": "問題",
+     "basis": "校準原則：本輪重掃跟既有文件數字對不上，符合「已審路線一樣重掃、發現退回標紅」——route-audit.md記載D45收邊後「未逐段複查是否隨收邊一併消失」，本輪重掃顯示情況比原記載更差，優先排查是否132改clip:后里區後反而裁掉了原本畫出的一段",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "coast-north": {
+   "route_name": "台61｜西濱北段",
+   "summary": "1 筆建議、4 筆問題",
+   "counts": {
+    "正常銷案": 1,
+    "問題": 4
+   },
+   "findings": [
+    {
+     "id": "F0083",
+     "route": "coast-north",
+     "route_name": "台61｜西濱北段",
+     "kind": "edges",
+     "coords": [
+      [
+       25.0101,
+       121.0473
+      ],
+      [
+       25.0049,
+       121.0409
+      ],
+      [
+       25.0319,
+       121.0749
+      ],
+      [
+       25.0322,
+       121.0726
+      ]
+     ],
+     "road": "15／文化路三段、濱海路武威段",
+     "observation": "2條邊，1/18、1/5取樣點不符",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：邊上單點瑕疵",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0084",
+     "route": "coast-north",
+     "route_name": "台61｜西濱北段",
+     "kind": "coverage",
+     "coords": [
+      [
+       25.0765,
+       121.205
+      ],
+      [
+       25.0794,
+       121.2097
+      ],
+      [
+       24.9453,
+       121.0053
+      ],
+      [
+       24.943,
+       121.0031
+      ],
+      [
+       24.9521,
+       121.0107
+      ],
+      [
+       24.9512,
+       121.0101
+      ]
+     ],
+     "road": "國際路一段／文化路一段",
+     "observation": "2筆覆蓋率不足：國際路一段79%（缺570m）、文化路一段88%（缺333m+117m），都在大園/蘆竹一帶",
+     "recommendation": "問題",
+     "basis": "量級不大，未查證具體成因",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0085",
+     "route": "coast-north",
+     "route_name": "台61｜西濱北段",
+     "kind": "visual_parallel",
+     "coords": [
+      [
+       25.02,
+       121.05
+      ]
+     ],
+     "road": "段1↔段4／段0↔段1",
+     "observation": "2組平行重複1240m/712m",
+     "recommendation": "問題",
+     "basis": "「61」含motorway/motorway_link類別，快速道路雙向車道殘留是HANDOFF根因表第14/28條記載的結構性成因，紅線內不動stitch/dedup容差",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0086",
+     "route": "coast-north",
+     "route_name": "台61｜西濱北段",
+     "kind": "meta",
+     "coords": [],
+     "road": "查詢設計（病灶A，全站最寬未clip）",
+     "observation": "「61」與「15」都沒有clip，bbox跨度lat0.320/lon0.400與lat0.250/lon0.330——全站bbox最寬卻完全沒收邊的查詢",
+     "recommendation": "問題",
+     "basis": "邊界律：服務六鄉鎮寬bbox有其必要性，但完全無clip風險偏高，建議列入下一輪clip補強候選（比照coast-south/dajia多鄉聯集做法）",
+     "confidence": "中",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0087",
+     "route": "coast-north",
+     "route_name": "台61｜西濱北段",
+     "kind": "adjacency",
+     "coords": [
+      [
+       24.844,
+       120.9426
+      ]
+     ],
+     "road": "與hsinpu（757m，新發現）",
+     "observation": "跟coast-17km↔hsinpu那組543m幾乎同一座標，是D31擴界後才出現的連帶效應，不在既有20條開放問題名單內",
+     "recommendation": "問題",
+     "basis": "連通律：新出現訊號，值得跟D27/D28一併查證要不要補上精確交棒點",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "coast-17km": {
+   "route_name": "南寮到香山｜十七公里海岸線",
+   "summary": "1 筆建議、1 筆問題",
+   "counts": {
+    "正常銷案": 1,
+    "問題": 1
+   },
+   "findings": [
+    {
+     "id": "F0088",
+     "route": "coast-17km",
+     "route_name": "南寮到香山｜十七公里海岸線",
+     "kind": "visual_identity",
+     "coords": [],
+     "road": "高濱路（西濱公路香山聯絡道殘段）",
+     "observation": "route-audit.md記載段[2] 50%命中「高濱路」，但本輪重掃check_visual已不再列出此警報——確認已消失",
+     "recommendation": "正常銷案",
+     "basis": "校準原則：已審路線重掃驗證，此筆訊號已消失（可能隨D49/D50香山區clip調整連帶解決），route-audit.md該筆記載已過期，建議下一輪更新文件",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0089",
+     "route": "coast-17km",
+     "route_name": "南寮到香山｜十七公里海岸線",
+     "kind": "adjacency",
+     "coords": [
+      [
+       24.8301,
+       120.9586
+      ]
+     ],
+     "road": "與zhudong（2520m，開放問題13）",
+     "observation": "值得跟D27/D28一併查證要不要補上hsinpu↔coast-17km之間的精確交棒點",
+     "recommendation": "問題",
+     "basis": "連通律：距離較大（>2.5km），未查證是否有真實走廊",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "coast-south": {
+   "route_name": "台61｜西濱南段（竹南・後龍・通霄）",
+   "summary": "1 筆建議、2 筆問題",
+   "counts": {
+    "正常銷案": 1,
+    "問題": 2
+   },
+   "findings": [
+    {
+     "id": "F0090",
+     "route": "coast-south",
+     "route_name": "台61｜西濱南段（竹南・後龍・通霄）",
+     "kind": "visual_gap",
+     "coords": [
+      [
+       24.6114,
+       120.7917
+      ],
+      [
+       24.6115,
+       120.7589
+      ],
+      [
+       24.4911,
+       120.6789
+      ]
+     ],
+     "road": "3處缺口",
+     "observation": "46m/77m/358m，本輪範圍外未處理",
+     "recommendation": "正常銷案",
+     "basis": "容忍律：量級小，前兩處<100m可視為交流道/路口取樣瑕疵，第三處358m略需留意但非本輪重點",
+     "confidence": "中",
+     "color": "綠"
+    },
+    {
+     "id": "F0091",
+     "route": "coast-south",
+     "route_name": "台61｜西濱南段（竹南・後龍・通霄）",
+     "kind": "visual_parallel",
+     "coords": [
+      [
+       24.61,
+       120.76
+      ]
+     ],
+     "road": "段[1]↔段[4]",
+     "observation": "並行851m",
+     "recommendation": "問題",
+     "basis": "未查證具體成因，技術債候選",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0092",
+     "route": "coast-south",
+     "route_name": "台61｜西濱南段（竹南・後龍・通霄）",
+     "kind": "meta",
+     "coords": [],
+     "road": "61南界／1己／128（病灶A候選）",
+     "observation": "皆仍是純bbox clip，範圍外未處理",
+     "recommendation": "問題",
+     "basis": "邊界律：候選病灶A，優先度較低（HANDOFF §6.32已記載），下一輪可比照D55/D56做法收邊",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  },
+  "dajia": {
+   "route_name": "台61／國3｜苑裡・大甲・清水",
+   "summary": "1 筆建議、4 筆問題",
+   "counts": {
+    "問題": 4,
+    "正常銷案": 1
+   },
+   "findings": [
+    {
+     "id": "F0093",
+     "route": "dajia",
+     "route_name": "台61／國3｜苑裡・大甲・清水",
+     "kind": "coverage",
+     "coords": [
+      [
+       24.4283,
+       120.6442
+      ],
+      [
+       24.4238,
+       120.6502
+      ],
+      [
+       24.42,
+       120.6547
+      ],
+      [
+       24.4217,
+       120.6529
+      ],
+      [
+       24.4202,
+       120.6546
+      ]
+     ],
+     "road": "140",
+     "observation": "宣告14.35km/畫出12.34km/覆蓋率86%，4段缺口233m~787m——本輪重掃新確認的殘留缺口，未見於route-audit.md現有文字明確列出",
+     "recommendation": "問題",
+     "basis": "6.34批次C6已補140西端（田心二十四路/苑南陸橋一帶），但這組缺口座標落在24.42~24.43，跟C6處理範圍是否重疊需查證，屬本輪重掃新增訊號",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0094",
+     "route": "dajia",
+     "route_name": "台61／國3｜苑裡・大甲・清水",
+     "kind": "visual_identity",
+     "coords": [
+      [
+       24.4433,
+       120.6518
+      ]
+     ],
+     "road": "無編號無路名／大甲交流道",
+     "observation": "段[9]（7.2km）40%抽樣點命中未宣告道路——本人已審：正常（A5，市區地方路名混入屬正常現象，量級不大）",
+     "recommendation": "正常銷案",
+     "basis": "本人已裁示正常",
+     "confidence": "高",
+     "color": "綠"
+    },
+    {
+     "id": "F0095",
+     "route": "dajia",
+     "route_name": "台61／國3｜苑裡・大甲・清水",
+     "kind": "visual_identity",
+     "coords": [
+      [
+       24.3443,
+       120.6235
+      ]
+     ],
+     "road": "中18",
+     "observation": "段[10]（0.8km）33%抽樣點命中「中18」",
+     "recommendation": "問題",
+     "basis": "本輪重掃新出現的身分不符訊號（33%命中率屬臨界，未達代表性律高信心門檻），未經人工核對，優先度低",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0096",
+     "route": "dajia",
+     "route_name": "台61／國3｜苑裡・大甲・清水",
+     "kind": "meta",
+     "coords": [],
+     "road": "C3中華街／中華路釐清",
+     "observation": "本人指出「中華街」是錯路、正解應為「中華路」，但反覆用不同bbox查證OSM資料裡查無「中華路」對應道路，只有「中華街」",
+     "recommendation": "問題",
+     "basis": "HANDOFF §6.34已誠實記錄查證結果，需本人下一輪釐清是路名記憶落差還是OSM資料缺漏，本輪不重複查證，僅提醒仍待裁決",
+     "confidence": "低",
+     "color": "紫問號"
+    },
+    {
+     "id": "F0097",
+     "route": "dajia",
+     "route_name": "台61／國3｜苑裡・大甲・清水",
+     "kind": "meta",
+     "coords": [],
+     "road": "C2光明路移除取捨",
+     "observation": "本人裁示移除但實測會製造更嚴重的平行重複（2256m+767m，比原本33%身分不符更嚴重），本輪未採納",
+     "recommendation": "問題",
+     "basis": "HANDOFF §6.34已誠實記錄這個取捨，需本人裁決是接受現況（33%身分不符）還是要求另尋修法",
+     "confidence": "低",
+     "color": "紫問號"
+    }
+   ]
+  }
+ }
+}
