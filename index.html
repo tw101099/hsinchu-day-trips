@@ -568,11 +568,20 @@ button{font:inherit; color:inherit; cursor:pointer}
    13px（跟 .chip 的 12.5px 差距很小），2026-08-22 改回 16px——這是 `<input
    type="time">`，iOS Safari 對任何 <16px 的表單控制項聚焦都會強制放大頁面
    （不限文字鍵盤，含時間選輪），跟 #q 同一條規則，優先權更高，蓋掉原本
-   「跟 .chip 對齊」的視覺考量。padding 從 4px 收到 3px 抵一點高度差。 */
+   「跟 .chip 對齊」的視覺考量。**font-size:16px 是底線，不能再動**（§6.17
+   記過的 iOS 聚焦放大線）。padding 從 4px 收到 3px 抵一點高度差。
+   2026-08-22 本人回報框偏大：根因不是 padding，是 `font:inherit` 把 body
+   的 `line-height:1.6` 也一併帶進來（`font` shorthand 的 inherit 涵蓋
+   line-height，後面單獨覆寫的只有 font-size），16px×1.6＝25.6px 的行高
+   撐出一顆比視覺需要大一截的行內框，跟旁邊 22px 的「家」圖示、12px 的
+   label 不成比例。改法只動 line-height／padding 這兩個不影響 font-size 的
+   屬性——line-height 不是 iOS 判斷聚焦放大的依據（那條規則只看 font-size
+   computed value），把它收緊到 1.15（貼近字級本身的自然行高）就夠讓框變
+   小，不用動用 transform:scale() 這種要另外補償版面寬度、風險更高的手段。 */
 #start{
   border:1px solid var(--line); background:var(--bg); color:var(--ink2); border-radius:999px;
-  padding:3px 10px; font:inherit; font-size:16px; font-family:var(--mono); cursor:pointer;
-  color-scheme:light;
+  padding:2px 7px; font:inherit; font-size:16px; line-height:1.15; font-family:var(--mono);
+  cursor:pointer; color-scheme:light;
 }
 #start:hover{border-color:var(--accent)}
 #start:focus{outline:1px solid var(--accent); border-color:var(--accent)}
@@ -1721,11 +1730,11 @@ function renderTrip(){
     const meta=document.createElement("div"); meta.className="meta";
     const win=document.createElement("span"); win.className="win"; win.textContent=it.win;
     const step=document.createElement("span"); step.className="stepper";
-    const minus=document.createElement("button"); minus.textContent="−"; minus.title="停少一點";
-    minus.onclick=()=>adjustStay(it.p,-0.5);
+    const minus=document.createElement("button"); minus.textContent="−"; minus.title="停少一點（15 分）";
+    minus.onclick=()=>adjustStay(it.p,-0.25);
     const v=document.createElement("span"); v.className="v"; v.textContent=it.stay;
-    const plus=document.createElement("button"); plus.textContent="＋"; plus.title="停久一點";
-    plus.onclick=()=>adjustStay(it.p,0.5);
+    const plus=document.createElement("button"); plus.textContent="＋"; plus.title="停久一點（15 分）";
+    plus.onclick=()=>adjustStay(it.p,0.25);
     step.append(minus,v,plus);
     meta.append(win,step);
     if (it.warn){
@@ -1838,6 +1847,32 @@ function alignLeadColumn(root){
   if (needed > avail) root.classList.add("stacked");
   else root.style.setProperty("--leadw", Math.ceil(max)+"px");
 }
+/* #trip 欄寬監控——通用解，跟上面 #map 那組 ResizeObserver（HANDOFF §6.26）
+   同一個道理（HANDOFF §6.28，本人真機回報橫向轉直向後行程展開區跑版：季節
+   備註擠成一字一行直排、時間字串被截斷「10:」、加減鈕被裁在右緣）。根因：
+   alignLeadColumn() 只在 renderTrip() 重新產生 DOM 時量一次——量出來的
+   --leadw（固定 px 值，見上面）或 .stacked class 只反映「量測當下」的容器
+   寬度；轉向這種不經過 renderTrip() 的寬度變化完全沒有補呼叫，殘留的舊
+   --leadw 在新的（更窄的）寬度下把中間欄（.meta：時間窗＋停留＋季節備註）
+   擠到只剩幾 px，逼得裡面文字一字一行、時間字串被截斷、.ops 加減鈕被裁到
+   右緣外——跟 #map 灰帶同一種「容器尺寸變了、卻沒有對應的重新量測入口」，
+   用同一招：對 #trip 本身掛 ResizeObserver，尺寸一變就 debounce 後重跑
+   alignLeadColumn()，不管是轉向、標籤列展開收合、或任何其他不經過
+   renderTrip() 的寬度變化，一次接住。alignLeadColumn() 一開頭就先解除
+   stacked／--leadw 鎖定再重新量（見上），本身就是幂等的——每次呼叫都是照
+   「當下實測」重算，不會因為呼叫時機多寡而累積誤差或在兩態間來回擺盪；
+   面板收合時 leads 量到 0 寬會自動早退、不動既有狀態，呼叫時機多寡也不影響
+   收合狀態下的行為。debounce 用 setTimeout（這個工具環境 rAF 不觸發，見
+   HANDOFF §6.15，沿用同一個理由不依賴它）。 */
+(function(){
+  const tripEl = document.getElementById("trip");
+  if (!tripEl || typeof ResizeObserver === "undefined") return;
+  let t = null;
+  new ResizeObserver(function(){
+    if (t) clearTimeout(t);
+    t = setTimeout(function(){ alignLeadColumn(tripEl); }, 100);
+  }).observe(tripEl);
+})();
 
 /* ── 行程列：橫滑刪除 ＋ 拖曳排序 ──
    兩種手勢共用同一顆 pointerdown，靠移動方向與起點元素分流：
@@ -2682,6 +2717,33 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     map:   ["#c0c", "紫"],
   };
 
+  /* 2026-08-22 新增（HANDOFF §6.28，本人真機回報橫向轉直向後行程展開區
+     跑版：季節備註擠成一字一行直排、時間字串被截斷、加減鈕被裁在右緣）：
+     量 .trip 展開區裡第一個行程站的關鍵欄（.lead／.meta／.win／.stepper／
+     .warn／.ops）寬度，加上 --leadw 目前值與 .stacked 是否套用——跟
+     alignLeadColumn() 判斷用的是同一批量測依據，本人截圖若再跑版，這幾行
+     能直接看出是「--leadw 殘留舊值撐不住新寬度」還是別的原因。跟上面
+     app/main/panel/stage/map/trip 那組「外層版面分配」互補，量的是「版面
+     分給 .trip 之後，裡面的欄位有沒有跟著正確分配」。純新增讀值，
+     applyOutlines()／open()／close()／toggleDiag() 都沒動。 */
+  function tripRowRects(){
+    const trip = document.getElementById("trip");
+    const stop = trip && trip.querySelector(".stop");
+    if (!trip) return ["(找不到 #trip)"];
+    const leadw = getComputedStyle(trip).getPropertyValue("--leadw").trim();
+    const lines = [
+      "--leadw: " + (leadw || "(未設定，用 max-content)"),
+      ".trip.stacked: " + trip.classList.contains("stacked"),
+    ];
+    if (!stop) return lines.concat(["(目前沒有展開的行程站可量)"]);
+    [".lead", ".meta", ".win", ".stepper", ".warn", ".ops"].forEach(function(sel){
+      const el = stop.querySelector(sel);
+      if (!el){ lines.push(sel + ": (不存在)"); return; }
+      const r = el.getBoundingClientRect();
+      lines.push(sel + ": left=" + r.left.toFixed(1) + " width=" + r.width.toFixed(1));
+    });
+    return lines;
+  }
   function measureDvh(){
     const p = document.createElement("div");
     p.style.cssText = "position:fixed;visibility:hidden;pointer-events:none;left:0;top:0;width:0;height:100dvh;";
@@ -2763,7 +2825,9 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
       rectLine("stage"),
       rectLine("map"),
       rectLine("trip"),
-    ];
+      "",
+      "== .trip 展開區欄位（第一個行程站）==",
+    ].concat(tripRowRects());
     overlay.querySelector("#diagText").textContent = lines.join("\n");
   }
   function applyOutlines(on){
