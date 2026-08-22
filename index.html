@@ -40,6 +40,13 @@
   --sb:#cfc7ba; --sb-hover:#a89f92;
   --r:10px; --barh:56px;
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  /* 審查模式三色（2026-08-22 新增，本人裁可）：故意避開 DIRS 的彩虹五色
+     （紅橙金綠藍）跟 hubpin 的紫，讓三個審查圖層跟「路線本身」一眼分得開。
+     --rv-line＝鄉鎮界線虛線（青綠）、--rv-flag＝交棒點旗標（洋紅）、
+     --rv-road＝道路查詢高亮（亮紫，任務指示的建議色）。JS 端用
+     getComputedStyle 讀這三個變數，不是寫死 hex——理由跟其餘元件一致：
+     單一色值來源，深淺模式各自覆寫即可，不必在 CSS／JS 兩處各記一份。 */
+  --rv-line:#0f766e; --rv-flag:#be185d; --rv-road:#8b2fc9;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -50,6 +57,7 @@
     --warn:#e0a45c;
     --danger:#c17167;
     --sb:#4a443c; --sb-hover:#6a6157;
+    --rv-line:#5eead4; --rv-flag:#f9a8d4; --rv-road:#c9a3f2;
   }
 }
 :root[data-theme="dark"]{
@@ -58,6 +66,7 @@
     --line:#332f2b; --line2:#454039;
     --accent:#bcb2a2; --accent-soft:#2c2822; --on-accent:#17150f;
     --warn:#e0a45c;
+    --rv-line:#5eead4; --rv-flag:#f9a8d4; --rv-road:#c9a3f2;
     --danger:#c17167;
     --sb:#4a443c; --sb-hover:#6a6157;
 }
@@ -762,6 +771,63 @@ button{font:inherit; color:inherit; cursor:pointer}
   :root:not([data-theme="light"]) .leaflet-tile{filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.85)}
 }
 :root[data-theme="dark"] .leaflet-tile{filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.85)}
+
+/* 審查模式（2026-08-22 新增，本人裁可，為路線驗收設計）：長按 topbar logo
+   3 秒開出的選單，新增鄉鎮界線／交棒點／道路查詢三個開關，跟既有真機診斷
+   共用同一個長按入口——見對應的最後一支 script。公開介面完全不受影響：
+   這層 DOM 只在長按觸發後才由 JS 建立，平常零成本（不在首屏 HTML 裡）。 */
+.review-menu{
+  position:fixed; z-index:40000; top:calc(var(--barh, 56px) + 8px); left:8px;
+  width:240px; max-width:calc(100vw - 16px); max-height:calc(100vh - var(--barh, 56px) - 16px);
+  overflow-y:auto; background:var(--panel); border:1px solid var(--line2); border-radius:var(--r);
+  box-shadow:0 6px 24px rgba(0,0,0,.28); padding:10px 12px; font-size:13px; color:var(--ink);
+}
+.review-menu h4{margin:0 0 8px; font-size:12.5px; font-weight:700; color:var(--ink2);
+  display:flex; align-items:center; justify-content:space-between}
+.review-menu .rvclose{
+  border:0; background:none; color:var(--ink3); font-size:17px; line-height:1; padding:2px 4px;
+  cursor:pointer; border-radius:999px;
+}
+.review-menu .rvclose:hover{color:var(--accent)}
+.review-menu .rvdiag{
+  width:100%; text-align:left; border:1px solid var(--line); background:var(--bg); color:var(--ink);
+  border-radius:999px; padding:6px 12px; font:inherit; font-size:12.5px; cursor:pointer; margin-bottom:8px;
+}
+.review-menu .rvdiag:hover{border-color:var(--accent); color:var(--accent)}
+.review-menu hr{border:0; border-top:1px solid var(--line); margin:2px 0 6px}
+.review-menu .rvrow{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 0}
+.review-menu .rvlabel{flex:1; min-width:0; line-height:1.35}
+.review-menu .rvsub{display:block; font-size:11px; color:var(--ink3); margin-top:1px}
+.review-menu .rvtoggle{
+  flex:none; border:1px solid var(--line2); background:var(--bg); border-radius:999px;
+  padding:4px 12px; font:inherit; font-size:12px; color:var(--ink2); cursor:pointer;
+}
+.review-menu .rvtoggle[aria-pressed=true]{background:var(--accent); color:var(--on-accent); border-color:var(--accent)}
+.review-menu .rvtoggle:disabled{opacity:.4; cursor:not-allowed}
+.review-menu .rvroad{display:none; margin-top:2px}
+.review-menu .rvroad.on{display:block}
+/* 沿用 #q 的 16px 底線（iOS 聚焦防放大）：見上面 #q 規則的同一則說明。 */
+.review-menu .rvin{
+  width:100%; padding:5px 13px; border-radius:999px; border:1px solid var(--line);
+  background:var(--bg); color:var(--ink); font:inherit; font-size:16px; margin-bottom:6px;
+}
+.review-menu .rvin:focus{outline:1px solid var(--accent); border-color:var(--accent)}
+.review-menu .rvgo{
+  width:100%; border:1px solid var(--line2); background:var(--accent); color:var(--on-accent);
+  border-radius:999px; padding:6px 12px; font:inherit; font-size:12.5px; cursor:pointer;
+}
+.review-menu .rvgo:disabled{opacity:.5; cursor:not-allowed}
+.review-menu .rvstatus{display:block; margin-top:6px; font-size:11.5px; color:var(--ink3); line-height:1.5}
+.review-menu .rvnote{font-size:11px; color:var(--ink3); line-height:1.5; margin-top:6px}
+/* 鄉鎮界線標籤：divIcon 是純 HTML，跟其他元件一樣直接吃 CSS 變數即可
+   （不像下面 Leaflet SVG polygon／marker 圖層要 JS 讀 computed value 再塞
+   進 inline style——SVG 的 stroke/fill attribute 不吃 var()）。 */
+.rvtownlabel{
+  font-size:11px; font-weight:600; white-space:nowrap; pointer-events:none;
+  color:var(--rv-line); text-shadow:0 0 3px var(--bg), 0 0 3px var(--bg), 0 0 5px var(--bg);
+}
+.rvflag{display:grid; place-items:center; width:20px; height:20px}
+.rvflag svg{width:18px; height:18px; filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}
 
 @media (prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important} }
 </style>
@@ -2687,6 +2753,11 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
 <script>
 /* 真機診斷模式（本人 2026-08-22 二輪回報後新增，臨時工具——不是交付物，等
    行程面板留白／回頂鈕兩項問題定案後下一輪拆掉，見 HANDOFF §6.18）。
+   **2026-08-22 同日再更新**：長按 logo 3 秒現在開的是「審查模式」選單（見
+   本檔最後一支 script），這支診斷浮層變成選單裡的一個項目
+   （window.__toggleDiag，由選單的「真機診斷」按鈕呼叫）——本支 script 內部
+   的浮層邏輯（open/close/refresh/applyOutlines）完全沒動，只有「長按觸發誰」
+   這件事換了手，細節見下面 logo 長按那段的新註解。
    啟用：長按 topbar 的「新竹一日」logo 3 秒（standalone 模式沒網址列，不能靠
    query 參數切換）。啟用後半透明浮層顯示：innerWidth/innerHeight、
    visualViewport.height、100dvh 實測 px（量一個隱藏的 100dvh 探測 div，不是
@@ -2873,15 +2944,30 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     overlay = null;
   }
   function toggleDiag(){ if (diagOn) close(); else open(); }
+  // 2026-08-22 新增（審查模式）：這支診斷工具現在是「審查模式」選單裡的一個
+  // 項目，不再是長按 logo 唯一的動作——選單本身在最後一支 script 建立，
+  // 那裡要能叫到這支 toggleDiag()，同一頁面內跨 <script> 的 let/const 不共享
+  // 到 IIFE 內部，所以照這份 repo 既有的跨 script 溝通慣例（同上面的
+  // window.__iosStandaloneFix）掛一份到 window。
+  window.__toggleDiag = toggleDiag;
 
   const logo = document.getElementById("logo");
   if (logo){
     let pressTimer = null, sx = 0, sy = 0, moved = false;
     const HOLD_MS = 3000, TOL = 14;
+    // 2026-08-22 新增：長按 3 秒現在開的是「審查模式」選單（最後一支 script
+    // 定義的 window.__toggleReviewMenu），真機診斷變成選單裡第一個項目，
+    // 不再是長按的直接效果——沒改長按判定邏輯本身（HOLD_MS／TOL／moved
+    // 都沒動），只換了計時器到點之後呼叫誰。找不到選單函式（例如那支
+    // script 執行順序異常）就退回舊行為，直接開診斷浮層，不讓長按整個失靈。
     function begin(x, y){
       moved = false; sx = x; sy = y;
       clearTimeout(pressTimer);
-      pressTimer = setTimeout(function(){ if (!moved) toggleDiag(); }, HOLD_MS);
+      pressTimer = setTimeout(function(){
+        if (moved) return;
+        if (window.__toggleReviewMenu) window.__toggleReviewMenu();
+        else toggleDiag();
+      }, HOLD_MS);
     }
     function trackMove(x, y){
       if (Math.abs(x - sx) > TOL || Math.abs(y - sy) > TOL){ moved = true; clearTimeout(pressTimer); }
@@ -2897,6 +2983,351 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     logo.addEventListener("mouseleave", cancelPress);
     logo.addEventListener("contextmenu", function(e){ e.preventDefault(); });
   }
+})();
+</script>
+<script>
+/* 審查模式（2026-08-22 新增，本人裁可，為路線驗收設計——見任務指示與
+   HANDOFF §6.35）。長按 topbar logo 3 秒開出的小選單，三個開關：
+
+     ①鄉鎮界線：從 review_layers.json 的 town_rings 畫虛線描邊多邊形，
+       縮放到 TOWN_LABEL_ZOOM 以上才疊字（避免縮小時糊成一片）。
+     ②交棒點：同一份 JSON 的 handoffs（僅 kind:"point" 那批，
+       export_review_layers.py 已篩過、去重），畫小旗標，點擊彈出
+       「A ↔ B（道路名）」。
+     ③道路查詢：輸入 ref（如 130）或路名（如 中華路），對 Overpass 公開
+       API（POST https://overpass-api.de/api/interpreter）查目前地圖視野
+       bbox 內的道路（ref 正則＋name 精確比對兩式合併，任務指示給的查詢
+       寫法），畫成高對比色（--rv-road）疊在地圖上；再查一次先清掉上一次
+       結果；逾時（15 秒）或失敗只在選單裡顯示一行訊息，不拋錯、不擋其他
+       功能。這項要連網，Overpass 被限流時會查不到。
+
+   ①②的資料是本地靜態檔（fetch('./review_layers.json')，跟 index.html
+   同層，build.py／publish.py 複製過去）；載不到就把這兩個開關 disable
+   掉、選單裡留一行說明，③不受影響（它本來就是另一條網路路徑）。
+
+   公開介面不變：這裡的 DOM／圖層一律等使用者長按 logo 才建立，一般模式
+   （不長按）完全不會碰到這支 script 的任何一行副作用。跟真機診斷共用同一個
+   長按入口，見上一支 script 尾端「logo 長按」那段——這支負責選單本身跟三個
+   審查圖層，真機診斷維持原本那支 script 的實作，本支只透過 window.__toggleDiag
+   呼叫它。
+
+   全域變數 map／L／engine／ready／DARK／esc／SYS 直接沿用主程式 script
+   （script #1）——同一份文件內多個 <script> 標籤的頂層 let/const 本來就共享
+   同一個全域字彙範圍，這裡不必也不應該再用 window.__ 橋接一次（已用一個
+   最小的內嵌測試頁核實過這件事）；只有要跨「IIFE 內部」的東西（例如上一支
+   script 的 toggleDiag）才需要掛 window.__，這是本檔既有的慣例
+   （window.__iosStandaloneFix 同理）。 */
+(function(){
+  let menu = null, menuOpen = false;
+  let rvData = null, rvDataPromise = null, rvDataFailed = false;
+  let rvTownOn = false, rvHandoffOn = false, rvRoadOn = false;
+  let rvTownLayer = null, rvTownLabelLayer = null, rvHandoffLayer = null, rvRoadLayer = null;
+  let rvZoomHooked = false;
+  let rvRoadAbort = null;
+  const TOWN_LABEL_ZOOM = 12;
+  const REVIEW_JSON_URL = "./review_layers.json";
+  const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
+
+  function cssVar(name){
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name);
+    return (v && v.trim()) || "#888";
+  }
+
+  function mapReady(){ return !!(typeof map !== "undefined" && map && typeof engine !== "undefined" && engine === "osm"); }
+
+  function ensureLayers(){
+    if (!mapReady()) return false;
+    if (!rvTownLayer){
+      rvTownLayer = L.layerGroup();
+      rvTownLabelLayer = L.layerGroup();
+      rvHandoffLayer = L.layerGroup();
+      rvRoadLayer = L.layerGroup();
+    }
+    if (!rvZoomHooked){
+      map.on("zoomend", updateTownLabelVisibility);
+      rvZoomHooked = true;
+    }
+    return true;
+  }
+
+  function loadReviewData(){
+    if (rvData) return Promise.resolve(rvData);
+    if (rvDataFailed) return Promise.reject(new Error("review_layers.json 先前已載入失敗"));
+    if (!rvDataPromise){
+      rvDataPromise = fetch(REVIEW_JSON_URL).then(function(r){
+        if (!r.ok) throw new Error("http " + r.status);
+        return r.json();
+      }).then(function(d){ rvData = d; return d; }).catch(function(err){
+        rvDataFailed = true; rvDataPromise = null; throw err;
+      });
+    }
+    return rvDataPromise;
+  }
+
+  function renderTowns(data){
+    rvTownLayer.clearLayers(); rvTownLabelLayer.clearLayers();
+    const color = cssVar("--rv-line");
+    const rings = data.town_rings || {};
+    Object.keys(rings).forEach(function(name){
+      (rings[name] || []).forEach(function(ring){
+        if (!ring || ring.length < 3) return;
+        L.polygon(ring, {
+          color: color, weight: 1.5, dashArray: "6 5", fill: false,
+          interactive: false, bubblingMouseEvents: false,
+        }).addTo(rvTownLayer);
+      });
+      const first = (rings[name] || [])[0];
+      if (first && first.length){
+        const center = L.latLngBounds(first).getCenter();
+        L.marker(center, {
+          icon: L.divIcon({
+            className: "", html: '<span class="rvtownlabel">' + esc(name) + '</span>',
+            iconSize: [0, 0],
+          }),
+          interactive: false,
+        }).addTo(rvTownLabelLayer);
+      }
+    });
+  }
+
+  function renderHandoffs(data){
+    rvHandoffLayer.clearLayers();
+    const color = cssVar("--rv-flag");
+    (data.handoffs || []).forEach(function(h){
+      if (!h.point) return;
+      const icon = L.divIcon({
+        className: "",
+        html: '<div class="rvflag" style="color:' + color + '">' +
+              '<svg viewBox="0 0 16 16"><path d="M3 14.5V1.5h9.5l-2.3 3.3 2.3 3.3H3" ' +
+              'fill="currentColor" stroke="none"/></svg></div>',
+        iconSize: [20, 20], iconAnchor: [2, 20],
+      });
+      const m = L.marker(h.point, {icon: icon, zIndexOffset: 600});
+      const road = h.road ? esc(h.road) : "（未記道路名）";
+      m.bindPopup(
+        '<b>' + esc(h.route_name || h.route) + ' ↔ ' + esc(h.neighbor_name || h.neighbor) + '</b>' +
+        '<br>' + road + (h.name ? '<br><span style="color:var(--ink3);font-size:11.5px">' + esc(h.name) + '</span>' : "")
+      );
+      m.addTo(rvHandoffLayer);
+    });
+  }
+
+  function updateTownLabelVisibility(){
+    if (!mapReady() || !rvTownLabelLayer) return;
+    const show = rvTownOn && map.getZoom() >= TOWN_LABEL_ZOOM;
+    const has = map.hasLayer(rvTownLabelLayer);
+    if (show && !has) map.addLayer(rvTownLabelLayer);
+    else if (!show && has) map.removeLayer(rvTownLabelLayer);
+  }
+
+  // 主題切換／系統跟隨切換時只重繪顏色，不重建整層——applyTheme() 更新的
+  // DARK 跟這裡的 cssVar() 讀值是同一份 CSS 變數，兩邊各自更新互不干涉。
+  function reapplyColors(){
+    if (!rvData) return;
+    if (rvTownOn) renderTowns(rvData);
+    if (rvHandoffOn) renderHandoffs(rvData);
+  }
+  const themeBtn = document.getElementById("theme");
+  if (themeBtn) themeBtn.addEventListener("click", reapplyColors);
+  if (typeof SYS !== "undefined" && SYS && SYS.addEventListener) SYS.addEventListener("change", reapplyColors);
+
+  function setPressed(btn, on){ if (btn) btn.setAttribute("aria-pressed", on ? "true" : "false"); }
+
+  function disableDataToggles(msg){
+    ["rvTownBtn", "rvHandoffBtn"].forEach(function(id){
+      const b = document.getElementById(id);
+      if (b) b.disabled = true;
+    });
+    const note = document.getElementById("rvNote");
+    if (note) note.textContent = msg;
+  }
+
+  function onToggleTown(){
+    if (!ensureLayers()) return;
+    rvTownOn = !rvTownOn;
+    const btn = document.getElementById("rvTownBtn");
+    setPressed(btn, rvTownOn);
+    if (rvTownOn){
+      loadReviewData().then(function(d){
+        renderTowns(d);
+        map.addLayer(rvTownLayer);
+        updateTownLabelVisibility();
+      }).catch(function(){
+        rvTownOn = false; setPressed(btn, false);
+        disableDataToggles("鄉鎮界線／交棒點資料載不到（review_layers.json），這兩項暫時不可用；道路查詢不受影響。");
+      });
+    } else {
+      map.removeLayer(rvTownLayer);
+      if (map.hasLayer(rvTownLabelLayer)) map.removeLayer(rvTownLabelLayer);
+    }
+  }
+
+  function onToggleHandoff(){
+    if (!ensureLayers()) return;
+    rvHandoffOn = !rvHandoffOn;
+    const btn = document.getElementById("rvHandoffBtn");
+    setPressed(btn, rvHandoffOn);
+    if (rvHandoffOn){
+      loadReviewData().then(function(d){
+        renderHandoffs(d);
+        map.addLayer(rvHandoffLayer);
+      }).catch(function(){
+        rvHandoffOn = false; setPressed(btn, false);
+        disableDataToggles("鄉鎮界線／交棒點資料載不到（review_layers.json），這兩項暫時不可用；道路查詢不受影響。");
+      });
+    } else {
+      map.removeLayer(rvHandoffLayer);
+    }
+  }
+
+  function onToggleRoad(){
+    rvRoadOn = !rvRoadOn;
+    setPressed(document.getElementById("rvRoadBtn"), rvRoadOn);
+    const box = document.getElementById("rvRoadBox");
+    if (box) box.classList.toggle("on", rvRoadOn);
+    if (!rvRoadOn){
+      if (ensureLayers() && map.hasLayer(rvRoadLayer)) map.removeLayer(rvRoadLayer);
+      const status = document.getElementById("rvRoadStatus");
+      if (status) status.textContent = "";
+      if (rvRoadAbort){ rvRoadAbort.abort(); rvRoadAbort = null; }
+    }
+  }
+
+  function regexEscape(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  function runRoadQuery(){
+    const status = document.getElementById("rvRoadStatus");
+    const input = document.getElementById("rvRoadInput");
+    const goBtn = document.getElementById("rvRoadGo");
+    if (!input || !status) return;
+    const q = input.value.trim();
+    if (!q){ status.textContent = "請先輸入 ref（如 130）或路名（如 中華路）。"; return; }
+    if (!ensureLayers()){ status.textContent = "地圖尚未載入完成，稍候再試。"; return; }
+    rvRoadLayer.clearLayers();
+    if (!map.hasLayer(rvRoadLayer)) map.addLayer(rvRoadLayer);
+    if (rvRoadAbort) rvRoadAbort.abort();
+    const ctrl = new AbortController();
+    rvRoadAbort = ctrl;
+    const timer = setTimeout(function(){ ctrl.abort(); }, 15000);
+    const b = map.getBounds();
+    const bbox = [b.getSouth(), b.getWest(), b.getNorth(), b.getEast()].join(",");
+    const refPat = regexEscape(q);
+    const namePat = q.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+    // 任務指示給的查詢寫法：ref 正則（考慮 ref 欄位可能是「130;120」這種
+    // 分號分隔多值）與 name 精確比對兩式合併，同一個 union block 一次查完。
+    const ql = '[out:json][timeout:25];(' +
+      'way["highway"]["ref"~"(^|;)' + refPat + '(;|$)"](' + bbox + ');' +
+      'way["highway"]["name"="' + namePat + '"](' + bbox + ');' +
+      ');out geom;';
+    if (goBtn) goBtn.disabled = true;
+    status.textContent = "查詢中…";
+    fetch(OVERPASS_URL, {
+      method: "POST",
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: "data=" + encodeURIComponent(ql),
+      signal: ctrl.signal,
+    }).then(function(r){
+      if (!r.ok) throw new Error("http " + r.status);
+      return r.json();
+    }).then(function(json){
+      clearTimeout(timer);
+      const color = cssVar("--rv-road");
+      let n = 0;
+      (json.elements || []).forEach(function(w){
+        const geom = w.geometry;
+        if (!geom || geom.length < 2) return;
+        const latlngs = geom.filter(function(p){ return p; }).map(function(p){ return [p.lat, p.lon]; });
+        if (latlngs.length < 2) return;
+        L.polyline(latlngs, {color: color, weight: 5, opacity: .95, lineCap: "round"}).addTo(rvRoadLayer);
+        n++;
+      });
+      status.textContent = n
+        ? ("找到 " + n + " 段道路，已用高對比色疊在地圖上。")
+        : "目前視野內查無符合的道路，試著縮小地圖範圍或換個寫法。";
+    }).catch(function(err){
+      clearTimeout(timer);
+      status.textContent = (err && err.name === "AbortError")
+        ? "查詢逾時（15 秒），可能連不上 Overpass 或被限流，稍後再試。"
+        : "查詢失敗，可能沒有網路或 Overpass 暫時擋掉了，稍後再試。";
+    }).finally(function(){
+      if (goBtn) goBtn.disabled = false;
+      rvRoadAbort = null;
+    });
+  }
+
+  function buildMenu(){
+    menu = document.createElement("div");
+    menu.className = "review-menu";
+    menu.innerHTML =
+      '<h4>審查模式<button type="button" class="rvclose" aria-label="關閉選單">×</button></h4>' +
+      '<button type="button" class="rvdiag" id="rvDiagBtn">真機診斷（量測浮層）</button>' +
+      '<hr>' +
+      '<div class="rvrow">' +
+        '<div class="rvlabel">鄉鎮界線<span class="rvsub">虛線描邊，放大後顯示鄉鎮名</span></div>' +
+        '<button type="button" class="rvtoggle" id="rvTownBtn" aria-pressed="false">開</button>' +
+      '</div>' +
+      '<div class="rvrow">' +
+        '<div class="rvlabel">交棒點<span class="rvsub">路線接棒的旗標，點擊看兩側路線</span></div>' +
+        '<button type="button" class="rvtoggle" id="rvHandoffBtn" aria-pressed="false">開</button>' +
+      '</div>' +
+      '<div class="rvrow">' +
+        '<div class="rvlabel">道路查詢<span class="rvsub">查目前視野內的道路（需連網）</span></div>' +
+        '<button type="button" class="rvtoggle" id="rvRoadBtn" aria-pressed="false">開</button>' +
+      '</div>' +
+      '<div class="rvroad" id="rvRoadBox">' +
+        '<input type="text" class="rvin" id="rvRoadInput" placeholder="例：130 或 中華路" inputmode="text">' +
+        '<button type="button" class="rvgo" id="rvRoadGo">查詢目前視野</button>' +
+        '<span class="rvstatus" id="rvRoadStatus"></span>' +
+      '</div>' +
+      '<div class="rvnote" id="rvNote"></div>';
+    document.body.appendChild(menu);
+
+    menu.querySelector(".rvclose").onclick = closeMenu;
+    document.getElementById("rvDiagBtn").onclick = function(){
+      closeMenu();
+      if (window.__toggleDiag) window.__toggleDiag();
+    };
+    document.getElementById("rvTownBtn").onclick = onToggleTown;
+    document.getElementById("rvHandoffBtn").onclick = onToggleHandoff;
+    document.getElementById("rvRoadBtn").onclick = onToggleRoad;
+    document.getElementById("rvRoadGo").onclick = runRoadQuery;
+    document.getElementById("rvRoadInput").addEventListener("keydown", function(e){
+      if (e.key === "Enter") runRoadQuery();
+    });
+
+    // 選單關掉重開，圖層開關狀態不歸零——套回目前實際狀態，不是每次都重置。
+    setPressed(document.getElementById("rvTownBtn"), rvTownOn);
+    setPressed(document.getElementById("rvHandoffBtn"), rvHandoffOn);
+    setPressed(document.getElementById("rvRoadBtn"), rvRoadOn);
+    document.getElementById("rvRoadBox").classList.toggle("on", rvRoadOn);
+
+    if (!mapReady()){
+      document.getElementById("rvNote").textContent = "地圖尚未載入完成，稍候再長按一次。";
+    } else if (!rvData && !rvDataFailed){
+      // 選單一開就順手探測一次資料能不能載，載不到就先把兩個開關標成不可用，
+      // 不用等使用者按下去才發現——道路查詢那顆不受影響，它是另一條網路路徑。
+      loadReviewData().catch(function(){
+        disableDataToggles("鄉鎮界線／交棒點資料載不到（review_layers.json），這兩項暫時不可用；道路查詢不受影響。");
+      });
+    } else if (rvDataFailed){
+      disableDataToggles("鄉鎮界線／交棒點資料載不到（review_layers.json），這兩項暫時不可用；道路查詢不受影響。");
+    }
+  }
+
+  function closeMenu(){
+    if (menu && menu.parentNode) menu.parentNode.removeChild(menu);
+    menu = null; menuOpen = false;
+  }
+  function openMenu(){
+    if (menuOpen) return;
+    menuOpen = true;
+    buildMenu();
+  }
+  function toggleReviewMenu(){ if (menuOpen) closeMenu(); else openMenu(); }
+  // 跟上一支 script 的 window.__toggleDiag 同一個橋接慣例：logo 長按的計時器
+  // 在上一支 script 裡，那是另一個 IIFE，叫不到這裡的 toggleReviewMenu，
+  // 得掛一份到 window。
+  window.__toggleReviewMenu = toggleReviewMenu;
 })();
 </script>
 </body>
