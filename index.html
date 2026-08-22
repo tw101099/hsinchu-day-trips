@@ -129,7 +129,20 @@ button{font:inherit; color:inherit; cursor:pointer}
    才會吃到最後一行。若這層 CSS 在某些 WebKit 版本仍不夠力（真機缺口沒補滿），
    下面 </body> 前有一層 JS 再補一道防線（直接量 screen.height 改寫行內高度），
    兩層互不衝突、可疊加生效。 */
-@media (display-mode:standalone){
+/* 2026-08-22 本人橫向截圖回報新症狀（見 HANDOFF §6.27）：iPhone standalone
+   轉橫向後，地圖（.stage/#map）下緣跟行程列（.trip）之間多出一大條頁面底色
+   的空白（不是 §6.26 修的灰帶——那是圖磚未補、這裡是容器本身沒撐滿）。這個工具
+   環境測不出真機橫向的 screen.height／display-mode:standalone（同 §6.20 記過的
+   限制），根因無法閉環驗證，改採防禦性做法：把上面這整支 standalone 高度覆蓋
+   分支限縮到 portrait 方向。理由——這支修法原本對應的症狀（WebView 從螢幕實體
+   頂端畫起、狀態列高度沒被算進視口）是本人 portrait 真機實測到的，landscape
+   下沒有對應的實測數據；同時 landscape 下疊了兩個未經證實的變因：
+   -webkit-fill-available 在橫向有已知的 WebKit 計算怪癖（可能吃到跟目前方向
+   不符的快取值），部分 iOS 版本的 screen.height 轉向時也不互換（恆回報長邊，
+   下面 JS 那層同步處理）。與其在測不到的環境裡替 landscape 現配一條公式，不如
+   讓沒有實測根據的分支完全不介入，landscape 交還給外層 100dvh（§6.15 已驗證
+   桌機與手機兩種視窗尺寸都逐位元組正確，不受任何 standalone 特判影響）。 */
+@media (display-mode:standalone) and (orientation:portrait){
   html, body, .app{ height:100vh; height:-webkit-fill-available; }
 }
 .bar{
@@ -769,7 +782,10 @@ button{font:inherit; color:inherit; cursor:pointer}
 
   <div class="main" id="main">
     <aside class="panel" id="panel"></aside>
-    <div class="stage">
+    <!-- id="stage" 供下面「真機診斷模式」浮層量測用（本人 2026-08-22 橫向
+         留白回報後新增，見 HANDOFF §6.27）；.stage 本身選擇器不受影響（class
+         照舊）。 -->
+    <div class="stage" id="stage">
       <div id="map"></div>
       <div class="mapnote" id="mapnote"></div>
       <div class="mapmsg" id="mapmsg"></div>
@@ -2559,12 +2575,27 @@ save();
    screen.height（行內樣式，特異度最高，保證蓋過任何 CSS）；不在範圍內則清掉
    可能殘留的行內高度，交還給 CSS 層決定。狀態存在 window.__iosStandaloneFix，
    下面的真機診斷浮層會讀它顯示「修正後 .app 實高」。監聽
-   orientationchange／resize 重算，避免旋轉後缺口跑掉或殘留舊的行內高度。 */
+   orientationchange／resize 重算，避免旋轉後缺口跑掉或殘留舊的行內高度。
+   2026-08-22 追加（HANDOFF §6.27）：這整支邏輯限定 portrait 才跑（見下面
+   apply() 開頭新增的 isPortrait() 判斷）——landscape 一律清掉行內高度、不
+   套用任何新值，理由與上面 CSS media query 那段同一件事。 */
 window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:null };
 (function(){
   function isStandaloneMode(){
     return (window.matchMedia && matchMedia("(display-mode:standalone)").matches) ||
            window.navigator.standalone === true;
+  }
+  /* 2026-08-22 新增（HANDOFF §6.27）：優先信任 orientation media feature（引擎
+     自己判斷目前佈局方向，不受 screen.width/height 轉向不互換的怪癖影響）；
+     不支援時退而比較 innerWidth/innerHeight（同樣是即時佈局值，不是 screen.*）。
+     兩者都刻意不用 window.screen，因為這支修正下面就是在處理 screen.height
+     本身不可信的情境，不能拿它來判斷方向。 */
+  function isPortrait(){
+    if (window.matchMedia){
+      const mq = matchMedia("(orientation:portrait)");
+      if (typeof mq.matches === "boolean") return mq.matches;
+    }
+    return window.innerWidth < window.innerHeight;
   }
   function clearInline(){
     document.documentElement.style.height = "";
@@ -2576,6 +2607,16 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     const state = window.__iosStandaloneFix;
     if (!isStandaloneMode()){
       state.active = false; state.gap = null; state.screenH = null; state.appliedH = null;
+      return;
+    }
+    if (!isPortrait()){
+      // landscape：整支跳過 gap 判斷，只清掉可能殘留的舊行內高度、不推論新值
+      // （理由見上面 CSS @media(display-mode:standalone) and (orientation:portrait)
+      // 那段註解，HANDOFF §6.27）。仍呼叫 resizeMap()：清掉行內高度後 #app／
+      // #map 的實際尺寸可能改變，跟既有兩個分支收斂處的處理方式一致。
+      clearInline();
+      state.active = false; state.gap = null; state.screenH = null; state.appliedH = null;
+      resizeMap();
       return;
     }
     const sh = window.screen && window.screen.height;
@@ -2631,6 +2672,14 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     main:  ["#2a2", "綠"],
     panel: ["#39f", "藍"],
     trip:  ["#f90", "橙"],
+    /* 2026-08-22 新增（HANDOFF §6.27，本人橫向截圖回報地圖下緣與行程列之間
+       多出空白）：加 stage／map 兩框，量的是「地圖容器有沒有撐滿版面分給它的
+       空間」，跟 app/main/panel/trip 那組量的是「外層版面分配」互補——兩組
+       疊在一起看才能定位空白卡在哪一層。applyOutlines()／open()／close() 的
+       邏輯完全沒改，都是泛用地跑過 Object.keys(OUTLINE)，加這兩個 key 就自動
+       套用，不用動那三支函式本體。 */
+    stage: ["#0cc", "青"],
+    map:   ["#c0c", "紫"],
   };
 
   function measureDvh(){
@@ -2676,26 +2725,43 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     const appElNow = document.getElementById("app");
     const appHNow = appElNow ? appElNow.getBoundingClientRect().height : null;
     const screenH = (window.screen && window.screen.height != null) ? window.screen.height : null;
+    /* 2026-08-22 新增（HANDOFF §6.27，本人橫向截圖回報地圖下緣與行程列之間
+       多出空白）：screen.width／orientation media feature——判斷「橫向」不能
+       只看 screen.width>screen.height（部分 iOS 版本轉向不互換，這個比較本身
+       可能就是錯的），額外印 orientation media feature 的判讀當對照組，兩者
+       不一致就是實測到「screen.* 不可信」這個怪癖本身，不用再猜。行內
+       style.height 三行是「清殘留」這個修法有沒有生效的直接證據：橫向下這三
+       行應該全是空字串（表示 clearInline() 真的清乾淨了），若還殘留舊的 px
+       值，就是本輪防禦性修法沒接住的漏網案例。 */
+    const screenW = (window.screen && window.screen.width != null) ? window.screen.width : null;
+    const orientPortrait = window.matchMedia ? matchMedia("(orientation:portrait)").matches : null;
     const lines = [
       "== 真機診斷（長按 logo 3 秒關閉）==",
       "innerWidth/innerHeight: " + innerWidth + " / " + innerHeight,
       "visualViewport.height: " + (vv ? vv.height.toFixed(1) : "(不支援)"),
       "100dvh 實測: " + dvh.toFixed(1) + "px",
-      "screen.height: " + (screenH != null ? screenH : "(不支援)"),
+      "screen.width/height: " + (screenW != null ? screenW : "(不支援)") + " / " + (screenH != null ? screenH : "(不支援)"),
+      "orientation media feature: " + (orientPortrait == null ? "(不支援)" : (orientPortrait ? "portrait" : "landscape")),
       "safe-area-inset-top 實測: " + sa.top.toFixed(1) + "px",
       "safe-area-inset-bottom 實測: " + sa.bottom.toFixed(1) + "px",
       "display-mode standalone: " + standalone,
       "iOS standalone 缺口修正(JS層): " + (fix.active
         ? ("啟用，已設高 " + fix.appliedH + "px")
-        : ("未啟用" + (fix.gap != null ? "（量到 gap=" + fix.gap.toFixed(1) + "px，不在 15~100 容忍範圍）" : standalone ? "（尚未量測）" : "（非 standalone，不需要）"))),
+        : ("未啟用" + (fix.gap != null ? "（量到 gap=" + fix.gap.toFixed(1) + "px，不在 15~100 容忍範圍）" : standalone ? "（尚未量測，或非 portrait 不適用）" : "（非 standalone，不需要）"))),
       "修正後 .app 實高: " + (appHNow != null ? appHNow.toFixed(1) + "px" : "(找不到 #app)") +
         (screenH != null && appHNow != null ? "　缺口(screen.height－app實高)=" + (screenH - appHNow).toFixed(1) + "px" : ""),
+      "html/body/#app 行內 style.height（應為空字串，非空＝殘留）: " +
+        JSON.stringify(document.documentElement.style.height) + " / " +
+        JSON.stringify(document.body.style.height) + " / " +
+        JSON.stringify(appElNow ? appElNow.style.height : null),
       "--barh: " + rootCS.getPropertyValue("--barh").trim(),
       "--tripup: " + (rootCS.getPropertyValue("--tripup").trim() || "(未設定)"),
       "",
       rectLine("app"),
       rectLine("main"),
       rectLine("panel"),
+      rectLine("stage"),
+      rectLine("map"),
       rectLine("trip"),
     ];
     overlay.querySelector("#diagText").textContent = lines.join("\n");
@@ -2722,6 +2788,7 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     legend.style.cssText = "margin-bottom:8px;color:#fff;";
     legend.innerHTML = "圖例：<span style='color:#e33'>■app</span> " +
       "<span style='color:#2a2'>■main</span> <span style='color:#39f'>■panel</span> " +
+      "<span style='color:#0cc'>■stage</span> <span style='color:#c0c'>■map</span> " +
       "<span style='color:#f90'>■trip</span>　（長按 logo 3 秒關閉）";
     const pre = document.createElement("pre");
     pre.id = "diagText";
