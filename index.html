@@ -571,12 +571,14 @@ button{font:inherit; color:inherit; cursor:pointer}
 .stopwrap.dragging .stop{box-shadow:0 4px 14px rgba(0,0,0,.18); border-radius:8px; cursor:grabbing}
 .stopwrap.drag-over-top{box-shadow:inset 0 2px 0 var(--accent)}
 .stopwrap.drag-over-bottom{box-shadow:inset 0 -2px 0 var(--accent)}
-/* 背景／icon／文字用 --danger（獨立於 --warn，見 :root 定義處說明）：刪除是
-   破壞性動作，本人回報暗色模式下沿用 --warn 的黃色跟整體色系不搭，改用低飽和
-   暗紅，跟 dark 色票裡其他暖色調同一個調性；淺色模式一併從偏橙的 --warn 換成
-   紅，兩個模式的「滑刪＝紅」語意保持一致。 */
+/* 2026-08-22（本人真機複驗批次任務 0）：改用主題強調色 --accent（跟本檔案
+   頭「強調色只有一個」的設計原則一致），上一輪加的 --danger 紅色棄用——本人
+   這輪回報紅色跟整體低飽和暖灰色系還是不搭，--accent 本身就是這個介面唯一
+   的強調色，滑刪揭示用它跟其他強調用途（選取態、進度條等）視覺語彙一致。
+   --danger 變數定義保留在 :root（不刪，未來如果需要破壞性動作的獨立警示色
+   可以再用），只是 .swipebg 不再引用它。 */
 .swipebg{
-  position:absolute; inset:0; border-radius:8px; background:var(--danger); color:var(--on-accent);
+  position:absolute; inset:0; border-radius:8px; background:var(--accent); color:var(--on-accent);
   display:flex; align-items:center; justify-content:flex-end; gap:6px; padding:0 14px;
   font-size:12.5px; font-weight:600; opacity:0; pointer-events:none;
 }
