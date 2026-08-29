@@ -1896,6 +1896,7 @@ const NEAR_STEPS = [{km:10,n:5},{km:20,n:8},{km:40,n:12}];
 function pickNearby(list, n){
   const groups=new Map();
   list.forEach(o=>{ if(!groups.has(o.x.theme)) groups.set(o.x.theme,[]); groups.get(o.x.theme).push(o); });
+  groups.forEach(g=>g.sort((a,b)=>a.d-b.d));
   const order=[...groups.keys()].sort((a,b)=>groups.get(a)[0].d-groups.get(b)[0].d);
   const picked=[]; let idx=0;
   while (picked.length<n){
