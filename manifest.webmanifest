@@ -1,0 +1,19 @@
+{
+  "name": "新竹一日",
+  "short_name": "新竹一日",
+  "description": "從新竹市出發、當天來回的步道、老街、海岸與吃的，挑完直接排成一天的行程。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "zh-Hant-TW",
+  "dir": "ltr",
+  "background_color": "#faf9f7",
+  "theme_color": "#5c5449",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
