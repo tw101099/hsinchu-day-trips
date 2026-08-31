@@ -1291,11 +1291,10 @@ function toggleLocate(){
       LOC.ring=L.circle(ll,{radius:acc, weight:1, color:"#7B57A8", opacity:.5,
                             fillColor:"#7B57A8", fillOpacity:.12, interactive:false}).addTo(map);
       LOC.dot=L.marker(ll,{icon:L.divIcon({className:"mypin",
-        html:'<svg viewBox="0 0 16 16"><g style="fill:var(--panel)" stroke="none">' +
-             '<ellipse cx="5" cy="9.2" rx="1.8" ry="2.5" transform="rotate(-18 5 9.2)"/>' +
-             '<circle cx="3.9" cy="13.1" r="1.15"/>' +
-             '<ellipse cx="11" cy="4.6" rx="1.8" ry="2.5" transform="rotate(-18 11 4.6)"/>' +
-             '<circle cx="9.9" cy="8.5" r="1.15"/></g></svg>'}),
+        html:'<svg viewBox="0 0 16 16"><g style="fill:var(--panel)" stroke="none" ' +
+             'transform="rotate(-14 8 8)">' +
+             '<ellipse cx="8" cy="6" rx="2.6" ry="3.5"/>' +
+             '<circle cx="8" cy="12.4" r="1.7"/></g></svg>'}),
         interactive:false, zIndexOffset:1500}).addTo(map);
     } else {
       LOC.dot.setLatLng(ll); LOC.ring.setLatLng(ll); LOC.ring.setRadius(acc);
