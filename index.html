@@ -175,15 +175,17 @@ button{font:inherit; color:inherit; cursor:pointer}
 .mypin{
   width:22px !important; height:22px !important; margin:-11px 0 0 -11px !important;
   display:grid; place-items:center; border-radius:999px;
-  background:#2C7FB8; border:2.5px solid var(--panel); box-shadow:0 1px 5px rgba(0,0,0,.35);
+  background:#7B57A8; border:2.5px solid var(--panel); box-shadow:0 1px 5px rgba(0,0,0,.35);
 }
-:root[data-theme="dark"] .mypin{background:#6FB4E0}
-@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .mypin{background:#6FB4E0} }
+:root[data-theme="dark"] .mypin{background:#B79BDB}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .mypin{background:#B79BDB} }
 .mypin svg{display:block; width:12px; height:12px; stroke:var(--panel); fill:none;
            stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
 
 .leaflet-marker-icon.hubpin, .leaflet-marker-icon.mypin{display:grid}
-.locbtn.on{color:#2C7FB8}
+.locbtn.on{color:#7B57A8}
+:root[data-theme="dark"] .locbtn.on{color:#B79BDB}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .locbtn.on{color:#B79BDB} }
 .loctip{
   position:absolute; left:50%; bottom:64px; transform:translateX(-50%);
   background:var(--panel); color:var(--ink); border:1px solid var(--line);
@@ -1286,11 +1288,14 @@ function toggleLocate(){
     const ll=[pos.coords.latitude, pos.coords.longitude];
     const acc=pos.coords.accuracy||0;
     if (!LOC.dot){
-      LOC.ring=L.circle(ll,{radius:acc, weight:1, color:"#2C7FB8", opacity:.5,
-                            fillColor:"#2C7FB8", fillOpacity:.12, interactive:false}).addTo(map);
+      LOC.ring=L.circle(ll,{radius:acc, weight:1, color:"#7B57A8", opacity:.5,
+                            fillColor:"#7B57A8", fillOpacity:.12, interactive:false}).addTo(map);
       LOC.dot=L.marker(ll,{icon:L.divIcon({className:"mypin",
-        html:'<svg viewBox="0 0 16 16"><circle cx="8" cy="4.8" r="2.3"/>' +
-             '<path d="M3.8 13.8c.6-3.1 2.3-4.8 4.2-4.8s3.6 1.7 4.2 4.8"/></svg>'}),
+        html:'<svg viewBox="0 0 16 16"><g style="fill:var(--panel)" stroke="none">' +
+             '<ellipse cx="5" cy="9.2" rx="1.8" ry="2.5" transform="rotate(-18 5 9.2)"/>' +
+             '<circle cx="3.9" cy="13.1" r="1.15"/>' +
+             '<ellipse cx="11" cy="4.6" rx="1.8" ry="2.5" transform="rotate(-18 11 4.6)"/>' +
+             '<circle cx="9.9" cy="8.5" r="1.15"/></g></svg>'}),
         interactive:false, zIndexOffset:1500}).addTo(map);
     } else {
       LOC.dot.setLatLng(ll); LOC.ring.setLatLng(ll); LOC.ring.setRadius(acc);
