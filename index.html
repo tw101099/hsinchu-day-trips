@@ -21,7 +21,8 @@
 
 :root{
   --bg:#faf9f7; --panel:#ffffff; --sunk:#f2efe9;
-  --ink:#1c1a17; --ink2:#6b645b; --ink3:#9a938a;
+
+  --ink:#1c1a17; --ink2:#6b645b; --ink3:#7a7369;
   --line:#e3ddd3; --line2:#cfc7ba;
   --accent:#5c5449; --accent-soft:#eae4d9; --on-accent:#ffffff;
   --warn:#9a5b17;
@@ -35,7 +36,7 @@
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --bg:#131211; --panel:#1b1a18; --sunk:#232120;
-    --ink:#efeae2; --ink2:#a29a8f; --ink3:#787066;
+    --ink:#efeae2; --ink2:#a29a8f; --ink3:#8a8277;
     --line:#332f2b; --line2:#454039;
     --accent:#bcb2a2; --accent-soft:#2c2822; --on-accent:#17150f;
     --warn:#e0a45c;
@@ -46,7 +47,7 @@
 }
 :root[data-theme="dark"]{
     --bg:#131211; --panel:#1b1a18; --sunk:#232120;
-    --ink:#efeae2; --ink2:#a29a8f; --ink3:#787066;
+    --ink:#efeae2; --ink2:#a29a8f; --ink3:#8a8277;
     --line:#332f2b; --line2:#454039;
     --accent:#bcb2a2; --accent-soft:#2c2822; --on-accent:#17150f;
     --warn:#e0a45c;
@@ -88,7 +89,8 @@ button{font:inherit; color:inherit; cursor:pointer}
   padding:max(8px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) 8px max(14px,env(safe-area-inset-left));
   background:var(--panel); border-bottom:1px solid var(--line); flex-wrap:wrap;
 }
-.logo{font-weight:700; white-space:nowrap}
+
+.logo{margin:0; font-size:inherit; font-weight:700; white-space:nowrap}
 .logo small{display:block; font-weight:400; font-size:11px; color:var(--ink3); letter-spacing:.06em}
 .seg{display:flex; background:var(--sunk); border-radius:999px; padding:2px}
 .seg button{border:0; background:none; padding:4px 13px; border-radius:999px; font-size:13px; color:var(--ink2)}
@@ -124,11 +126,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 #theme:hover{border-color:var(--accent); color:var(--accent)}
 #theme svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.6;
            stroke-linecap:round; stroke-linejoin:round; vertical-align:-2px}
-.tally{margin-left:auto; font-size:12px; color:var(--ink3); white-space:nowrap}
 
 @media (max-width:520px){
-  .tally{display:none}
-
   #qwrap{flex:1 1 80px; min-width:80px; max-width:none}
 }
 
@@ -373,10 +372,11 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 
 .gintro .groads{font-size:11.5px; color:var(--ink3); line-height:1.5; margin:0}
+
 .row{
   position:relative; display:flex; width:100%; text-align:left; gap:8px; align-items:flex-start;
   border:1px solid transparent; border-radius:var(--r); background:none; padding:7px 9px;
-  transition:background .12s, border-color .12s;
+  cursor:pointer; transition:background .12s, border-color .12s;
 }
 .row:hover{background:var(--sunk)}
 .row[aria-expanded=true]{background:var(--accent-soft); border-color:var(--accent)}
@@ -441,6 +441,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 .wider{border:0; background:none; color:var(--ink3); font-size:12px; text-decoration:underline; padding:4px 6px 0}
 .wider:hover{color:var(--accent)}
 
+.moreaxes{border:0; background:none; color:var(--accent); font-size:12.5px; text-decoration:underline; padding:3px 0 4px}
+
 .legend{display:flex; flex-wrap:wrap; gap:4px 12px; padding:11px 15px 8px; font-size:11.5px;
         color:var(--ink3); margin-top:11px; border-top:1px solid var(--line)}
 .legend span{display:inline-flex; align-items:center}
@@ -479,6 +481,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) #start{ color-scheme:dark; } }
 
 .plan{display:flex; flex-direction:column; margin:6px 0 10px; max-height:38vh; overflow-y:auto; overscroll-behavior:contain}
+
+@media (min-width:900px) and (min-height:560px){ .plan{max-height:26vh} }
 .plan .end{display:flex; align-items:center; gap:9px; font-size:13px; color:var(--ink3)}
 .plan .end.late{color:var(--warn)}
 .plan .end .home, .setrow .home{
@@ -672,14 +676,13 @@ button{font:inherit; color:inherit; cursor:pointer}
 <div class="app" id="app">
   <header class="bar">
 
-    <div class="logo" id="logo">新竹一日</div>
+    <h1 class="logo" id="logo">新竹一日</h1>
     <div class="seg" id="views">
       <button data-v="map" aria-pressed="true">地圖</button>
       <button data-v="list" aria-pressed="false">清單</button>
     </div>
     <div id="qwrap"><input id="q" type="search" placeholder="搜尋：步道、瀑布、溫泉…"></div>
     <button id="theme" title="切換明暗" aria-label="切換明暗"></button>
-    <div class="tally" id="tally"></div>
   </header>
 
   <div class="main" id="main">
@@ -723,7 +726,7 @@ const ICON = {
 
 const S = { view:"map", route:new Set(), themes:new Set(), diffs:new Set(), budget:new Set(),
             mine:null, inseason:false, q:"", qtags:[], sel:null, open:true, moreOpen:true,
-            routesOpen:false, listOpen:true, sort:"total", near:0,
+            axesOpen:true, routesOpen:false, listOpen:true, sort:"total", near:0,
             dirOpen:new Set() };
 let PLAN = [], TRIP_OPEN = false, EXTRA = new Set(), INFO_OPEN = false;
 
@@ -868,7 +871,7 @@ function save(){
       route:[...S.route], themes:[...S.themes], diffs:[...S.diffs], budget:[...S.budget],
       mine:S.mine, inseason:S.inseason, view:S.view, sort:S.sort, plan:PLAN, theme:THEME,
       seen:true, start:START, stay:STAY, routesOpen:S.routesOpen, listOpen:S.listOpen,
-      open:S.open, moreOpen:S.moreOpen, routeView:ROUTE_VIEW,
+      open:S.open, moreOpen:S.moreOpen, axesOpen:S.axesOpen, routeView:ROUTE_VIEW,
       nearView:NEAR_VIEW, nearLevel:NEAR_LEVEL
     }));
   }catch(e){}
@@ -891,6 +894,8 @@ function restore(){
     if (d.routesOpen) S.routesOpen=true;
     if (d.listOpen===false) S.listOpen=false;   // 預設是展開，只有明確存過收合才收
     if (typeof d.moreOpen==="boolean") S.moreOpen=d.moreOpen;
+    if (typeof d.axesOpen==="boolean") S.axesOpen=d.axesOpen;
+    else if (!d.seen && !matchMedia("(min-width:900px) and (min-height:560px)").matches) S.axesOpen=false;
     if (d.routeView) ROUTE_VIEW=true;
     if (d.nearView) NEAR_VIEW=true;
     if (typeof d.nearLevel==="number") NEAR_LEVEL=d.nearLevel;
@@ -1029,6 +1034,26 @@ function legText(min, km, real){
 let engine=null, map=null, marks={}, lines=null, pts=null, ready=false, zoom=11;
 const ICON_ZOOM = 14;
 
+const LINE_ZOOM = 12;
+function drawLines(){
+  if (engine!=="osm" || !lines) return;
+  lines.clearLayers();
+  const low = zoom < LINE_ZOOM;
+  const planRoutes=new Set();
+  PLAN.forEach(id=>{ const p=BY_ID[id]; if (p) planRoutes.add(p.route); });
+  ROUTES.forEach(c=>{
+    if (!c.path || !c.path.length) return;
+    const forced=planRoutes.has(c.id);
+    const dim=!forced && S.route.size && !S.route.has(c.id);
+
+    const style={color:(DR[c.dir]||{}).color||"#888",
+                 opacity:dim?(low?.18:.25):(low?.7:.9),
+                 weight:dim?(low?2:3):(low?4:5), lineCap:"round"};
+    const segs = Array.isArray(c.path[0][0]) ? c.path : [c.path];
+    segs.forEach(s=>{ if (s.length>1) L.polyline(s,style).addTo(lines); });
+  });
+}
+
 function note(html){
   const el=document.getElementById("mapnote");
   if (!html){ el.style.display="none"; return; }
@@ -1072,9 +1097,11 @@ function initOSM(why){
   map.on("click", ()=>{ if (S.sel){ S.sel=null; render(); } });
   map.on("zoomend", ()=>{
     const z=map.getZoom();
-    const crossed = (z>=ICON_ZOOM) !== (zoom>=ICON_ZOOM);
+    const crossedIcon = (z>=ICON_ZOOM) !== (zoom>=ICON_ZOOM);
+    const crossedLine = (z>=LINE_ZOOM) !== (zoom>=LINE_ZOOM);
     zoom=z;
-    if (crossed) draw();
+    if (crossedIcon) draw();          // draw() 本身會重畫線層
+    else if (crossedLine) drawLines();
   });
   ready=true;
   note(why ? "底圖用 OpenStreetMap：" + why : "");
@@ -1117,17 +1144,8 @@ function draw(){
   const planRoutes=new Set();
   PLAN.forEach(id=>{ const p=BY_ID[id]; if (p) planRoutes.add(p.route); });
   if (engine==="osm"){
-    lines.clearLayers(); pts.clearLayers(); marks={};
-    ROUTES.forEach(c=>{
-      if (!c.path || !c.path.length) return;
-      const forced=planRoutes.has(c.id);
-      const dim=!forced && S.route.size && !S.route.has(c.id);
-
-      const style={color:(DR[c.dir]||{}).color||"#888", opacity:dim?.25:.9,
-                   weight:dim?3:5, lineCap:"round"};
-      const segs = Array.isArray(c.path[0][0]) ? c.path : [c.path];
-      segs.forEach(s=>{ if (s.length>1) L.polyline(s,style).addTo(lines); });
-    });
+    pts.clearLayers(); marks={};
+    drawLines();
     const asIcon = zoom >= ICON_ZOOM;
     const planNo={}; PLAN.forEach((id,i)=>{ planNo[id]=i+1; });
     list.forEach(p=>{
@@ -1766,7 +1784,13 @@ function section(label, count, open, fn, cls){
   b.onclick=fn; return b;
 }
 
-function filterChanged(){ S.sel=null; EXTRA=new Set(); save(); render(); }
+let FIT_PENDING=false;
+function fitShown(){
+  if (S.view!=="map"){ FIT_PENDING=true; return; }
+  FIT_PENDING=false;
+  if (!S.sel) fit(shown());
+}
+function filterChanged(){ S.sel=null; EXTRA=new Set(); save(); render(); fitShown(); }
 
 function tagsHTML(p){
   const tags = p && p.tags;
@@ -1826,7 +1850,7 @@ function clearAll(){
   S.open=true; S.near=0;
   TRIP_OPEN=false;                        // 只收折行程列，PLAN 本身不動
   SCROLL_RESET=true;
-  save(); render();
+  save(); render(); fitShown();
 }
 function summary(){
   const bits=[];
@@ -1890,6 +1914,15 @@ function renderFilters(){
     wrap.appendChild(frow("主題", THEMES.map(t=>chip(
       `${t.name}<span class="cnt num">${thBase.filter(p=>p.theme===t.id).length}</span>`,
       S.themes.has(t.id), ()=>toggle(S.themes,t.id), t.color, t.id))));
+    const axes = S.axesOpen || S.budget.size>0 || S.diffs.size>0 || S.inseason || !!S.mine;
+    if (!axes){
+      const more=document.createElement("button");
+      more.type="button"; more.className="moreaxes";
+      more.textContent="更多條件：時間、費力、季節";
+      more.onclick=()=>{ S.axesOpen=true; save(); render(); };
+      wrap.appendChild(frow("", [more]));
+    }
+    if (axes){
     const budBase=PLACES.filter(p=>passExcept(p,"budget"));
     wrap.appendChild(frow("時間", BUDGETS.map(b=>chip(
       `${b.label}<span class="cnt num">${budBase.filter(p=>bud(p)===b.id).length}</span>`,
@@ -1910,6 +1943,7 @@ function renderFilters(){
            NEAR_VIEW, cycleNearView),
       chip("往返路線", ROUTE_VIEW, toggleRouteView),
     ]));
+    }
     f.appendChild(wrap);
   }
 
@@ -1972,8 +2006,13 @@ function legBit(p, rel){
   return `<span class="mi" title="車程">${CAR_SVG}<span class="num">${p.drive_min}</span> 分</span>`;
 }
 function rowFor(p, extra, rel){
-  const b=document.createElement("button");
+  const b=document.createElement("div");
   b.className="row"; b.dataset.id=p.id; b.setAttribute("aria-expanded", S.sel===p.id);
+  b.setAttribute("role","button"); b.tabIndex=0;
+  b.addEventListener("keydown", e=>{
+    if (e.target!==b) return;
+    if (e.key==="Enter" || e.key===" "){ e.preventDefault(); select(p.id); }
+  });
   const off = !pass(p);
   const body=document.createElement("div"); body.className="rbody";
   body.innerHTML =
@@ -2119,12 +2158,15 @@ function renderList(){
   return wrap;
 }
 
+let PANEL_MAPONLY=null;   // 上一次 renderPanel 是不是在手機地圖模式跳過了清單
 function renderPanel(){
   const panel=document.getElementById("panel");
   const keep=panel.scrollTop;
   panel.innerHTML="";
   panel.appendChild(renderFilterBar());
   if (S.open) panel.appendChild(renderFilters());
+  const mapOnly=isMapOnly(); PANEL_MAPONLY=mapOnly;
+  if (!mapOnly){
   panel.appendChild(section("景點清單", `${shown().length}/${PLACES.length}`, S.listOpen,
     ()=>{ S.listOpen=!S.listOpen; save(); render(); }, "toplevel"));
   if (S.listOpen){
@@ -2140,6 +2182,7 @@ function renderPanel(){
       "本頁僅供行程參考，不保證資訊正確或即時。底圖與圖磚為 OpenStreetMap 貢獻者所有。";
     panel.appendChild(f);
   }
+  }   // !mapOnly
   if (SCROLL_RESET){
     panel.scrollTop = 0;
     SCROLL_RESET = false;
@@ -2214,14 +2257,13 @@ function updateTotop(){
 }
 document.getElementById("panel").addEventListener("scroll", updateTotop, {passive:true});
 addEventListener("resize", updateTotop);
+addEventListener("resize", ()=>{ if (PANEL_MAPONLY!==null && isMapOnly()!==PANEL_MAPONLY) render(); });
 document.getElementById("totop").onclick=()=>{
   document.getElementById("panel").scrollTo({top:0, behavior: RM.matches ? "auto" : "smooth"});
 };
 function render(){
   refreshNearSet();
   primeNearView();   // fetchNear 現在是同步查內嵌表（NEIGH），重複呼叫有完成標記守門
-  document.getElementById("tally").innerHTML =
-    `<span class="num">${shown().length}</span> / <span class="num">${PLACES.length}</span>`;
   draw(); renderPanel(); renderTrip(); renderMapBtns(); renderMapCard(); updateTotop();
 }
 
@@ -2241,11 +2283,19 @@ document.querySelectorAll("#views button").forEach(b=>{
     }
     save(); render();
     if (S.view==="map") resizeMap();
+    if (S.view==="map" && FIT_PENDING) setTimeout(()=>{ FIT_PENDING=false; if (!S.sel) fit(shown()); }, 120);
   };
 });
-document.getElementById("q").addEventListener("input", e=>{
-  S.q=e.target.value.trim().toLowerCase(); filterChanged();
-});
+
+let Q_COMPOSING=false;
+function applyQ(){
+  const v=document.getElementById("q").value.trim().toLowerCase();
+  if (v===S.q) return;
+  S.q=v; filterChanged();
+}
+document.getElementById("q").addEventListener("compositionstart", ()=>{ Q_COMPOSING=true; });
+document.getElementById("q").addEventListener("compositionend", ()=>{ Q_COMPOSING=false; applyQ(); });
+document.getElementById("q").addEventListener("input", ()=>{ if (!Q_COMPOSING) applyQ(); });
 document.getElementById("q").addEventListener("keydown", e=>{
   if (e.key==="Backspace" && !e.target.value && S.qtags.length){
     S.qtags.pop(); SCROLL_GROUP=true;   // 同 × 移除：放寬條件捲回清單開頭
