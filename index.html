@@ -681,11 +681,11 @@ button{font:inherit; color:inherit; cursor:pointer}
       <button data-v="map" aria-pressed="true">地圖</button>
       <button data-v="list" aria-pressed="false">清單</button>
     </div>
-    <div id="qwrap"><input id="q" type="search" placeholder="搜尋：步道、瀑布、溫泉…"></div>
+    <div id="qwrap"><input id="q" type="search" placeholder="搜尋：步道、瀑布、溫泉…" aria-label="搜尋景點"></div>
     <button id="theme" title="切換明暗" aria-label="切換明暗"></button>
   </header>
 
-  <div class="main" id="main">
+  <main class="main" id="main">
     <aside class="panel" id="panel"></aside>
 
     <div class="stage" id="stage">
@@ -697,7 +697,7 @@ button{font:inherit; color:inherit; cursor:pointer}
         <div class="mapcard" id="mapcard"></div>
       </div>
     </div>
-  </div>
+  </main>
 </div>
 <div class="trip" id="trip"></div>
 <button id="totop" class="totop" type="button" aria-label="回到清單頂端" title="回到清單頂端">
@@ -910,17 +910,26 @@ function readHash(){
   const q={};
   h.split("&").forEach(kv=>{ const i=kv.indexOf("="); if (i>0) q[kv.slice(0,i)]=decodeURIComponent(kv.slice(i+1)); });
   if (q.plan){
-    const ids=q.plan.split(",").filter(id=>BY_ID[id]);
-    if (ids.length){ PLAN=ids; TRIP_OPEN=true; S.open=false; }
+    const raw=q.plan.split(",");
+    const ids=raw.filter(id=>BY_ID[id]);
+    if (ids.length){
+      PLAN=ids; TRIP_OPEN=true; S.open=false;
+      if (q.stay!=null){
+        const st=q.stay.split(",");
+        raw.forEach((id,i)=>{ const v=parseFloat(st[i]); if (BY_ID[id] && Number.isFinite(v) && v>0) STAY[id]=v; });
+      }
+    }
   }
   if (/^\d{1,2}:\d{2}$/.test(q.start||"")){
     const [hh,mm]=q.start.split(":").map(Number);
     START=(hh||0)*60+(mm||0);
   }
 }
+
 function shareURL(){
-  return location.origin + location.pathname + "#plan=" + PLAN.join(",") + "&start=" + fmt(START)
-;
+  const stay=PLAN.map(id=>STAY[id]==null ? "" : String(STAY[id]));
+  const stayQ=stay.some(Boolean) ? "&stay=" + stay.join(",") : "";
+  return location.origin + location.pathname + "#plan=" + PLAN.join(",") + "&start=" + fmt(START) + stayQ;
 }
 
 const months = p => Array.isArray(p.season_months) ? p.season_months : [];
@@ -1567,12 +1576,18 @@ function renderTrip(){
   a.className="primary"; a.href=planURL(); a.target="_blank"; a.rel="noopener";
   a.textContent="用 Google 地圖導航";
   const sh=document.createElement("button");
-  sh.textContent="複製分享連結";
+  const nativeShare = !!navigator.share && matchMedia("(pointer:coarse)").matches;
+  const shLabel = nativeShare ? "分享行程" : "複製分享連結";
+  sh.textContent=shLabel;
   sh.onclick=()=>{
     const url=shareURL();
-    const done=()=>{ sh.textContent="連結已複製"; setTimeout(()=>{ sh.textContent="複製分享連結"; },1800); };
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done,done);
-    else { location.hash=url.split("#")[1]||""; done(); }
+    const done=()=>{ sh.textContent="連結已複製"; setTimeout(()=>{ sh.textContent=shLabel; },1800); };
+    const copy=()=>{
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done,done);
+      else { location.hash=url.split("#")[1]||""; done(); }
+    };
+    if (nativeShare) navigator.share({title:"新竹一日｜今天的行程", url}).catch(err=>{ if (!err || err.name!=="AbortError") copy(); });
+    else copy();
   };
   const clr=document.createElement("button");
   clr.className="quiet"; clr.textContent="清空";
