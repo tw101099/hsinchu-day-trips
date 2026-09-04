@@ -1085,7 +1085,7 @@ function loadOSM(why){
 }
 function initOSM(why){
   engine="osm";
-  map=L.map("map",{zoomControl:true}).setView([24.76,121.06],11);
+  map=L.map("map",{zoomControl:true, preferCanvas:true}).setView([24.76,121.06],11);
 
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
               {maxZoom:18,
