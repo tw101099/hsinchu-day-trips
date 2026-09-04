@@ -1048,7 +1048,7 @@ function drawLines(){
 
     const style={color:(DR[c.dir]||{}).color||"#888",
                  opacity:dim?(low?.18:.25):(low?.7:.9),
-                 weight:dim?(low?2:3):(low?4:5), lineCap:"round"};
+                 weight:dim?(low?1.5:3):(low?3:5), lineCap:"round", pane:"routes"};
     const segs = Array.isArray(c.path[0][0]) ? c.path : [c.path];
     segs.forEach(s=>{ if (s.length>1) L.polyline(s,style).addTo(lines); });
   });
@@ -1086,6 +1086,7 @@ function initOSM(why){
                            'target="_blank" rel="noopener">OpenStreetMap</a> contributors' +
                            ' · <a href="https://opendatacommons.org/licenses/odbl/" ' +
                            'target="_blank" rel="noopener">ODbL</a>'}).addTo(map);
+  map.createPane("routes").style.zIndex=350;
   lines=L.layerGroup().addTo(map);
   pts=L.layerGroup().addTo(map);
   L.marker([HOME.lat,HOME.lng],{icon:L.divIcon({className:"hubpin",
