@@ -1035,11 +1035,9 @@ let engine=null, map=null, marks={}, lines=null, pts=null, ready=false, zoom=11;
 
 const ICON_ZOOM = 13;
 
-const LINE_ZOOM = 12;
 function drawLines(){
   if (engine!=="osm" || !lines) return;
   lines.clearLayers();
-  const low = zoom < LINE_ZOOM;
   const planRoutes=new Set();
   PLAN.forEach(id=>{ const p=BY_ID[id]; if (p) planRoutes.add(p.route); });
   ROUTES.forEach(c=>{
@@ -1048,8 +1046,7 @@ function drawLines(){
     const dim=!forced && S.route.size && !S.route.has(c.id);
 
     const style={color:(DR[c.dir]||{}).color||"#888",
-                 opacity:dim?(low?.18:.25):(low?.7:.9),
-                 weight:dim?(low?1.5:3):(low?3:5), lineCap:"round", pane:"routes"};
+                 opacity:dim?.18:.7, weight:dim?1.5:3, lineCap:"round", pane:"routes"};
     const segs = Array.isArray(c.path[0][0]) ? c.path : [c.path];
     segs.forEach(s=>{ if (s.length>1) L.polyline(s,style).addTo(lines); });
   });
@@ -1099,11 +1096,9 @@ function initOSM(why){
   map.on("click", ()=>{ if (S.sel){ S.sel=null; render(); } });
   map.on("zoomend", ()=>{
     const z=map.getZoom();
-    const crossedIcon = (z>=ICON_ZOOM) !== (zoom>=ICON_ZOOM);
-    const crossedLine = (z>=LINE_ZOOM) !== (zoom>=LINE_ZOOM);
+    const crossed = (z>=ICON_ZOOM) !== (zoom>=ICON_ZOOM);
     zoom=z;
-    if (crossedIcon) draw();          // draw() 本身會重畫線層
-    else if (crossedLine) drawLines();
+    if (crossed) draw();
   });
   ready=true;
   note(why ? "底圖用 OpenStreetMap：" + why : "");
