@@ -409,7 +409,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .add[data-in=true]:hover{border-color:var(--accent); color:var(--on-accent)}
 .tag{font-size:11px; padding:0 7px; border-radius:999px; border:1px solid var(--line2); color:var(--ink2); white-space:nowrap}
-.tag.hard{border-color:var(--warn); color:var(--warn)}
+
+.tag.hard{color:var(--ink)}
 .star{color:var(--accent); font-size:11px}
 .empty{padding:26px 6px; color:var(--ink2); font-size:14px}
 .empty button{border:0; background:none; color:var(--accent); text-decoration:underline; padding:0}
@@ -443,9 +444,10 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .mapcard .tags{margin:8px 0 0}
 .acts{display:flex; gap:7px; flex-wrap:wrap; margin:10px 0 4px}
+
 .acts a, .acts button{
   font-size:12.5px; text-decoration:none; color:var(--ink2); border:1px solid var(--line2);
-  border-radius:999px; padding:4px 12px; background:var(--panel);
+  border-radius:999px; padding:4px 12px; background:var(--chip-bg);
 }
 .acts a:hover, .acts button:hover{color:var(--accent); border-color:var(--accent)}
 .acts .primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
