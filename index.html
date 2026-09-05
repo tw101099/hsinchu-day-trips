@@ -23,6 +23,9 @@
   --bg:#faf9f7; --panel:#ffffff; --sunk:#f2efe9;
 
   --ink:#1c1a17; --ink2:#6b645b; --ink3:#7a7369;
+
+  --chip-bg:#faf9f7;
+
   --line:#e3ddd3; --line2:#cfc7ba;
   --accent:#5c5449; --accent-soft:#eae4d9; --on-accent:#ffffff;
   --warn:#9a5b17;
@@ -37,7 +40,9 @@
   :root:not([data-theme="light"]){
     --bg:#131211; --panel:#1b1a18; --sunk:#232120;
     --ink:#efeae2; --ink2:#a29a8f; --ink3:#8a8277;
-    --line:#332f2b; --line2:#454039;
+
+    --chip-bg:#34302c;
+    --line:#443f38; --line2:#524d46;
     --accent:#bcb2a2; --accent-soft:#2c2822; --on-accent:#17150f;
     --warn:#e0a45c;
     --danger:#c17167;
@@ -48,7 +53,9 @@
 :root[data-theme="dark"]{
     --bg:#131211; --panel:#1b1a18; --sunk:#232120;
     --ink:#efeae2; --ink2:#a29a8f; --ink3:#8a8277;
-    --line:#332f2b; --line2:#454039;
+
+    --chip-bg:#34302c;
+    --line:#443f38; --line2:#524d46;
     --accent:#bcb2a2; --accent-soft:#2c2822; --on-accent:#17150f;
     --warn:#e0a45c;
 
@@ -120,7 +127,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .qtok:hover{opacity:.7}
 .qtok .x{font-size:14px; line-height:1; opacity:.8}
 #theme{
-  flex:none; border:1px solid var(--line2); background:var(--bg); border-radius:999px;
+  flex:none; border:1px solid var(--line2); background:var(--chip-bg); border-radius:999px;
   padding:5px 9px; line-height:1; color:var(--ink2);
 }
 #theme:hover{border-color:var(--accent); color:var(--accent)}
@@ -223,10 +230,14 @@ button{font:inherit; color:inherit; cursor:pointer}
 .mapcard .m{margin:5px 0 0; font-size:12px; color:var(--ink2); display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 10px}
 .mapcard .acts{display:flex; flex-wrap:wrap; gap:6px; margin-top:9px}
 .mapcard .acts a, .mapcard .acts button{
-  border:1px solid var(--line); background:var(--bg); color:var(--ink2); text-decoration:none;
+  border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2); text-decoration:none;
   border-radius:999px; padding:3px 10px; font-size:12.5px; white-space:nowrap;
 }
+
+.mapcard .acts a:hover, .mapcard .acts button:hover{border-color:var(--accent); color:var(--accent)}
 .mapcard .acts .primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+
+.mapcard .acts .primary:hover{color:var(--on-accent); border-color:var(--accent)}
 
 .pinlbl{
   position:absolute; left:30px; top:50%; transform:translateY(-50%); white-space:nowrap;
@@ -274,27 +285,30 @@ button{font:inherit; color:inherit; cursor:pointer}
 .fsum b{color:var(--ink); font-weight:600}
 
 .clear, .ghost, .trip .go a, .trip .go button{
-  border:1px solid var(--line); background:var(--bg); color:var(--ink2);
+  border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2);
   border-radius:999px; padding:3px 10px; font-size:12.5px; white-space:nowrap;
   text-decoration:none; font-family:inherit; line-height:1.5;
 }
-.clear:hover, .ghost:hover, .trip .go a:hover, .trip .go button:hover{border-color:var(--line2); color:var(--ink)}
-.clear:hover{color:var(--accent)}
+
+.clear:hover, .ghost:hover, .trip .go a:hover, .trip .go button:hover{border-color:var(--accent); color:var(--accent)}
 #sort{
-  flex:none; border:1px solid var(--line); border-radius:999px; background:var(--bg); color:var(--ink2);
+  flex:none; border:1px solid var(--line); border-radius:999px; background:var(--chip-bg); color:var(--ink2);
   font:inherit; font-size:12.5px; padding:3px 10px; max-width:120px;
 }
+
+#sort:hover{border-color:var(--accent); color:var(--accent)}
 
 .filters{padding:10px 14px 12px; border-bottom:1px solid var(--line)}
 .frow{display:flex; align-items:flex-start; gap:9px; padding:4px 0}
 .fkey{flex:none; width:52px; padding-top:4px; font-size:11.5px; color:var(--ink3); letter-spacing:.06em}
 .chips{display:flex; flex-wrap:wrap; gap:5px; flex:1; min-width:0}
 .chip{
-  border:1px solid var(--line); background:var(--bg); border-radius:999px;
+  border:1px solid var(--line); background:var(--chip-bg); border-radius:999px;
   padding:3px 10px; font-size:12.5px; color:var(--ink2); line-height:1.5;
   transition:border-color .15s, background .15s, color .15s;
 }
-.chip:hover{border-color:var(--line2); color:var(--ink)}
+
+.chip:hover{border-color:var(--accent); color:var(--accent)}
 
 .chip[aria-pressed=true]{background:var(--accent-soft); border-color:var(--accent); color:var(--ink); font-weight:600}
 .chip:disabled{opacity:.45; cursor:default; pointer-events:none}
@@ -386,7 +400,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .row .m{font-size:12px; color:var(--ink2); margin-top:1px; display:flex; align-items:baseline; flex-wrap:wrap}
 .row .off{color:var(--ink3); font-size:11px; border:1px dashed var(--line2); border-radius:999px; padding:0 6px}
 .add{
-  flex:none; align-self:center; border:1px solid var(--line2); background:var(--bg);
+  flex:none; align-self:center; border:1px solid var(--line2); background:var(--chip-bg);
   width:26px; height:26px; border-radius:999px; font-size:14px; line-height:1;
   color:var(--ink3); padding:0;
 }
@@ -435,6 +449,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 .acts a:hover, .acts button:hover{color:var(--accent); border-color:var(--accent)}
 .acts .primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+
+.acts .primary:hover{color:var(--on-accent); border-color:var(--accent)}
 .nearby{margin-top:11px; border-top:1px solid var(--line); padding-top:8px}
 .nearby .row{padding:5px 6px}
 .nearby .nonear{margin:2px 6px 0; font-size:12px; color:var(--ink3); line-height:1.6}
@@ -533,7 +549,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .stop .win{font-size:12px; color:var(--ink2); font-family:var(--mono); white-space:nowrap}
 .stop .warn{font-size:11.5px; color:var(--warn)}
 
-.stepper{display:inline-flex; align-items:center; gap:2px; border:1px solid var(--line); background:var(--bg); border-radius:999px; padding:1px 2px}
+.stepper{display:inline-flex; align-items:center; gap:2px; border:1px solid var(--line); background:var(--chip-bg); border-radius:999px; padding:1px 2px}
 .stepper button{border:0; background:none; color:var(--ink3); width:20px; height:20px; border-radius:999px; line-height:1; font-size:14px; padding:0}
 .stepper button:hover{color:var(--accent)}
 .stepper .v{font-size:11.5px; color:var(--ink2); font-family:var(--mono); min-width:52px; text-align:center; white-space:nowrap}
@@ -545,7 +561,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .stop .ops .grip svg{width:13px; height:13px; fill:currentColor}
 .stop .ops .grip:active{cursor:grabbing}
 .stop .ops button{
-  border:1px solid var(--line); background:var(--bg); color:var(--ink2);
+  border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2);
   width:28px; height:28px; border-radius:999px; line-height:1; font-size:12px; padding:0;
 }
 .stop .ops button:disabled{color:var(--line2); cursor:default}
