@@ -31,7 +31,13 @@
 // 這道閘門要倚靠的那份副本親手刪掉，下一次開站反而少一層保護。SW 自己的更新
 // 靠瀏覽器對 sw.js 的位元組比對，跟版本號無關。
 
-const CACHE_VERSION = "v1";
+// v1 → v2（2026-09-06 棒 DINK，水墨改版）：**這一輪動到的殼層資源不只 icons**
+// ——五顆 icon 全部換成水彩手帳新稿，`manifest.webmanifest` 的 theme_color 與
+// background_color 也跟著新的 --accent／--bg 換值。兩種都在 SHELL_ASSETS 裡、
+// 都走 cache-first，不推版號的話舊訪客會**一直**拿到舊 icon 配新配色的中間態
+// （cache-first 的定義就是「有就不打網路」，它不會自己發現檔案變了）。
+// 一次推到位、只推一號：這兩件是同一次發布，分兩號沒有意義。
+const CACHE_VERSION = "v2";
 const CACHE_NAME = `hsinchu-day-trips-${CACHE_VERSION}`;
 
 // 殼層資源：install 時預熱，之後 cache-first。都是同源、幾乎不變的檔案。
