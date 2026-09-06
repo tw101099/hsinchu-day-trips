@@ -126,8 +126,9 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 .qtok:hover{opacity:.7}
 .qtok .x{font-size:14px; line-height:1; opacity:.8}
+
 #theme{
-  flex:none; border:1px solid var(--line2); background:var(--chip-bg); border-radius:999px;
+  flex:none; border:1px solid var(--line); background:var(--chip-bg); border-radius:999px;
   padding:5px 9px; line-height:1; color:var(--ink2);
 }
 #theme:hover{border-color:var(--accent); color:var(--accent)}
@@ -229,9 +230,10 @@ button{font:inherit; color:inherit; cursor:pointer}
 .mapcard .sub{margin:3px 0 0; font-size:12px; color:var(--ink3)}
 .mapcard .m{margin:5px 0 0; font-size:12px; color:var(--ink2); display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 10px}
 .mapcard .acts{display:flex; flex-wrap:wrap; gap:6px; margin-top:9px}
+
 .mapcard .acts a, .mapcard .acts button{
   border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2); text-decoration:none;
-  border-radius:999px; padding:3px 10px; font-size:12.5px; white-space:nowrap;
+  border-radius:999px; padding:3px 10px; font-size:12.5px; line-height:1.5; white-space:nowrap;
 }
 
 .mapcard .acts a:hover, .mapcard .acts button:hover{border-color:var(--accent); color:var(--accent)}
@@ -399,8 +401,9 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .row .m{font-size:12px; color:var(--ink2); margin-top:1px; display:flex; align-items:baseline; flex-wrap:wrap}
 .row .off{color:var(--ink3); font-size:11px; border:1px dashed var(--line2); border-radius:999px; padding:0 6px}
+
 .add{
-  flex:none; align-self:center; border:1px solid var(--line2); background:var(--chip-bg);
+  flex:none; align-self:center; border:1px solid var(--line); background:var(--chip-bg);
   width:26px; height:26px; border-radius:999px; font-size:14px; line-height:1;
   color:var(--ink3); padding:0;
 }
@@ -437,8 +440,9 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .tags{display:flex; flex-wrap:wrap; gap:5px; margin:0 0 9px}
 .tags .tag{
-  font-size:11px; padding:2px 8px; border-radius:999px; background:none;
-  border:1px solid var(--line2); color:var(--ink3); white-space:nowrap; cursor:pointer;
+  font-size:12.5px; line-height:1.5; padding:3px 10px; border-radius:999px;
+  background:var(--chip-bg);
+  border:1px solid var(--line); color:var(--ink2); white-space:nowrap; cursor:pointer;
 }
 .tags .tag:hover{color:var(--accent); border-color:var(--accent)}
 
@@ -446,8 +450,9 @@ button{font:inherit; color:inherit; cursor:pointer}
 .acts{display:flex; gap:7px; flex-wrap:wrap; margin:10px 0 4px}
 
 .acts a, .acts button{
-  font-size:12.5px; text-decoration:none; color:var(--ink2); border:1px solid var(--line2);
-  border-radius:999px; padding:4px 12px; background:var(--chip-bg);
+  font-size:12.5px; line-height:1.5; text-decoration:none; color:var(--ink2);
+  border:1px solid var(--line);
+  border-radius:999px; padding:3px 10px; background:var(--chip-bg);
 }
 .acts a:hover, .acts button:hover{color:var(--accent); border-color:var(--accent)}
 .acts .primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
