@@ -34,6 +34,8 @@
   --danger:#9c3b2c;
   --sb:#d1c6b0; --sb-hover:#a89a80;
   --r:10px; --barh:56px;
+
+  --triph:47px;
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
 
   --sh:70,50,25;
@@ -128,7 +130,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .ic{width:14px; height:14px; flex:none; stroke:currentColor; fill:none; stroke-width:1.5;
     stroke-linecap:round; stroke-linejoin:round; vertical-align:-2px; margin-right:4px}
 
-.app{display:flex; flex-direction:column; height:100dvh; overflow:hidden; padding-bottom:calc(var(--barh) + env(safe-area-inset-bottom))}
+.app{display:flex; flex-direction:column; height:100dvh; overflow:hidden; padding-bottom:calc(var(--triph) + env(safe-area-inset-bottom))}
 
 @media (display-mode:standalone) and (orientation:portrait){
   html, body, .app{ height:100vh; height:-webkit-fill-available; }
@@ -247,7 +249,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .totop{
   position:fixed; z-index:550;
   right:calc(16px + env(safe-area-inset-right));
-  bottom:calc(var(--barh) + env(safe-area-inset-bottom) + 16px);
+  bottom:calc(var(--triph) + env(safe-area-inset-bottom) + 16px);
   width:40px; height:40px;
   border-radius:50%; display:flex; align-items:center; justify-content:center;
   background:var(--panel); border:1px solid var(--line2); color:var(--ink2);
@@ -520,8 +522,9 @@ button{font:inherit; color:inherit; cursor:pointer}
   padding-bottom:env(safe-area-inset-bottom);
   padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right);
 }
+
 .trip .head{
-  display:flex; align-items:center; gap:10px; min-height:var(--barh); padding:8px 14px;
+  display:flex; align-items:center; gap:10px; min-height:var(--triph); padding:8px 14px;
   font-size:13.5px;
 }
 .trip .head .fbtn:disabled{cursor:default}
