@@ -37,7 +37,8 @@
 // 都走 cache-first，不推版號的話舊訪客會**一直**拿到舊 icon 配新配色的中間態
 // （cache-first 的定義就是「有就不打網路」，它不會自己發現檔案變了）。
 // 一次推到位、只推一號：這兩件是同一次發布，分兩號沒有意義。
-const CACHE_VERSION = "v2";
+// v2→v3：2026-09-06 站名統一「新竹出發一日遊」動了 manifest（cache-first 殼層資源），照檔頭規則推號。
+const CACHE_VERSION = "v3";
 const CACHE_NAME = `hsinchu-day-trips-${CACHE_VERSION}`;
 
 // 殼層資源：install 時預熱，之後 cache-first。都是同源、幾乎不變的檔案。
