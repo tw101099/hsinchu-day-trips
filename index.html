@@ -1120,8 +1120,45 @@ function fmt(min){
   return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
 }
 
+const EST_RAW_MAX = 10;     // 這個分鐘數以下照原值，不取階
+const EST_STEP    = 5;      // 90 分以前的階距
+const EST_HR_AT   = 90;     // 到這個分鐘數改走半小時階
+function estT(min){
+  const m = Math.max(0, Math.round(min));
+  if (m <= EST_RAW_MAX) return `${m}m`;
+  const stepped = Math.round(m / EST_STEP) * EST_STEP;
+  if (stepped < EST_HR_AT) return `${stepped}m`;
+  const h = Math.round(m / 30) / 2;
+  return `${Number.isInteger(h) ? h : h.toFixed(1)}hr`;
+}
+
+const est   = min => `<span class="num">${estT(min)}</span>`;
+const estHT = h => estT(h * 60);          // 小數小時入口（total_h 那類）
+function kmT(v){
+  if (v < 10){
+    const s = v.toFixed(1);
+    if (s !== "10.0") return `${s}km`;
+  }
+  return `${Math.round(v)}km`;
+}
+const kmv = v => `<span class="num">${kmT(v)}</span>`;
+
+function hmT(min){
+  const m = Math.round(min);
+  if (m < 60) return `${m}分`;
+  return m % 60 ? `${Math.floor(m / 60)}小時${m % 60}分` : `${m / 60}小時`;
+}
+const hmHT = h => hmT(h * 60);
+
+function rawT(min, km){
+  const parts=[];
+  if (min != null) parts.push(`${Math.round(min)} 分`);
+  if (km != null) parts.push(`${km.toFixed(1)} 公里`);
+  return parts.join(" · ");
+}
+
 function legText(min, km, real){
-  return km!=null ? `${real?"":"約 "}${min} 分 · ${km.toFixed(1)} km` : `${min} 分`;
+  return km!=null ? `${real?"":"約 "}${estT(min)} · ${kmT(km)}` : `${estT(min)}`;
 }
 
 let engine=null, map=null, marks={}, lines=null, pts=null, ready=false, zoom=11;
@@ -1219,8 +1256,8 @@ function planDotHTML(p, n){
 function tipHTML(p){
   return `<b>${esc(p.name)}</b>` +
     `<i>${esc(p.town)}　${EFFORT[p.diff]||p.diff}　` +
-    `<span class="mi" title="車程">${CAR_SVG}${p.drive_min} 分</span>　` +
-    `<span class="mi" title="停留">${HOURGLASS_SVG}${p.stay_h} 小時</span></i>` +
+    `<span class="mi" title="車程 ${rawT(p.drive_min)}">${CAR_SVG}${estT(p.drive_min)}</span>　` +
+    `<span class="mi" title="停留">${HOURGLASS_SVG}${hmHT(p.stay_h)}</span></i>` +
     (p.season?`<i>◈ ${esc(p.season)}</i>`:"") +
     (inPlan(p.id)?`<i>✓ 已在行程裡</i>`:"");
 }
@@ -1287,16 +1324,16 @@ function renderMapCard(){
   primeNearData();
   const ns=nearestStop(p);
   const legHTML = ns
-    ? `<span class="mi" title="離行程最近的一站">${CAR_SVG}離${esc(ns.stop.name)} ` +
-        (ns.min!=null ? `${ns.real?"":"約 "}<span class="num">${ns.min}</span> 分 · ` : ``) +
-        `<span class="num">${ns.km.toFixed(1)}</span> km</span>`
-    : `<span class="mi" title="從新竹市區出發的車程">${CAR_SVG}<span class="num">${p.drive_min}</span> 分</span>`;
+    ? `<span class="mi" title="離行程最近的一站 ${rawT(ns.min, ns.km)}">${CAR_SVG}離${esc(ns.stop.name)} ` +
+        (ns.min!=null ? `${ns.real?"":"約 "}${est(ns.min)} · ` : ``) +
+        `${kmv(ns.km)}</span>`
+    : `<span class="mi" title="從新竹市區出發的車程 ${rawT(p.drive_min)}">${CAR_SVG}${est(p.drive_min)}</span>`;
   box.innerHTML =
     `<div class="ttl"><b>${esc(p.name)}</b>` +
       `<button class="x" data-act="close" aria-label="關閉">×</button></div>` +
     `<p class="sub">${esc(p.town)}　${esc((TH[p.theme]||{}).name||"")}　${EFFORT[p.diff]||p.diff}</p>` +
     `<p class="m">${legHTML}` +
-      `<span class="mi" title="停留">${HOURGLASS_SVG}<span class="num">${p.stay_h}</span> 小時</span></p>` +
+      `<span class="mi" title="停留">${HOURGLASS_SVG}<span class="num">${hmHT(p.stay_h)}</span></span></p>` +
     tagsHTML(p) +
     `<div class="acts">` +
       `<button data-act="plan"${inPlan(p.id)?"":' class="primary"'}>${inPlan(p.id)?"從行程移除":"加進行程"}</button>` +
@@ -1470,11 +1507,8 @@ function highlightRow(id,on){
 
 const inPlan = id => PLAN.includes(id);
 const stayOf = p => (STAY[p.id]==null ? p.stay_h : STAY[p.id]);
-function stayLabel(h){
-  const m=Math.round(h*60);
-  if (m<60) return `停 ${m} 分`;
-  return m%60 ? `停 ${Math.floor(m/60)} 小時 ${m%60} 分` : `停 ${m/60} 小時`;
-}
+
+const stayLabel = h => `停 ${hmHT(h)}`;
 function adjustStay(p, delta){
   STAY[p.id]=Math.max(0.25, Math.round((stayOf(p)+delta)*4)/4);
   save(); renderTrip();
@@ -1523,6 +1557,7 @@ function schedule(){
     t=leave; stayTotal+=stay;
     return {p, n:i+1,
       leg: legText(legMin, legKm, legReal),
+      legRaw: rawT(legMin, legKm),          // 徽章 title 用：取階前的實算原值
       win: `${fmt(arrive)}–${fmt(leave)}`,
       stay: stayLabel(stay),
       warn: (months(p).length && !months(p).includes(MONTH)) ? "這季節不是它最好的時候" : ""};
@@ -1533,8 +1568,8 @@ function schedule(){
   const backKm = homeBack ? homeBack.km : null;
   const backReal = !!homeBack;
   driveTotal+=back;
-  return {ps, items, back, backKm, backReal, backTime:t+back, stay:Math.round(stayTotal*10)/10,
-          driveTotal, total:Math.round(((t+back)-START)/6)/10};
+  return {ps, items, back, backKm, backReal, backTime:t+back, stayMin:stayTotal*60,
+          driveTotal, totalMin:(t+back)-START};
 }
 function planURL(){
   const ps=PLAN.map(id=>BY_ID[id]).filter(Boolean);
@@ -1567,7 +1602,8 @@ function renderTrip(){
   head.appendChild(tripBtn);
   if (st){
     const hint=document.createElement("span"); hint.className="hint";
-    hint.textContent=`${st.ps.length} 站 · 停留 ${st.stay} 小時 · 車程約 ${st.driveTotal} 分 · 共 ${st.total} 小時`;
+    hint.textContent=`${st.ps.length} 站 · 停留 ${hmT(st.stayMin)} · 車程約 ${estT(st.driveTotal)} · 共 ${estT(st.totalMin)}`;
+    hint.title=`車程合計 ${rawT(st.driveTotal)}　總時程 ${rawT(st.totalMin)}`;
     const right=document.createElement("span"); right.className="right";
     const clock=document.createElement("span"); clock.className="clock"; clock.textContent=`${fmt(START)}–${fmt(st.backTime)}`;
     right.appendChild(clock);
@@ -1605,7 +1641,7 @@ function renderTrip(){
     const no=document.createElement("span"); no.className="no"; no.textContent=it.n;
     const nm=document.createElement("button"); nm.className="nm"; nm.textContent=it.p.name;
     nm.onclick=()=>select(it.p.id);
-    const lg=document.createElement("span"); lg.className="leg"; lg.title="車程";
+    const lg=document.createElement("span"); lg.className="leg"; lg.title=`車程 ${it.legRaw}`;
     lg.innerHTML = CAR_SVG;
     const dot=it.leg.indexOf(" · ");
     lg.appendChild(document.createTextNode(dot<0 ? it.leg : it.leg.slice(0,dot)));
@@ -1651,7 +1687,7 @@ function renderTrip(){
   const back=document.createElement("div"); back.className="end back" + (late?" late":"");
   back.innerHTML=`<span class="home">家</span>` +
     `<span>回到新竹 <span class="num">${fmt(st.backTime)}</span></span>` +
-    `<span class="leg" title="車程">${CAR_SVG}${legText(st.back, st.backKm, st.backReal)}</span>` +
+    `<span class="leg" title="車程 ${rawT(st.back, st.backKm)}">${CAR_SVG}${legText(st.back, st.backKm, st.backReal)}</span>` +
     (late?`<span class="warn" style="font-size:11.5px;color:var(--warn)">天已經黑了，山路請留餘裕</span>`:"");
   plan.appendChild(back);
 
@@ -2086,20 +2122,20 @@ function renderFilters(){
 const shortStop = n => n.length>5 ? n.slice(0,4)+"…" : n;
 
 function legBit(p, rel){
-  if (rel) return `<span class="mi" title="車程">${CAR_SVG}` +
-    (rel.min!=null ? `<span class="num">${rel.min}</span> 分 · ` : ``) +
-    `${rel.real?"":"直線 "}<span class="num">${rel.km.toFixed(1)}</span> km</span>`;
+  if (rel) return `<span class="mi" title="車程 ${rawT(rel.min, rel.km)}">${CAR_SVG}` +
+    (rel.min!=null ? `${est(rel.min)} · ` : ``) +
+    `${rel.real?"":"直線 "}${kmv(rel.km)}</span>`;
   if (NEAR_SET){
     const ns=nearestStop(p);
     if (ns){
       const many=PLAN.length>1;
-      return `<span class="mi" title="離${esc(ns.stop.name)}">${CAR_SVG}` +
+      return `<span class="mi" title="離${esc(ns.stop.name)} ${rawT(ns.min, ns.km)}">${CAR_SVG}` +
         (many ? `離${esc(shortStop(ns.stop.name))} ` : ``) +
-        (ns.min!=null ? `${ns.real?"":"約 "}<span class="num">${ns.min}</span> 分 · ` : ``) +
-        `<span class="num">${ns.km.toFixed(1)}</span> km</span>`;
+        (ns.min!=null ? `${ns.real?"":"約 "}${est(ns.min)} · ` : ``) +
+        `${kmv(ns.km)}</span>`;
     }
   }
-  return `<span class="mi" title="車程">${CAR_SVG}<span class="num">${p.drive_min}</span> 分</span>`;
+  return `<span class="mi" title="車程 ${rawT(p.drive_min)}">${CAR_SVG}${est(p.drive_min)}</span>`;
 }
 function rowFor(p, extra, rel){
   const b=document.createElement("div");
@@ -2117,7 +2153,7 @@ function rowFor(p, extra, rel){
     `<span class="tag ${HARD.has(p.diff)?"hard":""}">${EFFORT[p.diff]||p.diff}</span>` +
     (off?`<span class="off">不在篩選內</span>`:"") + `</div>` +
     `<div class="m">${(NEAR_SET||rel)?"":esc(p.town)+"　"}${legBit(p, rel)}　` +
-    `<span class="mi" title="停留">${HOURGLASS_SVG}<span class="num">${p.stay_h}</span> 小時</span>` +
+    `<span class="mi" title="停留">${HOURGLASS_SVG}<span class="num">${hmHT(p.stay_h)}</span></span>` +
     `${extra||""}</div>`;
   const add=document.createElement("button");
   add.className="add"; add.dataset.in=inPlan(p.id);
@@ -2173,9 +2209,9 @@ function renderDetail(p){
       `${esc(RT[p.route].name)}　${esc(TH[p.theme].name)}　${esc(p.kind||"")}</p>` +
     `<dl class="facts">` +
       `<dt>位置</dt><dd>${esc(p.town)}${p.coord_conf==="low"?"（座標估計值）":""}</dd>` +
-      `<dt>車程</dt><dd><span class="num">${p.drive_min}</span> 分（單程）</dd>` +
+      `<dt>車程</dt><dd><span class="num" title="${rawT(p.drive_min)}">${estT(p.drive_min)}</span>（單程）</dd>` +
       `<dt>停留</dt><dd>${esc(p.time||"—")}</dd>` +
-      `<dt>整趟</dt><dd><span class="num">${p.total_h}</span> 小時　${EFFORT[p.diff]||p.diff}</dd>` +
+      `<dt>整趟</dt><dd><span class="num" title="${rawT(p.total_h*60)}">${estHT(p.total_h)}</span>　${EFFORT[p.diff]||p.diff}</dd>` +
     `</dl>` +
     (p.desc?`<p class="desc">${esc(p.desc)}</p>`:"") +
     tagsHTML(p) +
