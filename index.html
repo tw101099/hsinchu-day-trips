@@ -154,7 +154,7 @@ button{font:inherit; color:inherit; cursor:pointer}
   background:var(--sunk); border:1px solid var(--line); border-radius:999px}
 .seg button{
   border:0; border-radius:999px; padding:3px 12px; font-size:13px;
-  background:none; color:var(--ink2);
+  background:var(--bg); color:var(--ink2);
   transition:background-color .15s, color .15s, box-shadow .15s;
 }
 .seg button:hover{background:var(--accent-soft); color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent)}
@@ -406,7 +406,6 @@ button{font:inherit; color:inherit; cursor:pointer}
 .rrow:hover{background:var(--sunk); color:var(--ink)}
 .rrow[aria-pressed=true]{background:var(--accent-soft); border-color:var(--accent); color:var(--ink); font-weight:600}
 
-.rrow .rbar{flex:none; width:3px; height:17px; border-radius:2px}
 .rrow .nm{flex:1; min-width:0}
 .rrow .n{flex:none; font-size:11.5px; color:var(--ink3)}
 
@@ -578,6 +577,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 .mi{display:inline-flex; align-items:baseline; gap:3px}
 
 .mi .caric, .mi .hgic{align-self:center; position:relative; top:-0.05em}
+
+.mi .sep{line-height:0}
 .caric{width:15px; height:8px; flex:none; stroke:currentColor; fill:none; stroke-width:5;
        stroke-linecap:round; stroke-linejoin:round}
 .hgic{width:5.5px; height:9px; flex:none; stroke:currentColor; fill:none; stroke-width:1.3;
@@ -1151,8 +1152,8 @@ const kmv = v => `<span class="num">${kmT(v)}</span>`;
 
 function hmT(min){
   const m = Math.round(min);
-  if (m < 60) return `${m}分`;
-  return m % 60 ? `${Math.floor(m / 60)}小時${m % 60}分` : `${m / 60}小時`;
+  if (m < 60) return `${m}m`;
+  return m % 60 ? `${Math.floor(m / 60)}hr${m % 60}m` : `${m / 60}hr`;
 }
 const hmHT = h => hmT(h * 60);
 
@@ -1330,8 +1331,9 @@ function renderMapCard(){
   primeNearData();
   const ns=nearestStop(p);
   const legHTML = ns
-    ? `<span class="mi" title="離行程最近的一站 ${rawT(ns.min, ns.km)}">${CAR_SVG}離${esc(ns.stop.name)} ` +
-        (ns.min!=null ? `${ns.real?"":"約 "}${est(ns.min)} · ` : ``) +
+    ? `<span class="mi" title="離行程最近的一站 ${rawT(ns.min, ns.km)}">${CAR_SVG}` +
+        `<span class="sep">離${esc(ns.stop.name)} </span>` +
+        (ns.min!=null ? `${ns.real?"":`<span class="sep">約 </span>`}${est(ns.min)}<span class="sep"> · </span>` : ``) +
         `${kmv(ns.km)}</span>`
     : `<span class="mi" title="從新竹市區出發的車程 ${rawT(p.drive_min)}">${CAR_SVG}${est(p.drive_min)}</span>`;
   box.innerHTML =
@@ -1928,7 +1930,11 @@ function fitShown(){
   FIT_PENDING=false;
   if (!S.sel) fit(shown());
 }
-function filterChanged(){ S.sel=null; EXTRA=new Set(); save(); render(); fitShown(); }
+
+function filterChanged(o){
+  S.sel=null; EXTRA=new Set(); save(); render();
+  if (!(o && o.nofit)) fitShown();
+}
 
 function tagsHTML(p){
   const tags = p && p.tags;
@@ -2102,8 +2108,7 @@ function renderFilters(){
         rs.forEach(r=>{
           const b=document.createElement("button");
           b.className="rrow"; b.setAttribute("aria-pressed", S.route.has(r.id));
-          b.innerHTML=`<span class="rbar" style="background:${d.color}"></span>` +
-                      `<span class="nm">${esc(r.name)}</span>` +
+          b.innerHTML=`<span class="nm">${esc(r.name)}</span>` +
                       `<span class="n num">${rtBase.filter(p=>p.route===r.id).length} 處</span>`;
           b.onclick=()=>{
 
@@ -2124,15 +2129,15 @@ const shortStop = n => n.length>5 ? n.slice(0,4)+"…" : n;
 
 function legBit(p, rel){
   if (rel) return `<span class="mi" title="車程 ${rawT(rel.min, rel.km)}">${CAR_SVG}` +
-    (rel.min!=null ? `${est(rel.min)} · ` : ``) +
-    `${rel.real?"":"直線 "}${kmv(rel.km)}</span>`;
+    (rel.min!=null ? `${est(rel.min)}<span class="sep"> · </span>` : ``) +
+    `${rel.real?"":`<span class="sep">直線 </span>`}${kmv(rel.km)}</span>`;
   if (NEAR_SET){
     const ns=nearestStop(p);
     if (ns){
       const many=PLAN.length>1;
       return `<span class="mi" title="離${esc(ns.stop.name)} ${rawT(ns.min, ns.km)}">${CAR_SVG}` +
-        (many ? `離${esc(shortStop(ns.stop.name))} ` : ``) +
-        (ns.min!=null ? `${ns.real?"":"約 "}${est(ns.min)} · ` : ``) +
+        (many ? `<span class="sep">離${esc(shortStop(ns.stop.name))} </span>` : ``) +
+        (ns.min!=null ? `${ns.real?"":`<span class="sep">約 </span>`}${est(ns.min)}<span class="sep"> · </span>` : ``) +
         `${kmv(ns.km)}</span>`;
     }
   }
@@ -2421,10 +2426,12 @@ document.querySelectorAll("#views button").forEach(b=>{
 });
 
 let Q_COMPOSING=false;
+
 function applyQ(){
   const v=document.getElementById("q").value.trim().toLowerCase();
   if (v===S.q) return;
-  S.q=v; filterChanged();
+  const cleared=!v;
+  S.q=v; filterChanged({nofit:cleared});
 }
 document.getElementById("q").addEventListener("compositionstart", ()=>{ Q_COMPOSING=true; });
 document.getElementById("q").addEventListener("compositionend", ()=>{ Q_COMPOSING=false; applyQ(); });
