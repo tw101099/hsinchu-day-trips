@@ -215,6 +215,66 @@ button{font:inherit; color:inherit; cursor:pointer}
   #qreset .gl{font-size:20px}
 }
 
+#msback, #msearch, #mcond{display:none}
+@media (max-width:899px), (max-height:559px){
+
+  .bar .logo{flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+  #app:not([data-msearch]) #qwrap{display:none}
+  #app:not([data-msearch]) #msearch{display:inline-flex}
+
+  #qreset .lbl{display:none}
+  #qreset{min-width:40px; min-height:40px; padding:0; border:0; background:none; justify-content:center; color:var(--ink2)}
+  #qreset:hover{color:var(--accent)}
+  #qreset:focus-visible{outline:2px solid var(--accent); outline-offset:-2px; border-radius:999px}
+  #qreset .gl{font-size:20px}
+
+  #app[data-msearch] .logo,
+  #app[data-msearch] #qreset,
+  #app[data-msearch] #theme{display:none}
+  #app[data-msearch] #msback{display:inline-flex}
+  #app[data-msearch] #qwrap{display:flex; flex:1 1 auto; max-width:none; min-width:0}
+
+  #app[data-msearch] #mcond{display:flex}
+  #app[data-msearch] #mcond[hidden]{display:none}
+}
+
+#msback, #msearch{
+  flex:none; position:relative;
+  align-items:center; justify-content:center;
+  min-width:40px; min-height:40px; padding:0;
+  border:0; background:none; color:var(--ink2); cursor:pointer; font-family:inherit;
+}
+#msback svg, #msearch svg{
+  display:block; width:17px; height:17px;
+  stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;
+}
+#msback:hover, #msearch:hover{color:var(--accent)}
+#msback:focus-visible, #msearch:focus-visible{
+  outline:2px solid var(--accent); outline-offset:-2px; border-radius:999px;
+}
+
+#msearch .mdot{
+  display:none; position:absolute; top:7px; right:7px;
+  width:6px; height:6px; border-radius:999px; background:var(--accent);
+}
+#msearch[data-on] .mdot{display:block}
+#msearch[data-on]{color:var(--accent)}
+
+#mcond{
+  flex:0 0 100%; align-items:center; gap:10px; min-height:38px;
+  margin-top:0; padding-top:0; box-shadow:inset 0 1px 0 var(--line);
+  font-size:12.5px; color:var(--ink3);
+}
+#mcond .mcn{flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+#mcreset{
+  flex:none; min-height:38px; padding:0 4px; border:0; background:none; cursor:pointer;
+  font-family:inherit; font-size:13px; color:var(--ink3); text-decoration:underline;
+  text-underline-offset:3px;
+}
+#mcreset:hover{color:var(--accent)}
+#mcreset:focus-visible{outline:2px solid var(--accent); outline-offset:-2px; border-radius:6px}
+
 .main{flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden}
 .panel{
   background:var(--panel); border-top:1px solid var(--line);
@@ -509,20 +569,24 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .empty{padding:26px 6px; color:var(--ink2); font-size:14px}
 .empty .eh{margin:0; font-size:14px; color:var(--ink)}
+
 .empty .ec{margin:7px 0 0; font-size:12.5px; line-height:1.7; color:var(--ink3)}
-.empty .ec .cb{white-space:nowrap}
 .empty .ea{margin-top:12px; display:flex; flex-wrap:wrap; gap:7px}
-.empty .ebtn{
+.ebtn{
   font-size:12.5px; line-height:1.5; color:var(--ink2); border:1px solid var(--line);
   border-radius:999px; padding:3px 10px; background:var(--chip-bg); font-family:inherit;
 }
-.empty .ebtn:hover{color:var(--accent); border-color:var(--accent)}
-.empty .ebtn.primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
-.empty .ebtn.primary:hover{color:var(--on-accent); border-color:var(--accent)}
+.ebtn:hover{color:var(--accent); border-color:var(--accent)}
+.ebtn.primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.ebtn.primary:hover{color:var(--on-accent); border-color:var(--accent)}
+
+.qglobal{padding:26px 6px 4px}
+.qglobal .qgt{margin:0; font-size:14px; line-height:1.7; color:var(--ink)}
+.qglobal .qga{margin-top:12px; display:flex; flex-wrap:wrap; gap:7px}
 
 .main.nomap .results{display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:0 14px; align-items:start}
 
-.main.nomap .ghead, .main.nomap .gintro, .main.nomap .detail, .main.nomap .empty{grid-column:1/-1}
+.main.nomap .ghead, .main.nomap .gintro, .main.nomap .detail, .main.nomap .empty, .main.nomap .qglobal{grid-column:1/-1}
 
 @media (min-width:700px){
   .main.nomap .detail{border-top:1px solid var(--accent); border-radius:var(--r); margin-top:6px}
@@ -784,6 +848,91 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 @keyframes badgepulse{0%{transform:scale(1)} 40%{transform:scale(1.35)} 100%{transform:scale(1)}}
 
+.sheetwrap{display:none; position:fixed; inset:0; z-index:1200; pointer-events:none}
+.sheetmask{position:absolute; inset:0; background:rgba(var(--sh),.42); pointer-events:auto;
+           transition:opacity .2s ease-out}
+
+html.sheeton .panel{overflow:hidden}
+.sheet{
+  position:absolute; left:0; right:0; bottom:0; pointer-events:auto;
+  display:flex; flex-direction:column;
+
+  max-height:82vh; max-height:82dvh;
+  background:var(--panel); background-image:var(--paper-panel); border-top:1px solid var(--line);
+  border-radius:16px 16px 0 0;
+  box-shadow:0 -3px 20px rgba(var(--sh),.20);
+
+  padding-bottom:env(safe-area-inset-bottom);
+}
+@keyframes sheetup{from{transform:translateY(100%)} to{transform:none}}
+@keyframes sheetfade{from{opacity:0} to{opacity:1}}
+.sheetwrap[data-open] .sheet{animation:sheetup .24s cubic-bezier(.22,.61,.36,1)}
+.sheetwrap[data-open] .sheetmask{animation:sheetfade .18s ease-out}
+
+.sheetgrab{
+  flex:none; height:40px; border:0; background:none; padding:0; width:100%;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  touch-action:none;
+}
+.sheetgrab span{display:block; width:38px; height:4px; border-radius:999px; background:var(--line)}
+.sheetgrab:hover span{background:var(--accent)}
+.sheetgrab:focus-visible{outline:2px solid var(--accent); outline-offset:-3px}
+.sheethead{
+  flex:none; display:flex; align-items:center; gap:10px;
+  padding:0 14px 8px; border-bottom:1px solid var(--line);
+}
+.sheettitle{flex:1; min-width:0; font-size:15px; font-weight:700; color:var(--ink)}
+.sheetbody{
+  flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch; padding:4px 14px 12px;
+}
+
+.sheetbody .filters{padding:0; border-bottom:0}
+.sheetbody .frow{flex-direction:column; align-items:stretch; gap:5px; padding:9px 0}
+.sheetbody .fkey{width:auto; padding-top:0; font-size:12px}
+.sheetbody .fkey:empty{display:none}
+.sheetbody .subrows{margin-top:0}
+
+.sheetfoot:empty{display:none}
+.sheetfoot{
+  flex:none; display:flex; align-items:center; justify-content:flex-end; gap:10px;
+  padding:9px 14px 12px; border-top:1px solid var(--line);
+}
+
+.sheetbtn{
+  min-height:32px; padding:0 14px; border-radius:999px; cursor:pointer; position:relative;
+  font-family:inherit; font-size:13.5px; line-height:1.4;
+  border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2);
+}
+.sheetbtn:hover{border-color:var(--accent); color:var(--accent)}
+.sheetbtn.sb-clear{flex:none}
+.sheetbtn.sb-go{flex:none; font-weight:600; background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.sheetbtn.sb-go:hover{color:var(--on-accent)}
+.sheetbtn::after{content:""; position:absolute; inset:-6px 0}
+.sheetbtn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+.mfbtn{
+  flex:none; margin-left:auto; min-height:32px; padding:0 12px; border-radius:999px; cursor:pointer;
+  position:relative; display:inline-flex; align-items:center; gap:5px;
+  font-family:inherit; font-size:13px; line-height:1.4; font-weight:600; white-space:nowrap;
+  border:1px solid var(--accent); background:var(--accent-soft); color:var(--accent);
+}
+.mfbtn::after{content:""; position:absolute; inset:-6px 0}
+.mfbtn[aria-expanded=true]{background:var(--accent); color:var(--on-accent)}
+.mfbtn .mfn{font-size:15px; line-height:1}
+
+@media (max-width:899px), (max-height:559px){
+  .sheetwrap[data-open]{display:block}
+  .panel .filters{display:none}
+}
+
+.mnav button::after{
+  content:""; position:absolute; top:8px; left:50%; margin-left:9px;
+  width:6px; height:6px; border-radius:999px; background:var(--accent);
+  opacity:0; transition:opacity .15s;
+}
+.mnav button[data-hit]::after{opacity:1}
+
 .gw{font-family:inherit; max-width:230px; line-height:1.5}
 .gw b{font-size:14px}
 
@@ -913,15 +1062,28 @@ button{font:inherit; color:inherit; cursor:pointer}
 <div class="app" id="app">
   <header class="bar">
 
+    
+    <button id="msback" type="button" aria-label="退出搜尋" title="退出搜尋（保留搜尋條件）">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H3M7.5 3.5 3 8l4.5 4.5"/></svg>
+    </button>
     <h1 class="logo" id="logo">新竹出發一日遊</h1>
     <div class="seg" id="views">
       <button data-v="map" aria-pressed="true">地圖</button>
       <button data-v="list" aria-pressed="false">清單</button>
     </div>
     <div id="qwrap"><input id="q" type="search" placeholder="搜尋：步道、瀑布、溫泉…" aria-label="搜尋景點"></div>
+    <button id="msearch" type="button" aria-label="搜尋" title="搜尋景點">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.4"/><path d="M10.3 10.3 13.8 13.8"/></svg>
+      <span class="mdot" aria-hidden="true"></span>
+    </button>
 
     <button id="qreset" type="button" hidden aria-label="重置全部條件（不含今天的行程）" title="重置全部條件（不含今天的行程）"><span class="gl" aria-hidden="true">⟲</span><span class="lbl">重置</span></button>
     <button id="theme" title="切換明暗" aria-label="切換明暗"></button>
+
+    <div id="mcond" hidden>
+      <span class="mcn"></span>
+      <button id="mcreset" type="button">重置全部</button>
+    </div>
   </header>
 
   <main class="main" id="main">
@@ -951,6 +1113,18 @@ button{font:inherit; color:inherit; cursor:pointer}
 <button id="totop" class="totop" type="button" aria-label="回到清單頂端" title="回到清單頂端">
   <svg viewBox="0 0 16 16"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg>
 </button>
+
+<div class="sheetwrap" id="sheetwrap">
+  <div class="sheetmask" id="sheetmask"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheettitle">
+    <button type="button" class="sheetgrab" id="sheetgrab" aria-label="收合篩選"><span></span></button>
+    <div class="sheethead">
+      <div class="sheettitle" id="sheettitle">篩選</div>
+    </div>
+    <div class="sheetbody" id="sheetbody"></div>
+    <div class="sheetfoot" id="sheetfoot"></div>
+  </div>
+</div>
 
 <script>
 const THEMES = [{"id": "heritage", "emoji": "🏛️", "name": "古蹟人文", "color": "#6E5A94", "dark": "#AD9CCF", "desc": "宗祠、老屋、古橋、日式建築"}, {"id": "water", "emoji": "💧", "name": "水庫湖埤", "color": "#3F6A94", "dark": "#86AFD0", "desc": "水庫、湖、埤塘、圳道"}, {"id": "coast", "emoji": "🌊", "name": "海岸濕地", "color": "#4696AA", "dark": "#86BDCB", "desc": "沙灘、堤岸、單車道、夕陽"}, {"id": "trail-mountain", "emoji": "⛰️", "name": "高山林道", "color": "#6B8A4F", "dark": "#9EBB80", "desc": "林道、巨木、部落，車程與體力都要算"}, {"id": "trail-near", "emoji": "🚶", "name": "近郊步道", "color": "#91AB63", "dark": "#C0D09F", "desc": "台地郊山、古道、環湖，兩三小時解決"}, {"id": "food", "emoji": "🍜", "name": "吃的", "color": "#B8933A", "dark": "#D9BE6A", "desc": "路上與山上的館子小吃"}, {"id": "cafe", "emoji": "☕", "name": "咖啡茶館", "color": "#C4763A", "dark": "#E5A66E", "desc": "景觀咖啡、老屋茶館、山中書店"}, {"id": "oldstreet", "emoji": "🏮", "name": "老街聚落", "color": "#A8463A", "dark": "#D98D7E", "desc": "客家庄與礦業聚落，吃喝採買"}];
@@ -2247,6 +2421,51 @@ function syncReset(){
   if (b) b.hidden = !anyCondition();
 }
 
+function syncMSearch(){
+  const app=document.getElementById("app");
+  if (!app) return;
+  if (MSEARCH) app.setAttribute("data-msearch",""); else app.removeAttribute("data-msearch");
+  const on = !!(S.q || S.qtags.length);
+  const ms=document.getElementById("msearch");
+  if (ms){
+    if (on) ms.setAttribute("data-on",""); else ms.removeAttribute("data-on");
+    ms.setAttribute("aria-label", on ? "搜尋（目前有搜尋條件）" : "搜尋");
+    ms.title = on ? "搜尋景點（目前有搜尋條件）" : "搜尋景點";
+  }
+  const mc=document.getElementById("mcond");
+  if (mc){
+    const n=condBits().length;
+    mc.hidden = !n;
+    const t=mc.querySelector(".mcn");
+    if (t) t.textContent = `目前套用 ${n} 個條件`;
+  }
+}
+
+function openSearchMode(){
+  if (MSEARCH || !isMobile()) return;
+  MSEARCH=true;
+  HSTEP++;
+  history.pushState(navState(), "", location.href);
+  syncMSearch();
+  const qi=document.getElementById("q");
+  if (qi) qi.focus({preventScroll:true});
+}
+function exitSearchMode(){
+  if (!MSEARCH) return;
+  if (HSTEP>0){ history.back(); return; }
+  MSEARCH=false; syncMSearch();
+}
+
+function syncNavDots(){
+  const on = !!(S.q || S.qtags.length);
+  const hit = { place: on ? shown().length : 0, trip: 0, map: 0 };
+  document.querySelectorAll("#mnav button").forEach(b=>{
+    const t=b.dataset.t;
+    if (on && t!==S.tab && hit[t]) b.setAttribute("data-hit","");
+    else b.removeAttribute("data-hit");
+  });
+}
+
 function resetAll(){
   ROUTE_VIEW=false; NEAR_VIEW=false; NEAR_LEVEL=0;   // 清除篩選也離開這兩種檢視
   S.route=new Set(); S.themes=new Set(); S.diffs=new Set(); S.budget=new Set();
@@ -2274,15 +2493,19 @@ function toggleFilters(){
 }
 function renderFilterBar(){
   const bar=document.createElement("div"); bar.className="fbar";
-  bar.onclick=e=>{ if (e.target===bar) toggleFilters(); };
-  const btn=document.createElement("button");
-  btn.className="fbtn"; btn.setAttribute("aria-expanded",S.open);
-  btn.innerHTML=`篩選<svg class="chev" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg>`;
-  btn.onclick=toggleFilters;
-  const sum=document.createElement("button");
-  sum.type="button"; sum.className="fsum"; sum.innerHTML=summary();
-  sum.onclick=toggleFilters;
-  bar.append(btn,sum);
+
+  const mob=isMobile();
+  bar.onclick=e=>{ if (e.target===bar && !mob) toggleFilters(); };
+  if (!mob){
+    const btn=document.createElement("button");
+    btn.className="fbtn"; btn.setAttribute("aria-expanded",S.open);
+    btn.innerHTML=`篩選<svg class="chev" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg>`;
+    btn.onclick=toggleFilters;
+    const sum=document.createElement("button");
+    sum.type="button"; sum.className="fsum"; sum.innerHTML=summary();
+    sum.onclick=toggleFilters;
+    bar.append(btn,sum);
+  }
   const sel=document.createElement("select");
   sel.id="sort";
   sel.innerHTML=SORTS.map(s=>`<option value="${s.id}"${S.sort===s.id?" selected":""}>${s.label}</option>`).join("");
@@ -2290,8 +2513,111 @@ function renderFilterBar(){
   sel.onclick=e=>e.stopPropagation();
   bar.appendChild(sel);
 
+  if (mob) bar.appendChild(mFilterBtn("place"));
   return bar;
 }
+
+let SHEET = null;          // null／"place"＝現在開著哪一張
+
+const circled = n => (n>=1 && n<=20) ? "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳"[n-1] : String(n);
+
+function placeFilterCount(){
+  return S.themes.size + S.diffs.size + S.budget.size + (S.inseason?1:0) +
+         (ROUTE_VIEW ? 1 : S.route.size) + ((NEAR_VIEW && PLAN.length) ? 1 : 0);
+}
+
+function clearPlaceFilters(){
+  PASS_AXES.forEach(a=>a.clear());
+  S.sel=null; EXTRA=new Set(); S.near=0;
+  S.dirOpen=new Set();
+  save(); render(); fitShown();
+}
+
+const SHEETS = {
+  place: {
+    tab:"place", kind:"filter", title:()=>"篩選",
+    ok: () => true,
+    count: placeFilterCount,
+    body: renderFilters,              // **原封重用**桌機抽屜那支渲染家，不寫第二套謂詞
+    clear: clearPlaceFilters,
+    go: () => `顯示 ${shown().length} 個景點`,
+  },
+};
+function openSheet(kind){
+  const spec=SHEETS[kind];
+  if (!isMobile() || !spec || SHEET===kind || !spec.ok()) return;
+  SHEET=kind;
+  render();
+  const g=document.getElementById("sheetgrab"); if (g) g.focus();
+}
+
+function closeSheet(){
+  if (!SHEET) return;
+  SHEET=null;
+  render();
+  const b=document.querySelector(".mfbtn");
+  if (b) b.focus({preventScroll:true});
+}
+function sheetFoot(spec){
+  const f=document.createElement("div"); f.id="sheetfoot"; f.className="sheetfoot";
+  const c=document.createElement("button");
+  c.type="button"; c.className="sheetbtn sb-clear"; c.textContent="清除";
+  c.onclick=spec.clear;
+  const g=document.createElement("button");
+  g.type="button"; g.className="sheetbtn sb-go"; g.textContent=spec.go();
+  g.onclick=closeSheet;
+  f.append(c,g);
+  return f;
+}
+function renderSheet(){
+  const wrap=document.getElementById("sheetwrap");
+  if (!wrap) return;
+  const spec = SHEET && SHEETS[SHEET];
+  const on = !!(spec && isMobile() && S.tab===spec.tab && spec.ok());
+  if (!on){
+    if (SHEET) SHEET=null;
+    wrap.removeAttribute("data-open");
+    wrap.removeAttribute("data-kind");
+    document.documentElement.classList.remove("sheeton");
+    document.getElementById("sheetbody").innerHTML="";
+    document.getElementById("sheetfoot").innerHTML="";
+    return;
+  }
+  const body=document.getElementById("sheetbody");
+
+  const btns=[...body.querySelectorAll("button")];
+  const fi=btns.indexOf(document.activeElement);
+  const keep=body.scrollTop;
+  body.innerHTML="";
+  body.appendChild(spec.body());
+  body.scrollTop=keep;
+  if (fi>=0){
+    const now=body.querySelectorAll("button");
+    if (now[fi]) now[fi].focus({preventScroll:true});
+  }
+  const foot=document.getElementById("sheetfoot");
+  if (spec.go) foot.replaceWith(sheetFoot(spec));
+  else { foot.innerHTML=""; foot.className="sheetfoot"; }
+  document.getElementById("sheettitle").textContent = spec.title();
+  wrap.setAttribute("data-kind", spec.kind);
+  wrap.setAttribute("data-open","");
+  document.documentElement.classList.add("sheeton");
+}
+
+function mFilterBtn(kind){
+  const spec=SHEETS[kind];
+  const n=spec.count();
+  const b=document.createElement("button");
+  b.type="button"; b.className="mfbtn";
+  b.innerHTML = "篩選" + (n ? `<span class="mfn">${circled(n)}</span>` : "");
+  b.setAttribute("aria-haspopup","dialog");
+  b.setAttribute("aria-expanded", SHEET===kind);
+  b.setAttribute("aria-label", n ? `篩選，目前 ${n} 個條件` : "篩選");
+  b.onclick=e=>{ e.stopPropagation(); openSheet(kind); };
+  return b;
+}
+document.getElementById("sheetmask").onclick=closeSheet;
+document.getElementById("sheetgrab").onclick=closeSheet;
 
 function renderFilters(){
   const f=document.createElement("div"); f.className="filters";
@@ -2515,38 +2841,23 @@ function renderList(){
   if (!list.length){
     const terms=[...S.qtags].concat(S.q ? [S.q] : []);
     const hits=terms.length ? PLACES.filter(matchQ) : [];
-    const d=document.createElement("div"); d.className="empty";
-    const h=document.createElement("p"); h.className="eh";
-    h.textContent = hits.length
-      ? `目前條件內沒有結果，但全站另有 ${hits.length} 個符合項目。`
-      : "在目前條件下找不到內容";
-    d.appendChild(h);
-    const bits=condBits();
-    if (bits.length){
-      const c=document.createElement("p"); c.className="ec";
-      c.append("目前仍套用：");
-      bits.forEach(([k,v],i)=>{
-        if (i) c.append("、");
-        const s=document.createElement("span"); s.className="cb"; s.textContent=`＜${k}：${v}＞`;
-        c.appendChild(s);
-      });
-      d.appendChild(c);
-    }
-    const a=document.createElement("div"); a.className="ea";
-    const reset=document.createElement("button");
-    reset.type="button"; reset.className="ebtn"; reset.textContent="重置全部條件";
-    reset.onclick=e=>{ e.stopPropagation(); resetAll(); };
     if (hits.length){
+      const d=document.createElement("div"); d.className="qglobal";
+      const t=document.createElement("p"); t.className="qgt";
+      t.textContent=`目前條件內沒有結果，但全站另有 ${hits.length} 個符合項目。`;
+      const a=document.createElement("div"); a.className="qga";
       const g=document.createElement("button");
       g.type="button"; g.className="ebtn primary"; g.textContent="顯示全站結果";
       g.title=`放下擋住這 ${hits.length} 個項目的那幾組條件，用完整清單列出它們（搜尋字保留）`;
       g.onclick=e=>{ e.stopPropagation(); releaseForAll(hits); S.sel=null; EXTRA=new Set(); save(); render(); fitShown(); };
       a.appendChild(g);
-    } else {
-      reset.classList.add("primary");
+      d.append(t,a);
+      wrap.appendChild(d); return wrap;
     }
-    a.appendChild(reset);
-    d.appendChild(a);
+    const d=document.createElement("div"); d.className="empty";
+    const h=document.createElement("p"); h.className="eh";
+    h.textContent = terms.length ? `找不到符合「${terms.join("、")}」的內容。` : "在目前條件下找不到內容";
+    d.appendChild(h);
     wrap.appendChild(d); return wrap;
   }
   const cmp=(SORTS.find(s=>s.id===S.sort)||SORTS[0]).fn;
@@ -2594,7 +2905,7 @@ function renderPanel(){
   const keep=panel.scrollTop;
   panel.innerHTML="";
   panel.appendChild(renderFilterBar());
-  if (S.open) panel.appendChild(renderFilters());
+  if (S.open && !isMobile()) panel.appendChild(renderFilters());
   const mapOnly=panelHidden(); PANEL_MAPONLY=mapOnly;
   if (!mapOnly){
   panel.appendChild(section("景點清單", `${shown().length}/${PLACES.length}`, S.listOpen,
@@ -2730,6 +3041,13 @@ addEventListener("resize", syncMobile);
 new ResizeObserver(syncMobile).observe(document.getElementById("main"));
 
 let HASH_APPLYING=true, HASH_LAST=null, HSTEP=0;
+
+let MSEARCH = false;
+const navState = () => {
+  const st = {hs:HSTEP};
+  if (MSEARCH) st.ms = 1;
+  return st;
+};
 const hashNow = () => S.sel || null;
 function parseHash(){
   const h=(location.hash||"").replace(/^#/,"");
@@ -2755,7 +3073,7 @@ function syncHash(){
   const deeper = !!st && !HASH_LAST;
   const url = s || (location.pathname + location.search);
   if (deeper) HSTEP++;
-  history[deeper ? "pushState" : "replaceState"]({hs:HSTEP}, "", url);
+  history[deeper ? "pushState" : "replaceState"](navState(), "", url);
   HASH_LAST=st;
 }
 
@@ -2774,8 +3092,11 @@ function applyHash(initial){
   render();          // 「關掉景點」那一路沒有 render 過，補一次
   syncHash();        // 把網址正規化（例如指向已退場 id 的舊連結）；同層＝replace
 }
+
 addEventListener("popstate", e=>{
   HSTEP = (e.state && e.state.hs) || 0;
+  const want = !!(e.state && e.state.ms);
+  if (want !== MSEARCH){ MSEARCH = want; syncMSearch(); }
   applyHash(false);
 });
 
@@ -2802,6 +3123,9 @@ function render(){
   primeNearView();   // fetchNear 現在是同步查內嵌表（NEIGH），重複呼叫有完成標記守門
   draw(); renderPanel(); renderTrip(); renderMapBtns(); renderMapCard(); updateTotop();
   syncReset();   // 頁首 ⟲ 是靜態節點，renderPanel 重建面板碰不到它（2026-09-12 棒 DA）
+  syncMSearch(); // 手機頁首兩態＋搜尋鈕狀態點＋ #mcond 條件數（2026-09-12 棒 DB2）
+  syncNavDots(); // 非當前頁籤的搜尋命中小點（2026-09-12 棒 DB2）
+  renderSheet(); // 手機篩選 Bottom Sheet 的內容與守衛（2026-09-12 棒 DB2）
   syncHash();    // 景點詳情那一層寫進網址列（2026-09-12 棒 DB1；單一出口，見那段）
 }
 
@@ -2847,7 +3171,17 @@ document.getElementById("qwrap").addEventListener("click", ()=>{
 });
 
 document.getElementById("qreset").onclick=e=>{ e.stopPropagation(); resetAll(); };
-addEventListener("keydown", e=>{ if (e.key==="Escape" && S.sel){ S.sel=null; render(); } });
+
+document.getElementById("msearch").onclick=e=>{ e.stopPropagation(); openSearchMode(); };
+document.getElementById("msback").onclick=e=>{ e.stopPropagation(); exitSearchMode(); };
+document.getElementById("mcreset").onclick=e=>{ e.stopPropagation(); resetAll(); };
+
+addEventListener("keydown", e=>{
+  if (e.key!=="Escape") return;
+  if (SHEET){ closeSheet(); return; }
+  if (MSEARCH){ exitSearchMode(); return; }
+  if (S.sel){ S.sel=null; render(); }
+});
 
 restore();
 applyTheme();
