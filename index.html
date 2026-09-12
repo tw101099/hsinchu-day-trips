@@ -558,6 +558,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 .ghead:hover{background-color:var(--sunk)}
 
+.ghead.stuck{border-radius:0}
+
 @media (max-width:899px), (max-height:559px){
   :root{--l1h:48px; --triph:var(--l1h)}
 }
@@ -3339,7 +3341,8 @@ function renderPanel(){
       const wasPos=g.style.position; g.style.position="static";
       const r=g.getBoundingClientRect();
       g.style.position=wasPos;
-      const target=stopAt(false)+10;   // 地板見 stopAt（2026-09-12 棒 DS）
+
+      const target=stopAt(false);   // 地板見 stopAt（2026-09-12 棒 DS）
       panel.scrollTop += (r.top-target);
     }
     SCROLL_GROUP=false;
@@ -3541,11 +3544,12 @@ function syncStuck(box){
   if (!box) return;
 
   const bt=box.getBoundingClientRect().top + box.clientTop; let last=null;
+
   [...box.children, ...box.querySelectorAll(".ghead")].forEach(el=>{
-    el.classList.remove("stuck-last");
+    el.classList.remove("stuck-last", "stuck");
     const cs=getComputedStyle(el); if (cs.position!=="sticky") return;
     const top=parseFloat(cs.top)||0; const r=el.getBoundingClientRect();
-    if (r.top <= bt+top+0.5 && r.height>0) last=el;
+    if (r.top <= bt+top+0.5 && r.height>0){ el.classList.add("stuck"); last=el; }
   });
   if (last) last.classList.add("stuck-last");
 }
