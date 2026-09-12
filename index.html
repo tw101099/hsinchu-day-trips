@@ -28,6 +28,8 @@
 
   --chip-bg:#fdfbf6;
 
+  --card-bg:#ffffff;
+
   --line:#e6ddcc; --line2:#d1c6b0;
 
   --accent:#4a4038; --accent-soft:#efe9dc; --on-accent:#fffefb;
@@ -70,6 +72,7 @@
     --ink:#ede4d3; --ink2:#b3a794; --ink3:#978c79;
 
     --chip-bg:#3a352f;
+    --card-bg:#3a352f;   
     --line:#514840; --line2:#65594e;
     --accent:#c9bda8; --accent-soft:#35302a; --on-accent:#1c1a17;
     --warn:#e0a45c;
@@ -96,6 +99,7 @@
     --ink:#ede4d3; --ink2:#b3a794; --ink3:#978c79;
 
     --chip-bg:#3a352f;
+    --card-bg:#3a352f;   
     --line:#514840; --line2:#65594e;
     --accent:#c9bda8; --accent-soft:#35302a; --on-accent:#1c1a17;
     --warn:#e0a45c;
@@ -758,7 +762,11 @@ button{font:inherit; color:inherit; cursor:pointer}
   flex:none; width:22px; height:22px; border-radius:999px; border:1px dashed var(--line2);
   display:grid; place-items:center; font-size:10px; color:var(--ink3);
 }
-.plan .end.back{border-top:1px solid var(--line); padding-top:7px; color:var(--ink)}
+
+.plan .end.back{
+  margin-top:var(--rowgap); padding:7px 9px; border:1px solid var(--line); border-radius:var(--r);
+  background:var(--card-bg); background-image:var(--paper-panel); color:var(--ink);
+}
 .plan .leg{display:inline-flex; align-items:center; font-size:11.5px; color:var(--ink3); font-family:var(--mono); white-space:nowrap}
 
 .mi{display:inline-flex; align-items:baseline; gap:3px}
@@ -772,30 +780,27 @@ button{font:inherit; color:inherit; cursor:pointer}
       stroke-linecap:round; stroke-linejoin:round}
 .leg .caric{width:16px; height:8px; margin-right:3px; vertical-align:-1px}
 
-.stopwrap{position:relative; border-top:1px solid var(--line)}
+.stopwrap{position:relative}
 
-.stopwrap + .stopwrap{border-top:0; margin-top:var(--rowgap)}
-.stopwrap + .stopwrap::before{
-  content:""; position:absolute; left:0; right:0; top:calc(var(--rowgap) / -2);
-  border-top:1px solid var(--line); pointer-events:none;
-}
+.stopwrap + .stopwrap{margin-top:var(--rowgap)}
 
 .stop{
   display:grid; grid-template-columns:var(--leadw,max-content) 1fr auto; column-gap:10px;
-  align-items:center; padding:5px 0; position:relative; z-index:1;
+  align-items:center; padding:7px 9px; position:relative; z-index:1;
+  border:1px solid var(--line); border-radius:var(--r);
+  background:var(--card-bg); background-image:var(--paper-panel);
   touch-action:pan-y; cursor:grab; user-select:none; -webkit-touch-callout:none;
 }
 
 .stop button.nm, .stop .stepper button, .stop .ops button{cursor:pointer}
 .stopwrap.dragging{z-index:5}
 
-.stopwrap.swiping .stop, .stopwrap.dragging .stop{background:var(--panel); background-image:var(--paper-panel)}
-.stopwrap.dragging .stop{box-shadow:0 4px 14px rgba(var(--sh),.20); border-radius:8px; cursor:grabbing}
+.stopwrap.dragging .stop{box-shadow:0 4px 14px rgba(var(--sh),.20); cursor:grabbing}
 .stopwrap.drag-over-top{box-shadow:inset 0 2px 0 var(--accent)}
 .stopwrap.drag-over-bottom{box-shadow:inset 0 -2px 0 var(--accent)}
 
 .swipebg{
-  position:absolute; inset:0; border-radius:8px; background:var(--accent); color:var(--on-accent);
+  position:absolute; inset:0; border-radius:var(--r); background:var(--accent); color:var(--on-accent);
   display:flex; align-items:center; justify-content:flex-end; gap:6px; padding:0 14px;
   font-size:12.5px; font-weight:600; opacity:0; pointer-events:none;
 }
@@ -924,9 +929,10 @@ button{font:inherit; color:inherit; cursor:pointer}
                    padding-bottom:calc(16px + env(safe-area-inset-bottom))}
   #tripview .plan{max-height:none; overflow:visible}
 
+  #tripview .stopwrap{margin-left:5px}
   #tripview .stop.mstop{
     display:grid; grid-template-columns:minmax(0,1fr) 44px; column-gap:8px; row-gap:2px;
-    grid-template-areas:"ra grip" "rb x" "warn warn"; align-items:center; padding:6px 0;
+    grid-template-areas:"ra grip" "rb x" "warn warn"; align-items:center;
   }
   #tripview .mstop .ra{grid-area:ra; display:flex; align-items:center; gap:9px; min-width:0}
   #tripview .mstop .rb{grid-area:rb; display:flex; align-items:center; gap:10px; flex-wrap:wrap; min-width:0}
@@ -963,7 +969,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 
   #tripview .stopwrap.dragging .stop{opacity:.92}
 
-  #tripview .plan .end.back{flex-wrap:wrap; padding-top:8px}
+  #tripview .plan .end.back{flex-wrap:wrap; margin:0 0 0 5px}
 
   #tripview .go{padding-top:6px}
   #tripview .empty{padding:26px 20px}
