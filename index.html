@@ -868,8 +868,57 @@ button{font:inherit; color:inherit; cursor:pointer}
   }
   #tripview .head .hint{color:var(--ink); font-weight:600}
 
-  #tripview .sheet{display:block; max-height:none; overflow:visible; border-top:0}
+  
+  #tripview .sheet{display:block; max-height:none; overflow:visible; border-top:0;
+                   padding-bottom:calc(16px + env(safe-area-inset-bottom))}
   #tripview .plan{max-height:none; overflow:visible}
+
+  #tripview .stop.mstop{
+    display:grid; grid-template-columns:minmax(0,1fr) 44px; column-gap:8px; row-gap:2px;
+    grid-template-areas:"ra grip" "rb x" "warn warn"; align-items:center; padding:6px 0;
+  }
+  #tripview .mstop .ra{grid-area:ra; display:flex; align-items:center; gap:9px; min-width:0}
+  #tripview .mstop .rb{grid-area:rb; display:flex; align-items:center; gap:10px; flex-wrap:wrap; min-width:0}
+  #tripview .mstop .warn{grid-area:warn; padding-left:35px}
+  #tripview .mstop .no{width:26px; height:26px; line-height:26px; font-size:12px}
+  #tripview .mstop .nm{white-space:normal; font-size:15px; line-height:1.35; text-align:left; min-width:0}
+  #tripview .mstop .win{font-size:12.5px}
+
+  #tripview .mstop .grip{
+    grid-area:grip; display:grid; place-items:center; width:44px; height:44px; justify-self:end;
+    color:var(--ink3); cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none;
+  }
+  #tripview .mstop .grip svg{width:16px; height:16px; fill:currentColor}
+  #tripview .mstop .grip:active{cursor:grabbing}
+
+  #tripview .mstop .stepper{padding:1px 3px; gap:4px}
+  #tripview .mstop .stepper button{position:relative; width:32px; height:32px; font-size:17px; color:var(--ink2)}
+  #tripview .mstop .stepper button::after{content:""; position:absolute; inset:-6px}
+  #tripview .mstop .stepper .v{font-size:12.5px; min-width:56px}
+  #tripview .mstop .x{
+    grid-area:x; justify-self:end; position:relative; width:32px; height:32px; margin-right:6px;
+    border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2);
+    border-radius:999px; line-height:1; font-size:14px; padding:0; cursor:pointer;
+  }
+  #tripview .mstop .x::after{content:""; position:absolute; inset:-6px}
+  #tripview .mstop .x:hover{border-color:var(--accent); color:var(--accent)}
+
+  #tripview .legrow{
+    display:flex; align-items:center; padding:5px 0 5px 26px; background:var(--panel);
+    font-size:12px; color:var(--ink3); position:relative;
+  }
+  #tripview .legrow::before{content:""; position:absolute; left:12px; top:0; bottom:0; border-left:2px solid var(--line2)}
+  #tripview .legrow .leg{font-size:12px}
+
+  #tripview .stopwrap.dragging .stop{opacity:.92}
+
+  #tripview .plan .end.back{flex-wrap:wrap; padding-top:8px}
+
+  #tripview .go{display:grid; grid-template-columns:auto auto 1fr; gap:8px 6px; padding-top:6px}
+  #tripview .go a.primary{
+    grid-column:1 / -1; justify-content:center; min-height:44px; font-size:14px; font-weight:600;
+  }
+  #tripview .go .infobtn{justify-self:end}
 
   #tripview .stopwrap + .detail{border-top:1px solid var(--accent); border-radius:var(--r); margin:4px 0 10px}
   #tripview .empty{padding:26px 20px}
@@ -885,7 +934,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 .sheetwrap[data-kind=map][data-st=peek] .sheetmask{opacity:0; pointer-events:none}
 
 html.sheeton .panel{overflow:hidden}
-.sheet{
+
+.bsheet{
   position:absolute; left:0; right:0; bottom:0; pointer-events:auto;
   display:flex; flex-direction:column;
 
@@ -898,15 +948,15 @@ html.sheeton .panel{overflow:hidden}
   padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right);
 }
 
-.sheetwrap[data-kind=map] .sheet{max-height:none; height:var(--sheeth)}
-.sheetwrap[data-kind=map][data-st=peek] .sheet{--sheeth:46vh; --sheeth:46dvh}
-.sheetwrap[data-kind=map][data-st=full] .sheet{--sheeth:92vh; --sheeth:92dvh}
+.sheetwrap[data-kind=map] .bsheet{max-height:none; height:var(--sheeth)}
+.sheetwrap[data-kind=map][data-st=peek] .bsheet{--sheeth:46vh; --sheeth:46dvh}
+.sheetwrap[data-kind=map][data-st=full] .bsheet{--sheeth:92vh; --sheeth:92dvh}
 
-.sheetwrap .sheet{transition:height .22s cubic-bezier(.22,.61,.36,1)}
-.sheetwrap .sheet.dragging, .sheetwrap.dragging .sheetmask{transition:none}
+.sheetwrap .bsheet{transition:height .22s cubic-bezier(.22,.61,.36,1)}
+.sheetwrap .bsheet.dragging, .sheetwrap.dragging .sheetmask{transition:none}
 @keyframes sheetup{from{transform:translateY(100%)} to{transform:none}}
 @keyframes sheetfade{from{opacity:0} to{opacity:1}}
-.sheetwrap[data-open] .sheet{animation:sheetup .24s cubic-bezier(.22,.61,.36,1)}
+.sheetwrap[data-open] .bsheet{animation:sheetup .24s cubic-bezier(.22,.61,.36,1)}
 .sheetwrap[data-open] .sheetmask{animation:sheetfade .18s ease-out}
 
 .sheetgrab{
@@ -1221,7 +1271,7 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
 
 <div class="sheetwrap" id="sheetwrap">
   <div class="sheetmask" id="sheetmask"></div>
-  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheettitle">
+  <div class="bsheet" role="dialog" aria-modal="true" aria-labelledby="sheettitle">
     <button type="button" class="sheetgrab" id="sheetgrab" aria-label="收合篩選"><span></span></button>
     <div class="sheethead">
       <div class="sheettitle" id="sheettitle">篩選</div>
@@ -2122,53 +2172,75 @@ function renderTrip(){
 
   const plan=document.createElement("div"); plan.className="plan";
 
+  const legRow=(text, raw)=>{
+    const r=document.createElement("div"); r.className="legrow";
+    const lg=document.createElement("span"); lg.className="leg"; lg.title=`車程 ${raw}`;
+    lg.innerHTML=CAR_SVG; lg.appendChild(document.createTextNode(text));
+    r.appendChild(lg); return r;
+  };
+
   st.items.forEach((it,i)=>{
+    if (mob) plan.appendChild(legRow(it.leg, it.legRaw));
     const wrap=document.createElement("div"); wrap.className="stopwrap"; wrap.dataset.id=it.p.id;
     const swipebg=document.createElement("div"); swipebg.className="swipebg";
     swipebg.innerHTML = BIN_SVG + "<span>移出行程</span>";
-    const stop=document.createElement("div"); stop.className="stop"; stop.dataset.id=it.p.id;
+    const stop=document.createElement("div"); stop.className= mob ? "stop mstop" : "stop"; stop.dataset.id=it.p.id;
 
-    const lead=document.createElement("div"); lead.className="lead";
     const no=document.createElement("span"); no.className="no"; no.textContent=it.n;
     const nm=document.createElement("button"); nm.className="nm"; nm.textContent=it.p.name;
     nm.onclick=()=>select(it.p.id);
-    const lg=document.createElement("span"); lg.className="leg"; lg.title=`車程 ${it.legRaw}`;
-    lg.innerHTML = CAR_SVG;
-    const dot=it.leg.indexOf(" · ");
-    lg.appendChild(document.createTextNode(dot<0 ? it.leg : it.leg.slice(0,dot)));
-    if (dot>=0){
-      const kmp=document.createElement("span"); kmp.className="km"; kmp.textContent=it.leg.slice(dot);
-      lg.appendChild(kmp);
-    }
-    lead.append(no,nm,lg);
 
-    const meta=document.createElement("div"); meta.className="meta";
     const win=document.createElement("span"); win.className="win"; win.textContent=it.win;
     const step=document.createElement("span"); step.className="stepper";
     const minus=document.createElement("button"); minus.textContent="−"; minus.title="停少一點（15 分）"; minus.setAttribute("aria-label","停少一點（15 分）");
-    minus.onclick=()=>adjustStay(it.p,-0.25);
     const v=document.createElement("span"); v.className="v"; v.textContent=it.stay;
     const plus=document.createElement("button"); plus.textContent="＋"; plus.title="停久一點（15 分）"; plus.setAttribute("aria-label","停久一點（15 分）");
-    plus.onclick=()=>adjustStay(it.p,0.25);
+    if (mob){ wireStepHold(minus, ()=>adjustStay(it.p,-0.25)); wireStepHold(plus, ()=>adjustStay(it.p,0.25)); }
+    else { minus.onclick=()=>adjustStay(it.p,-0.25); plus.onclick=()=>adjustStay(it.p,0.25); }
     step.append(minus,v,plus);
-    meta.append(win,step);
-    if (it.warn){
-      const w=document.createElement("span"); w.className="warn"; w.textContent=it.warn;
-      meta.appendChild(w);
-    }
 
-    const ops=document.createElement("span"); ops.className="ops";
     const grip=document.createElement("span"); grip.className="grip"; grip.title="拖曳排序";
     grip.setAttribute("aria-hidden","true"); grip.innerHTML=GRIP_SVG;
-    const up=document.createElement("button"); up.textContent="↑"; up.title="往前一站"; up.setAttribute("aria-label","往前一站");
-    up.disabled=i===0; up.onclick=()=>movePlan(i,-1);
-    const down=document.createElement("button"); down.textContent="↓"; down.title="往後一站"; down.setAttribute("aria-label","往後一站");
-    down.disabled=i===st.items.length-1; down.onclick=()=>movePlan(i,1);
     const x=document.createElement("button"); x.textContent="×"; x.title="移出行程"; x.setAttribute("aria-label","移出行程");
     x.onclick=()=>togglePlan(it.p.id);
-    ops.append(grip,up,down,x);
 
-    stop.append(lead,meta,ops);
+    if (mob){
+      const ra=document.createElement("div"); ra.className="ra"; ra.append(no,nm);
+      const rb=document.createElement("div"); rb.className="rb"; rb.append(win,step);
+      x.className="x";
+      stop.append(ra,grip,rb,x);
+      if (it.warn){
+        const w=document.createElement("span"); w.className="warn"; w.textContent=it.warn;
+        stop.appendChild(w);
+      }
+    } else {
+      const lead=document.createElement("div"); lead.className="lead";
+      const lg=document.createElement("span"); lg.className="leg"; lg.title=`車程 ${it.legRaw}`;
+      lg.innerHTML = CAR_SVG;
+      const dot=it.leg.indexOf(" · ");
+      lg.appendChild(document.createTextNode(dot<0 ? it.leg : it.leg.slice(0,dot)));
+      if (dot>=0){
+        const kmp=document.createElement("span"); kmp.className="km"; kmp.textContent=it.leg.slice(dot);
+        lg.appendChild(kmp);
+      }
+      lead.append(no,nm,lg);
+
+      const meta=document.createElement("div"); meta.className="meta";
+      meta.append(win,step);
+      if (it.warn){
+        const w=document.createElement("span"); w.className="warn"; w.textContent=it.warn;
+        meta.appendChild(w);
+      }
+
+      const ops=document.createElement("span"); ops.className="ops";
+      const up=document.createElement("button"); up.textContent="↑"; up.title="往前一站"; up.setAttribute("aria-label","往前一站");
+      up.disabled=i===0; up.onclick=()=>movePlan(i,-1);
+      const down=document.createElement("button"); down.textContent="↓"; down.title="往後一站"; down.setAttribute("aria-label","往後一站");
+      down.disabled=i===st.items.length-1; down.onclick=()=>movePlan(i,1);
+      ops.append(grip,up,down,x);
+
+      stop.append(lead,meta,ops);
+    }
     wrap.append(swipebg,stop);
     plan.appendChild(wrap);
     wireStopGestures(wrap, stop, grip, it.p.id);
@@ -2176,10 +2248,11 @@ function renderTrip(){
   });
 
   const late=st.backTime>18*60;
+  if (mob) plan.appendChild(legRow(legText(st.back, st.backKm, st.backReal), rawT(st.back, st.backKm)));
   const back=document.createElement("div"); back.className="end back" + (late?" late":"");
   back.innerHTML=`<span class="home">家</span>` +
     `<span>回到新竹 <span class="num">${fmt(st.backTime)}</span></span>` +
-    `<span class="leg" title="車程 ${rawT(st.back, st.backKm)}">${CAR_SVG}${legText(st.back, st.backKm, st.backReal)}</span>` +
+    (mob ? "" : `<span class="leg" title="車程 ${rawT(st.back, st.backKm)}">${CAR_SVG}${legText(st.back, st.backKm, st.backReal)}</span>`) +
     (late?`<span class="warn" style="font-size:11.5px;color:var(--warn)">天已經黑了，山路請留餘裕</span>`:"");
   plan.appendChild(back);
 
@@ -2227,17 +2300,49 @@ function renderTrip(){
     document.documentElement.style.setProperty("--tripup", "0px");
     if (TRIP_SCROLL_TO){
       const row=el.querySelector(`.stopwrap[data-id="${TRIP_SCROLL_TO}"]`);
-      const head=el.querySelector(".head");
       if (row){
-        const floor=(head ? head.getBoundingClientRect().bottom : el.getBoundingClientRect().top)+10;
+        const floor=tripStopAt(el)+10;
         el.scrollTop = Math.max(0, keep + (row.getBoundingClientRect().top - floor));
       } else el.scrollTop=keep;
       TRIP_SCROLL_TO=null;
     } else el.scrollTop=keep;
+    syncStuck(el);   // 釘層陰影：`.head` 釘住時掛 `.stuck-last`（棒 DS 那支，整棵剛重建）
     return;
   }
   syncTripUp();
 }
+
+function tripStopAt(el){
+  let h=el.getBoundingClientRect().top + el.clientTop;
+  [...el.children].forEach(c=>{ if (getComputedStyle(c).position==="sticky") h+=c.offsetHeight; });
+  return h;
+}
+
+let STEP_HOLD=null, STEP_SUPPRESS_UNTIL=0;
+function stopStepHold(){
+  if (!STEP_HOLD) return;
+  clearTimeout(STEP_HOLD.timer); clearInterval(STEP_HOLD.iv);
+  if (STEP_HOLD.fired) STEP_SUPPRESS_UNTIL=Date.now()+400;
+  STEP_HOLD=null;
+}
+function wireStepHold(btn, fn){
+  btn.addEventListener("pointerdown", e=>{
+    if (e.pointerType==="mouse" && e.button!==0) return;
+    stopStepHold();
+    const h={fired:false, x:e.clientX, y:e.clientY, timer:0, iv:0};
+    h.timer=setTimeout(()=>{ h.fired=true; fn(); h.iv=setInterval(fn, 150); }, 400);
+    STEP_HOLD=h;
+  });
+  btn.addEventListener("click", ()=>{
+    if (Date.now()<STEP_SUPPRESS_UNTIL) return;
+    fn();
+  });
+}
+document.addEventListener("pointerup", stopStepHold);
+document.addEventListener("pointercancel", stopStepHold);
+document.addEventListener("pointermove", e=>{
+  if (STEP_HOLD && (Math.abs(e.clientX-STEP_HOLD.x)>12 || Math.abs(e.clientY-STEP_HOLD.y)>12)) stopStepHold();
+});
 
 const MSCROLL={place:0, trip:0};
 let MAPKEEP=null, MJUMP=null, TJUMP=null, TRIP_SCROLL_TO=null;
@@ -2362,32 +2467,55 @@ function markDragOver(id,pos){
   const el=document.querySelector(`.stopwrap[data-id="${id}"]`);
   if (el) el.classList.add(pos==="top"?"drag-over-top":"drag-over-bottom");
 }
+
+const DRAG_EDGE=48, DRAG_STEP=8, DRAG_TICK=16;
 function startDrag(id, wrap, e){
   const startIndex=PLAN.indexOf(id);
   if (startIndex<0) return;
-  const rows=Array.from(document.querySelectorAll("#trip .stopwrap, #tripview .stopwrap")).map(r=>{
-    const rc=r.getBoundingClientRect();
-    return {id:r.dataset.id, top:rc.top, h:rc.height};
-  });
-  DRAG={id, startY:e.clientY, startIndex, targetIndex:startIndex, pointerId:e.pointerId, rows};
+  const box = isMobile() ? document.getElementById("tripview") : null;
+  DRAG={id, startY:e.clientY, lastY:e.clientY, startIndex, targetIndex:startIndex, pointerId:e.pointerId,
+        box, startScroll: box ? box.scrollTop : 0, timer:0};
   wrap.classList.add("dragging");
+  const others=()=>Array.from(document.querySelectorAll("#trip .stopwrap, #tripview .stopwrap")).filter(r=>r.dataset.id!==id);
+  const place=()=>{
+    if (!DRAG) return;
+    const shift = DRAG.box ? DRAG.box.scrollTop-DRAG.startScroll : 0;
+    wrap.style.transform=`translateY(${DRAG.lastY-DRAG.startY+shift}px)`;
+    const rows=others();
+    let count=0;
+    rows.forEach(r=>{ const rc=r.getBoundingClientRect(); if (DRAG.lastY > rc.top + rc.height/2) count++; });
+    DRAG.targetIndex=count;
+    clearDragIndicators();
+    if (count<rows.length) markDragOver(rows[count].dataset.id,"top");
+    else if (rows.length) markDragOver(rows[rows.length-1].dataset.id,"bottom");
+  };
+  const tick=()=>{
+    if (!DRAG || !DRAG.box) return;
+    DRAG.timer=0;
+    const b=DRAG.box.getBoundingClientRect();
+    let dy=0;
+    if (DRAG.lastY < b.top+DRAG_EDGE) dy=-DRAG_STEP;
+    else if (DRAG.lastY > b.bottom-DRAG_EDGE) dy=DRAG_STEP;
+    if (!dy) return;
+    const before=DRAG.box.scrollTop;
+    DRAG.box.scrollTop=before+dy;
+    if (DRAG.box.scrollTop===before) return;   // 捲到底／到頂：停，等手指再動
+    place();
+    DRAG.timer=setTimeout(tick, DRAG_TICK);
+  };
   const move=ev=>{
     if (!DRAG || ev.pointerId!==DRAG.pointerId) return;
     ev.preventDefault();
-    wrap.style.transform=`translateY(${ev.clientY-DRAG.startY}px)`;
-    const others=DRAG.rows.filter(r=>r.id!==id);
-    let count=0;
-    others.forEach(r=>{ if (ev.clientY > r.top + r.h/2) count++; });
-    DRAG.targetIndex=count;
-    clearDragIndicators();
-    if (count<others.length) markDragOver(others[count].id,"top");
-    else if (others.length) markDragOver(others[others.length-1].id,"bottom");
+    DRAG.lastY=ev.clientY;
+    place();
+    if (DRAG.box && !DRAG.timer) DRAG.timer=setTimeout(tick, DRAG_TICK);
   };
   const up=ev=>{
     if (!DRAG || ev.pointerId!==DRAG.pointerId) return;
     document.removeEventListener("pointermove",move);
     document.removeEventListener("pointerup",up);
     document.removeEventListener("pointercancel",up);
+    if (DRAG.timer) clearTimeout(DRAG.timer);
     clearDragIndicators();
     wrap.classList.remove("dragging");
     const {startIndex:si, targetIndex:ti}=DRAG;
@@ -2775,7 +2903,7 @@ function renderSheet(){
   wrap.setAttribute("data-st", SHEET_ST);
   syncGrab();
 
-  const sh=wrap.querySelector(".sheet");
+  const sh=wrap.querySelector(".bsheet");
   if (sh) sh.setAttribute("aria-modal", spec.kind!=="map" || SHEET_ST==="full");
   wrap.setAttribute("data-open","");
   document.documentElement.classList.add("sheeton");
@@ -2805,7 +2933,7 @@ document.getElementById("sheetgrab").onclick=()=>{
 };
 
 const SHEET_H = {peek:0, full:0};          // 兩態的像素高（每次按下去現量，見下面）
-function sheetEl(){ return document.querySelector("#sheetwrap .sheet"); }
+function sheetEl(){ return document.querySelector("#sheetwrap .bsheet"); }
 function setSheetState(st){
   if (!SHEET || SHEET_ST===st) return;
   SHEET_ST=st;
@@ -3401,6 +3529,7 @@ function updateTotop(){
 }
 document.getElementById("panel").addEventListener("scroll", updateTotop, {passive:true});
 document.getElementById("panel").addEventListener("scroll", ()=>syncStuck(document.getElementById("panel")), {passive:true});
+document.getElementById("tripview").addEventListener("scroll", ()=>syncStuck(document.getElementById("tripview")), {passive:true});
 
 function syncStuck(box){
   if (!box) return;
