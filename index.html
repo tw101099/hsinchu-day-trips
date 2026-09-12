@@ -39,7 +39,8 @@
 
   --rowgap:8px;
 
-  --triph:47px;
+  
+  --triph:var(--l1h);
 
   --l1h:38px;
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
@@ -678,9 +679,11 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 
 .trip .head{
-  display:flex; align-items:center; gap:10px; min-height:var(--triph); padding:8px 14px;
+  display:flex; align-items:center; gap:10px; min-height:var(--triph); padding:4px 14px;
   font-size:13.5px;
 }
+
+.trip .head .fbtn{font-size:12.5px; padding:3px 10px; line-height:1.5}
 .trip .head .fbtn:disabled{cursor:default}
 .trip .head .hint{flex:1; min-width:0; color:var(--ink2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .trip .head .hint.none{color:var(--ink3)}
