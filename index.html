@@ -37,7 +37,7 @@
   --sb:#d1c6b0; --sb-hover:#a89a80;
   --r:10px; --barh:56px;
 
-  --rowgap:10px;
+  --rowgap:8px;
 
   --triph:47px;
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
@@ -122,7 +122,8 @@
 ::-webkit-scrollbar-thumb:hover{background:var(--sb-hover); background-clip:content-box}
 ::-webkit-scrollbar-corner{background:transparent}
 
-html{height:100%; overflow:hidden; overscroll-behavior:none; touch-action:manipulation}
+html{height:100%; overflow:hidden; overscroll-behavior:none; touch-action:manipulation;
+     background:var(--bg); background-image:var(--paper-bg)}
 body{
   margin:0; height:100dvh; overflow:hidden; overscroll-behavior:none;
   background:var(--bg); color:var(--ink); font-size:15px; line-height:1.6;
@@ -202,7 +203,12 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 #qreset[hidden]{display:none}
 #qreset:hover{border-color:var(--accent); color:var(--accent)}
-#qreset .gl{font-size:13px; line-height:1}
+
+#qreset .gl{display:inline-flex; line-height:1}
+#qreset .gl svg{
+  display:block; width:14px; height:14px;
+  stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;
+}
 @media (max-width:520px){
 
   .bar{gap:8px; padding-left:max(12px,env(safe-area-inset-left)); padding-right:max(12px,env(safe-area-inset-right))}
@@ -212,7 +218,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 
   #qreset .lbl{display:none}
   #qreset{padding:3px 6px}
-  #qreset .gl{font-size:20px}
+  #qreset .gl svg{width:20px; height:20px}   
 }
 
 #msback, #msearch, #mcond{display:none}
@@ -227,7 +233,7 @@ button{font:inherit; color:inherit; cursor:pointer}
   #qreset{min-width:40px; min-height:40px; padding:0; border:0; background:none; justify-content:center; color:var(--ink2)}
   #qreset:hover{color:var(--accent)}
   #qreset:focus-visible{outline:2px solid var(--accent); outline-offset:-2px; border-radius:999px}
-  #qreset .gl{font-size:20px}
+  #qreset .gl svg{width:20px; height:20px}   
 
   #app[data-msearch] .logo,
   #app[data-msearch] #qreset,
@@ -249,6 +255,9 @@ button{font:inherit; color:inherit; cursor:pointer}
   display:block; width:17px; height:17px;
   stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;
 }
+
+#msback{min-width:44px; min-height:44px; margin:-2px}
+#msback svg{width:20px; height:20px}
 #msback:hover, #msearch:hover{color:var(--accent)}
 #msback:focus-visible, #msearch:focus-visible{
   outline:2px solid var(--accent); outline-offset:-2px; border-radius:999px;
@@ -436,6 +445,16 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 
 #sort:hover{border-color:var(--accent); color:var(--accent)}
+
+.sortwrap{flex:none; position:relative; display:inline-flex}
+.sortlbl{
+  display:none; align-items:center; white-space:nowrap; font-family:inherit;
+  border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2);
+  border-radius:999px; padding:3px 10px; font-size:12.5px; line-height:1.5;
+}
+.sortlbl .chev{margin-left:3px}
+
+#sort:focus-visible + .sortlbl{outline:2px solid var(--accent); outline-offset:2px}
 
 .filters{padding:10px 14px 12px; border-bottom:1px solid var(--line)}
 .frow{display:flex; align-items:flex-start; gap:9px; padding:4px 0}
@@ -1106,6 +1125,12 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
 
 @media (max-width:699px), (pointer:coarse){
   input, textarea, select, #q, #sort, #start{font-size:16px}
+
+  .sortlbl{display:inline-flex; min-height:32px}
+  #sort{
+    position:absolute; left:0; right:0; top:-6px; bottom:-6px; width:100%; height:auto;
+    max-width:none; min-height:0; margin:0; padding:0; border:0; opacity:0; z-index:1;
+  }
 }
 
 @media (prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important} }
@@ -1137,7 +1162,8 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
       <span class="mdot" aria-hidden="true"></span>
     </button>
 
-    <button id="qreset" type="button" hidden aria-label="重置全部條件（不含今天的行程）" title="重置全部條件（不含今天的行程）"><span class="gl" aria-hidden="true">⟲</span><span class="lbl">重置</span></button>
+    
+    <button id="qreset" type="button" hidden aria-label="重置全部條件（不含今天的行程）" title="重置全部條件（不含今天的行程）"><span class="gl" aria-hidden="true"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2.6 4.2v4.4h4.3"/><path d="M4.4 12.2a6.5 6.5 0 1 0 1.5-6.8L2.6 8.6"/></svg></span><span class="lbl">重置</span></button>
     <button id="theme" title="切換明暗" aria-label="切換明暗"></button>
 
     <div id="mcond" hidden>
@@ -2159,7 +2185,7 @@ function renderTrip(){
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done,done);
       else { location.hash=url.split("#")[1]||""; done(); }
     };
-    if (nativeShare) navigator.share({title:"新竹一日｜今天的行程", url}).catch(err=>{ if (!err || err.name!=="AbortError") copy(); });
+    if (nativeShare) navigator.share({title:"新竹出發一日遊｜今天的行程", url}).catch(err=>{ if (!err || err.name!=="AbortError") copy(); });
     else copy();
   };
   const clr=document.createElement("button");
@@ -2563,7 +2589,13 @@ function renderFilterBar(){
   sel.innerHTML=SORTS.map(s=>`<option value="${s.id}"${S.sort===s.id?" selected":""}>${s.label}</option>`).join("");
   sel.onchange=()=>{ S.sort=sel.value; save(); render(); };
   sel.onclick=e=>e.stopPropagation();
-  bar.appendChild(sel);
+
+  const wrap=document.createElement("span"); wrap.className="sortwrap";
+  const lbl=document.createElement("span"); lbl.className="sortlbl"; lbl.setAttribute("aria-hidden","true");
+  lbl.innerHTML=esc((SORTS.find(s=>s.id===S.sort)||SORTS[0]).label)+
+    `<svg class="chev" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg>`;
+  wrap.append(sel, lbl);
+  bar.appendChild(wrap);
 
   if (mob) bar.appendChild(mFilterBtn("place"));
   return bar;
