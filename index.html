@@ -505,42 +505,47 @@ button{font:inherit; color:inherit; cursor:pointer}
 .sec .chev{margin-left:auto}
 .sec[aria-expanded=true] .chev{transform:rotate(180deg)}
 
-.rgroups{padding:0 12px 10px}
+.rgroups{padding:0 14px 10px}
 .rgroup{margin-top:6px}
 
-.dirsec{border-top:0; margin-top:4px; padding-top:4px; font-size:12px}
+.dirsec{border-top:0; margin-top:4px; padding-top:4px; padding-left:2px; gap:6px; font-size:12px}
 
 .rgroup.first .dirsec{margin-top:0}
 
 .dirsec::before{content:""; flex:none; width:8px; height:8px; border-radius:2px; background:var(--dc,var(--ink3))}
 .dirsec .n{font-family:var(--mono)}
 
-.rlist{display:flex; flex-direction:column; gap:var(--rowgap); margin-top:4px}
+.rlist{display:flex; flex-direction:column; gap:0; margin:2px 0 0 4px; width:calc(100% - 4px)}
+
 .rrow{
-  position:relative; display:flex; width:100%; align-items:center; gap:9px; padding:6px 8px 6px 15px; font-size:13px;
+  position:relative; display:flex; width:100%; align-items:center; gap:8px; padding:6px 8px; font-size:13px;
   border:1px solid transparent; border-radius:8px; background:none; text-align:left; color:var(--ink2);
 }
+.rrow .rbar{flex:none; width:3px; height:17px; border-radius:2px; background:var(--dc,var(--ink3))}
 .rrow:hover{background:var(--sunk); color:var(--ink)}
 .rrow[aria-pressed=true]{background:var(--accent-soft); border-color:var(--accent); color:var(--ink); font-weight:600}
 
-.rrow::before{
-  content:""; position:absolute; left:-1px; top:8px; bottom:8px; width:3px;
-  border-radius:2px; background:var(--dc,var(--ink3));
-}
 .rrow .nm{flex:1; min-width:0}
 .rrow .n{flex:none; font-size:11.5px; color:var(--ink3)}
 
-.results{padding:2px 12px 20px}
+.results{padding:2px 14px 20px}
+
+.results > .ghead, .results > .gintro{margin-left:4px; width:calc(100% - 4px)}
+
+.results > .grp{margin:0 0 0 17px; padding-left:11px; border-left:1px solid var(--line)}
 
 .ghead{
-  position:relative; display:flex; width:100%; align-items:center; gap:7px;
-  margin:14px 0 6px; padding:6px 10px 6px 15px; border:0; border-radius:8px;
+  position:relative; display:flex; width:100%; align-items:center; gap:8px;
+  margin:14px 0 6px; padding:6px 9px; border:0; border-radius:8px;
   border-bottom:1px solid var(--line); background:none; text-align:left; cursor:pointer;
   font:inherit; font-size:12px; color:var(--ink3); transition:background .12s;
 }
 .ghead:hover{background:var(--sunk)}
-.ghead::before{
-  content:""; position:absolute; left:0; top:8px; bottom:8px; width:3px;
+
+.ghead .rbar{flex:none; width:3px; height:17px; border-radius:2px; background:var(--dc,var(--ink3))}
+
+.ghead.stuck::before{
+  content:""; position:absolute; left:-2px; top:50%; margin-top:-4px; width:8px; height:8px;
   border-radius:2px; background:var(--dc,var(--ink3));
 }
 .ghead .gnm{
@@ -627,6 +632,11 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .main.nomap .ghead, .main.nomap .gintro, .main.nomap .detail, .main.nomap .empty, .main.nomap .qglobal{grid-column:1/-1}
 
+.main.nomap .results > .grp{
+  grid-column:1/-1; display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:0 14px; align-items:start;
+}
+
 @media (min-width:700px){
   .main.nomap .detail{border-top:1px solid var(--accent); border-radius:var(--r); margin-top:6px}
 }
@@ -640,8 +650,9 @@ button{font:inherit; color:inherit; cursor:pointer}
   width:100%; border:1px solid var(--accent); border-radius:var(--r);
   background:var(--accent-soft); overflow:hidden; margin:0 0 10px;
 }
-.results > .place-card{margin-left:0; width:100%}
-.results > .place-card > .row{margin:0; width:100%}
+
+.results > .grp > .place-card{margin-left:0; width:100%}
+.results > .grp > .place-card > .row{margin:0; width:100%}
 .place-card > .place-summary{
   width:100%; margin:0; border:0; border-radius:0; background:transparent;
 }
@@ -3115,7 +3126,8 @@ function renderRoutes(){
         const b=document.createElement("button");
         b.className="rrow"; b.setAttribute("aria-pressed", S.route.has(r.id));
         b.style.setProperty("--dc", d.color);
-        b.innerHTML=`<span class="nm">${esc(r.name)}</span>` +
+        b.innerHTML=`<span class="rbar"></span>` +
+                    `<span class="nm">${esc(r.name)}</span>` +
                     `<span class="n num">${rtBase.filter(p=>p.route===r.id).length} 處</span>`;
         b.onclick=()=>{
 
@@ -3304,7 +3316,9 @@ function renderList(){
     const h=document.createElement("button");
     h.className="ghead"; h.setAttribute("aria-expanded", open);
     h.style.setProperty("--dc", DR[r.dir].color);
-    h.innerHTML=`<span class="gnm">${esc(r.name)}</span>` +
+
+    h.innerHTML=`<span class="rbar"></span>` +
+      `<span class="gnm">${esc(r.name)}</span>` +
       `<span class="num">${g[r.id].length}</span>` +
       `<svg class="chev" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg>`;
     h.onclick=()=>{ toggleSet(ROAD_OPEN, r.id); render(); };
@@ -3319,9 +3333,12 @@ function renderList(){
         (r.road ? `<p class="groads">${esc(r.road)}</p>` : "");
       wrap.appendChild(rd);
     }
+
+    const gb=document.createElement("div"); gb.className="grp";
     g[r.id].sort(cmp).forEach(p=>{
-      wrap.appendChild(S.sel===p.id ? placeCard(rowFor(p), renderDetail(p)) : rowFor(p));
+      gb.appendChild(S.sel===p.id ? placeCard(rowFor(p), renderDetail(p)) : rowFor(p));
     });
+    wrap.appendChild(gb);
   });
   return wrap;
 }
@@ -3382,8 +3399,9 @@ function renderPanel(){
   }
   if (SCROLL_TO){
 
-    const el=panel.querySelector(`.results > .place-card > .row[data-id="${SCROLL_TO}"]`)
-          || panel.querySelector(`.results > .row[data-id="${SCROLL_TO}"]`);
+    
+    const el=panel.querySelector(`.results > .grp > .place-card > .row[data-id="${SCROLL_TO}"]`)
+          || panel.querySelector(`.results > .grp > .row[data-id="${SCROLL_TO}"]`);
     if (el){
       const r=el.getBoundingClientRect();
       const target=stopAt(true)+10;   // 地板見 stopAt（2026-09-12 棒 DS）
