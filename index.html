@@ -635,6 +635,28 @@ button{font:inherit; color:inherit; cursor:pointer}
   border:1px solid var(--accent); border-top:0; border-radius:0 0 var(--r) var(--r);
   margin:-1px 9px 10px; padding:11px 13px 13px; background:var(--accent-soft);
 }
+
+.place-card{
+  width:100%; border:1px solid var(--accent); border-radius:var(--r);
+  background:var(--accent-soft); overflow:hidden; margin:0 0 10px;
+}
+.results > .place-card{margin-left:0; width:100%}
+.results > .place-card > .row{margin:0; width:100%}
+.place-card > .place-summary{
+  width:100%; margin:0; border:0; border-radius:0; background:transparent;
+}
+.place-card > .place-detail{
+  margin:0; border:0; border-top:1px solid var(--line); border-radius:0;
+  padding-left:9px; padding-right:9px; background:transparent;
+}
+.place-card.is-expanded > .place-summary{
+  background:var(--accent-soft); border-color:var(--accent); transition:none;
+}
+@media (pointer:coarse){
+  .place-card.is-expanded{transform:translateZ(0)}
+}
+.main.nomap .place-card{grid-column:1/-1}
+.main.nomap .place-card > .place-detail{border-top:1px solid var(--line); border-radius:0; margin-top:0}
 .detail h3{margin:0 0 8px; font-size:12px; color:var(--ink3); font-weight:600; letter-spacing:.06em}
 .facts{display:grid; grid-template-columns:auto 1fr; gap:2px 14px; font-size:13px; margin:0 0 10px}
 .facts dt{color:var(--ink3)}
@@ -996,6 +1018,11 @@ html.sheeton .panel{overflow:hidden}
 
 .sheetwrap[data-kind=map] .sheetbody .detail{
   margin:6px 0 10px; border-top:1px solid var(--accent); border-radius:var(--r);
+}
+
+.sheetwrap[data-kind=map] .sheetbody .place-card{margin:6px 0 10px}
+.sheetwrap[data-kind=map] .sheetbody .place-card > .place-detail{
+  margin:0; border:0; border-top:1px solid var(--line); border-radius:0;
 }
 
 .tsheet .tsum{margin:8px 0 6px; font-size:13px; color:var(--ink); font-weight:600; line-height:1.5}
@@ -2784,7 +2811,7 @@ const SHEETS = {
     tab:"map", kind:"map",
     ok: () => !!(S.sel && BY_ID[S.sel]),
     title: () => `景點｜${(BY_ID[S.sel]||{}).name||""}`,
-    body: () => renderDetail(BY_ID[S.sel]),
+    body: () => { const p=BY_ID[S.sel]; return placeCard(rowFor(p), renderDetail(p)); },
   },
   mtrip: {
     tab:"map", kind:"map",
@@ -3124,7 +3151,7 @@ function legBit(p, rel){
 }
 function rowFor(p, extra, rel){
   const b=document.createElement("div");
-  b.className="row"; b.dataset.id=p.id; b.setAttribute("aria-expanded", S.sel===p.id);
+  b.className="row place-summary"; b.dataset.id=p.id; b.setAttribute("aria-expanded", S.sel===p.id);
   b.setAttribute("role","button"); b.tabIndex=0;
   b.addEventListener("keydown", e=>{
     if (e.target!==b) return;
@@ -3189,7 +3216,7 @@ function renderDetail(p){
       const r=road&&road[x.id];
       return r ? {x, d:r.km, min:r.min, real:true} : null;
     }).filter(o=>o && o.d<=step.km), step.n);
-  const d=document.createElement("div"); d.className="detail";
+  const d=document.createElement("div"); d.className="detail place-detail";
   d.innerHTML =
     `<p class="crumb" style="margin:0 0 8px;font-size:12px;color:var(--ink3)">` +
       `${esc(RT[p.route].name)}　${esc(TH[p.theme].name)}　${esc(p.kind||"")}</p>` +
@@ -3235,6 +3262,13 @@ function renderDetail(p){
     d.appendChild(n);
   }
   return d;
+}
+
+function placeCard(summary, detail){
+  const card=document.createElement("article");
+  card.className="place-card is-expanded";
+  card.append(summary, detail);
+  return card;
 }
 
 function renderList(){
@@ -3286,8 +3320,7 @@ function renderList(){
       wrap.appendChild(rd);
     }
     g[r.id].sort(cmp).forEach(p=>{
-      wrap.appendChild(rowFor(p));
-      if (S.sel===p.id) wrap.appendChild(renderDetail(p));
+      wrap.appendChild(S.sel===p.id ? placeCard(rowFor(p), renderDetail(p)) : rowFor(p));
     });
   });
   return wrap;
@@ -3348,7 +3381,9 @@ function renderPanel(){
     SCROLL_GROUP=false;
   }
   if (SCROLL_TO){
-    const el=panel.querySelector(`.row[data-id="${SCROLL_TO}"]`);
+
+    const el=panel.querySelector(`.results > .place-card > .row[data-id="${SCROLL_TO}"]`)
+          || panel.querySelector(`.results > .row[data-id="${SCROLL_TO}"]`);
     if (el){
       const r=el.getBoundingClientRect();
       const target=stopAt(true)+10;   // 地板見 stopAt（2026-09-12 棒 DS）
