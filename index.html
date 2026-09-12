@@ -744,14 +744,17 @@ button{font:inherit; color:inherit; cursor:pointer}
   content:""; position:absolute; left:0; right:0; top:calc(var(--rowgap) / -2);
   border-top:1px solid var(--line); pointer-events:none;
 }
+
 .stop{
   display:grid; grid-template-columns:var(--leadw,max-content) 1fr auto; column-gap:10px;
-  align-items:center; padding:5px 0; background:var(--panel); position:relative; z-index:1;
+  align-items:center; padding:5px 0; position:relative; z-index:1;
   touch-action:pan-y; cursor:grab; user-select:none; -webkit-touch-callout:none;
 }
 
-.stop .nm, .stop .stepper button, .stop .ops button{cursor:pointer}
+.stop button.nm, .stop .stepper button, .stop .ops button{cursor:pointer}
 .stopwrap.dragging{z-index:5}
+
+.stopwrap.swiping .stop, .stopwrap.dragging .stop{background:var(--panel); background-image:var(--paper-panel)}
 .stopwrap.dragging .stop{box-shadow:0 4px 14px rgba(var(--sh),.20); border-radius:8px; cursor:grabbing}
 .stopwrap.drag-over-top{box-shadow:inset 0 2px 0 var(--accent)}
 .stopwrap.drag-over-bottom{box-shadow:inset 0 -2px 0 var(--accent)}
@@ -770,7 +773,7 @@ button{font:inherit; color:inherit; cursor:pointer}
   font-size:11px; font-weight:700; text-align:center; line-height:22px; font-family:var(--mono);
 }
 .stop .nm{border:0; background:none; padding:0; text-align:left; font-size:14px; font-weight:600; white-space:nowrap}
-.stop .nm:hover{color:var(--accent)}
+.stop button.nm:hover{color:var(--accent)}
 .stop .meta{display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-width:0}
 .stop .win{font-size:12px; color:var(--ink2); font-family:var(--mono); white-space:nowrap}
 .stop .warn{font-size:11.5px; color:var(--warn)}
@@ -873,11 +876,13 @@ button{font:inherit; color:inherit; cursor:pointer}
   }
 
   #tripview .head{
-    position:sticky; top:0; z-index:400; padding:4px 14px;
+    position:sticky; top:0; z-index:400; padding:4px 14px; font-size:12.5px;
     background:var(--panel); background-image:var(--paper-panel);
     box-shadow:inset 0 -1px 0 var(--line);
   }
-  #tripview .head .hint{color:var(--ink); font-weight:600}
+
+  #tripview .head .hint{color:var(--ink2); font-weight:400}
+  #tripview .head .clock{font-size:12px; color:var(--ink3)}
 
   
   #tripview .sheet{display:block; max-height:none; overflow:visible; border-top:0;
@@ -902,8 +907,8 @@ button{font:inherit; color:inherit; cursor:pointer}
   #tripview .mstop .grip svg{width:16px; height:16px; fill:currentColor}
   #tripview .mstop .grip:active{cursor:grabbing}
 
-  #tripview .mstop .stepper{padding:1px 3px; gap:4px}
-  #tripview .mstop .stepper button{position:relative; width:32px; height:32px; font-size:17px; color:var(--ink2)}
+  #tripview .mstop .stepper{height:32px; box-sizing:border-box; padding:0 3px; gap:4px}
+  #tripview .mstop .stepper button{position:relative; width:32px; height:32px; flex:none; font-size:17px; color:var(--ink2)}
   #tripview .mstop .stepper button::after{content:""; position:absolute; inset:-6px}
   #tripview .mstop .stepper .v{font-size:12.5px; min-width:56px}
   #tripview .mstop .x{
@@ -915,23 +920,17 @@ button{font:inherit; color:inherit; cursor:pointer}
   #tripview .mstop .x:hover{border-color:var(--accent); color:var(--accent)}
 
   #tripview .legrow{
-    display:flex; align-items:center; padding:5px 0 5px 26px; background:var(--panel);
-    font-size:12px; color:var(--ink3); position:relative;
+    display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+    margin-left:5px; padding:7px 0 7px 7px; font-size:11.5px; color:var(--ink3);
+    border-left:3px solid var(--line2);
   }
-  #tripview .legrow::before{content:""; position:absolute; left:12px; top:0; bottom:0; border-left:2px solid var(--line2)}
-  #tripview .legrow .leg{font-size:12px}
+  #tripview .legrow .via, #tripview .legrow .mv{color:var(--ink2)}
 
   #tripview .stopwrap.dragging .stop{opacity:.92}
 
   #tripview .plan .end.back{flex-wrap:wrap; padding-top:8px}
 
-  #tripview .go{display:grid; grid-template-columns:auto auto 1fr; gap:8px 6px; padding-top:6px}
-  #tripview .go a.primary{
-    grid-column:1 / -1; justify-content:center; min-height:44px; font-size:14px; font-weight:600;
-  }
-  #tripview .go .infobtn{justify-self:end}
-
-  #tripview .stopwrap + .detail{border-top:1px solid var(--accent); border-radius:var(--r); margin:4px 0 10px}
+  #tripview .go{padding-top:6px}
   #tripview .empty{padding:26px 20px}
 
   .totop{bottom:calc(16px + var(--navh) + env(safe-area-inset-bottom))}
@@ -2183,23 +2182,33 @@ function renderTrip(){
 
   const plan=document.createElement("div"); plan.className="plan";
 
-  const legRow=(text, raw)=>{
+  const legRow=(from, to, text, raw)=>{
     const r=document.createElement("div"); r.className="legrow";
-    const lg=document.createElement("span"); lg.className="leg"; lg.title=`車程 ${raw}`;
-    lg.innerHTML=CAR_SVG; lg.appendChild(document.createTextNode(text));
-    r.appendChild(lg); return r;
+    const via=document.createElement("span"); via.className="via"; via.textContent=`${from} → ${to}`;
+    r.innerHTML=CAR_SVG; r.appendChild(via);
+    const val=document.createElement("span"); val.title=`實算 ${raw}`;
+    const dot=text.indexOf(" · ");
+    const mv=document.createElement("span"); mv.className="mv"; mv.textContent = dot<0 ? text : text.slice(0,dot);
+    val.appendChild(mv);
+    if (dot>=0){
+      val.appendChild(document.createTextNode(" · "));
+      const km=document.createElement("span"); km.className="mv"; km.textContent=text.slice(dot+3);
+      val.appendChild(km);
+    }
+    r.appendChild(val);
+    return r;
   };
 
   st.items.forEach((it,i)=>{
-    if (mob) plan.appendChild(legRow(it.leg, it.legRaw));
+    if (mob) plan.appendChild(legRow(i===0 ? "家" : st.ps[i-1].name, it.p.name, it.leg, it.legRaw));
     const wrap=document.createElement("div"); wrap.className="stopwrap"; wrap.dataset.id=it.p.id;
     const swipebg=document.createElement("div"); swipebg.className="swipebg";
     swipebg.innerHTML = BIN_SVG + "<span>移出行程</span>";
     const stop=document.createElement("div"); stop.className= mob ? "stop mstop" : "stop"; stop.dataset.id=it.p.id;
 
     const no=document.createElement("span"); no.className="no"; no.textContent=it.n;
-    const nm=document.createElement("button"); nm.className="nm"; nm.textContent=it.p.name;
-    nm.onclick=()=>select(it.p.id);
+    const nm=document.createElement(mob ? "span" : "button"); nm.className="nm"; nm.textContent=it.p.name;
+    if (!mob) nm.onclick=()=>select(it.p.id);
 
     const win=document.createElement("span"); win.className="win"; win.textContent=it.win;
     const step=document.createElement("span"); step.className="stepper";
@@ -2255,11 +2264,10 @@ function renderTrip(){
     wrap.append(swipebg,stop);
     plan.appendChild(wrap);
     wireStopGestures(wrap, stop, grip, it.p.id);
-    if (mob && S.sel===it.p.id) plan.appendChild(renderDetail(it.p));
   });
 
   const late=st.backTime>18*60;
-  if (mob) plan.appendChild(legRow(legText(st.back, st.backKm, st.backReal), rawT(st.back, st.backKm)));
+  if (mob) plan.appendChild(legRow(st.ps[st.ps.length-1].name, "新竹市", legText(st.back, st.backKm, st.backReal), rawT(st.back, st.backKm)));
   const back=document.createElement("div"); back.className="end back" + (late?" late":"");
   back.innerHTML=`<span class="home">家</span>` +
     `<span>回到新竹 <span class="num">${fmt(st.backTime)}</span></span>` +
@@ -2309,24 +2317,11 @@ function renderTrip(){
   alignLeadColumn(el);
   if (mob){
     document.documentElement.style.setProperty("--tripup", "0px");
-    if (TRIP_SCROLL_TO){
-      const row=el.querySelector(`.stopwrap[data-id="${TRIP_SCROLL_TO}"]`);
-      if (row){
-        const floor=tripStopAt(el)+10;
-        el.scrollTop = Math.max(0, keep + (row.getBoundingClientRect().top - floor));
-      } else el.scrollTop=keep;
-      TRIP_SCROLL_TO=null;
-    } else el.scrollTop=keep;
+    el.scrollTop=keep;
     syncStuck(el);   // 釘層陰影：`.head` 釘住時掛 `.stuck-last`（棒 DS 那支，整棵剛重建）
     return;
   }
   syncTripUp();
-}
-
-function tripStopAt(el){
-  let h=el.getBoundingClientRect().top + el.clientTop;
-  [...el.children].forEach(c=>{ if (getComputedStyle(c).position==="sticky") h+=c.offsetHeight; });
-  return h;
 }
 
 let STEP_HOLD=null, STEP_SUPPRESS_UNTIL=0;
@@ -2356,7 +2351,7 @@ document.addEventListener("pointermove", e=>{
 });
 
 const MSCROLL={place:0, trip:0};
-let MAPKEEP=null, MJUMP=null, TJUMP=null, TRIP_SCROLL_TO=null;
+let MAPKEEP=null, MJUMP=null, TJUMP=null;
 
 function syncTripUp(){
   const el=document.getElementById("trip");
@@ -3388,7 +3383,6 @@ function select(id){
   }
 
   if (isMobile() && S.tab==="trip" && !inPlan(id)) gotoTab("place");
-  if (isMobile() && S.tab==="trip"){ TRIP_SCROLL_TO=id; }
   else if (!isMapOnly()){ SCROLL_TO=id; }
   if (isMapOnly()) setSheet("mplace");
   render();
@@ -3665,6 +3659,13 @@ applyHash(true);
       if (t && typeof t.click === "function") t.click();
     }
   }, {passive:false});
+})();
+
+(function(){
+  ["app", "sheetwrap"].forEach(function(id){
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("click", function(){}, {passive:true});
+  });
 })();
 </script>
 <script>
