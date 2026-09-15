@@ -22,7 +22,7 @@
 
 :root{
 
-  --bg:#fdfbf6; --panel:#fffefb; --sunk:#ece5d6;
+  --bg:#fdfbf6; --panel:#fffefb;
 
   
   --surface-panel:var(--panel);
@@ -108,7 +108,7 @@
   :root:not([data-theme="light"]){
 
     
-    --bg:#26221f; --panel:#2f2b28; --sunk:#443e37;
+    --bg:#26221f; --panel:#2f2b28;   
     --ink:#ede4d3; --ink2:#b3a794; --ink3:#a89d89;
     --chip-bg:#151311;
     --card-bg:#151311;
@@ -149,7 +149,7 @@
 :root[data-theme="dark"]{
 
     
-    --bg:#26221f; --panel:#2f2b28; --sunk:#443e37;
+    --bg:#26221f; --panel:#2f2b28;   
     --ink:#ede4d3; --ink2:#b3a794; --ink3:#a89d89;
     --chip-bg:#151311;
     --card-bg:#151311;
@@ -568,14 +568,9 @@ button{font:inherit; color:inherit; cursor:pointer}
 .fsum .fsc{min-width:0; overflow:hidden; text-overflow:ellipsis}
 .fsum .fsep, .fsum .fn{flex:none; color:var(--ink3)}
 .fsum .ic{width:15px; height:15px; flex:none}
-.fbtn{
-  flex:none; border:1px solid var(--accent); background:var(--accent-soft); color:var(--accent);
-  border-radius:999px; padding:4px 12px; font-size:13px; white-space:nowrap; font-weight:600;
-}
-.fbtn[aria-expanded=true]{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+
 .chev{width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round;
       stroke-linejoin:round; margin-left:4px; vertical-align:-1px; transition:transform .15s}
-.fbtn[aria-expanded=true] .chev{transform:rotate(180deg)}
 
 .clear, .ghost, .trip .go a, .trip .go button, .mfbtn{
   border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2);
@@ -792,13 +787,8 @@ button{font:inherit; color:inherit; cursor:pointer}
   gap:0 14px; align-items:start;
 }
 
-@media (min-width:700px){
-  .main.nomap .detail{border-top:1px solid var(--accent); border-radius:var(--r); margin-top:6px}
-}
-
 .detail{
-  border:1px solid var(--accent); border-top:0; border-radius:0 0 var(--r) var(--r);
-  margin:-1px 9px 10px; padding:11px 13px 13px; background:none;
+  padding:11px 13px 13px; background:none;
 }
 
 .place-card{
@@ -831,8 +821,6 @@ button{font:inherit; color:inherit; cursor:pointer}
   .place-card.is-expanded{transform:translateZ(0)}
 }
 .main.nomap .place-card{grid-column:1/-1}
-
-.main.nomap .place-card > .place-detail{border-top:0; border-radius:0; margin-top:0}
 
 .place-detail .facts, .place-detail .tags, .place-detail .desc,
 .place-detail .flag, .place-detail .acts{margin-left:var(--detail-body-inset)}
@@ -967,7 +955,7 @@ button{font:inherit; color:inherit; cursor:pointer}
   box-shadow:var(--lift-shadow);
   border-color:transparent;
 }
-.row[aria-pressed="true"], .rrow[aria-pressed="true"]{
+.rrow[aria-pressed="true"]{
   background-color:var(--state-selected-row);
   background-image:var(--paper-base-sheet);
   box-shadow:var(--sel-shadow);
@@ -976,12 +964,9 @@ button{font:inherit; color:inherit; cursor:pointer}
   font-weight:600;
 }
 
-.row[aria-pressed="true"] .m, .row[aria-pressed="true"] .tag, .rrow[aria-pressed="true"] .n{color:var(--ink)}
+.rrow[aria-pressed="true"] .n{color:var(--ink)}
 
 @media (hover:hover){.nearby .row:hover, .tnear .row:hover{background-color:var(--state-hover)}}
-.nearby .row[aria-pressed="true"], .tnear .row[aria-pressed="true"]{
-  background-color:var(--state-selected); background-image:none; box-shadow:none;
-}
 
 .stop{
   padding:7px 9px; position:relative; z-index:1;
@@ -1209,7 +1194,8 @@ html.sheeton .panel{overflow:hidden}
   display:flex; align-items:center; justify-content:center; cursor:pointer;
   touch-action:none;
 }
-.sheetgrab span{display:block; width:38px; height:4px; border-radius:999px; background:var(--line)}
+
+.sheetgrab span{display:block; width:38px; height:4px; border-radius:999px; background:var(--hair)}
 @media (hover:hover){.sheetgrab:hover span{background-color:var(--accent)}}
 .sheetgrab:focus-visible{outline:2px solid var(--accent); outline-offset:-3px}
 .sheethead{
@@ -1271,7 +1257,7 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
 .sheetbtn{
   min-height:32px; padding:0 14px; border-radius:999px; cursor:pointer; position:relative;
   font-family:inherit; font-size:13.5px; line-height:1.4;
-  border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2);
+  border:1px solid var(--hair); background:var(--chip-bg); color:var(--ink2);
 }
 @media (hover:hover){.sheetbtn:hover{border-color:var(--accent); color:var(--accent)}}
 .sheetbtn.sb-clear{flex:none}
@@ -1344,11 +1330,6 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
   opacity:0; transition:opacity .15s;
 }
 .mnav button[data-hit]::after{opacity:1}
-
-.gw{font-family:inherit; max-width:230px; line-height:1.5}
-.gw b{font-size:14px}
-
-.gw span{display:block; font-size:12px; color:var(--ink2); margin-top:2px}
 
 .hubpin{
   width:22px !important; height:22px !important; margin:-11px 0 0 -11px !important;
@@ -1925,7 +1906,6 @@ function kmT(v){
   }
   return `${Math.round(v)}km`;
 }
-const kmv = v => `<span class="num">${kmT(v)}</span>`;
 
 function hmT(min){
   const m = Math.round(min);
@@ -2300,12 +2280,7 @@ function togglePlan(id){
   syncRouteView();   // 這個檢視以行程為前提，行程一動就重算（`syncNearView()` 棒 J5 退役）
   save(); render();
 }
-function movePlan(i, dir){
-  const j=i+dir;
-  if (j<0 || j>=PLAN.length) return;
-  const t=PLAN[i]; PLAN[i]=PLAN[j]; PLAN[j]=t;
-  save(); render();
-}
+
 function optimizePlan(){
   const ps=PLAN.map(id=>BY_ID[id]).filter(Boolean);
   if (ps.length<3) return;
