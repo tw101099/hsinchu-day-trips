@@ -563,8 +563,10 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .fsum{
   flex:1 1 auto; min-width:0; display:flex; align-items:center; gap:6px;
-  font-size:12.5px; color:var(--ink3); white-space:nowrap; overflow:hidden;
+  white-space:nowrap; overflow:hidden;
 }
+.fsum .fsc{min-width:0; overflow:hidden; text-overflow:ellipsis}
+.fsum .fsep, .fsum .fn{flex:none; color:var(--ink3)}
 .fsum .ic{width:15px; height:15px; flex:none}
 .fbtn{
   flex:none; border:1px solid var(--accent); background:var(--accent-soft); color:var(--accent);
@@ -602,7 +604,6 @@ button{font:inherit; color:inherit; cursor:pointer}
 #sort:focus-visible + .sortlbl{outline:2px solid var(--accent); outline-offset:2px}
 
 .filters{padding:10px 14px 12px; border-bottom:1px solid var(--hair)}   
-.lfilters{padding:6px 14px 10px; border-bottom:1px solid var(--hair)}   
 .frow{display:flex; align-items:flex-start; gap:9px; padding:4px 0}
 .fkey{flex:none; width:52px; padding-top:4px; font-size:11.5px; color:var(--ink3); letter-spacing:.06em}
 .chips{display:flex; flex-wrap:wrap; gap:5px; flex:1; min-width:0}
@@ -621,10 +622,13 @@ button{font:inherit; color:inherit; cursor:pointer}
 .chip:disabled{opacity:.45; cursor:default; pointer-events:none}
 .cnt{margin-left:5px; color:var(--ink3); font-size:11px}
 .chip[aria-pressed=true] .cnt{color:var(--ink3)}
+
+.sec, .fsum, .ghead .gnm{font-size:12.5px; font-weight:400; color:var(--ink2)}
+.sec .n, .ghead .n{font-size:12.5px; color:var(--ink3)}
 .sec{
   display:flex; align-items:center; gap:7px; width:100%; border:0; background:none;
   padding:9px 0 0; margin-top:11px; border-top:1px solid var(--hair);   
-  font-size:12.5px; color:var(--ink2); text-align:left;
+  text-align:left;
 }
 @media (hover:hover){.sec:hover{color:var(--accent)}}
 .sec .n{color:var(--ink3); font-family:var(--mono)}
@@ -672,7 +676,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .results{padding:2px 14px 20px}
 
-.results > .ghead, .results > .gintro{margin-left:4px; width:calc(100% - 4px)}
+.results > .ghead{margin-left:-14px; width:calc(100% + 28px)}
+.results > .gintro{margin-left:13px; width:calc(100% - 13px)}
 
 .results > .grp{position:relative; margin:0 0 0 13px; padding-left:var(--guide-slot); border-left:0}
 .results > .grp::before{
@@ -683,7 +688,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .ghead{
   position:relative; display:flex; width:100%; align-items:center; gap:8px;
-  margin:14px 0 6px; padding:6px 9px; border:0; border-radius:0;   
+  margin:14px 0 6px; padding:6px 14px 6px 27px; border:0; border-radius:0;   
   border-bottom:1px solid var(--hair); background:none; text-align:left; cursor:pointer;   
   font:inherit; font-size:12px; color:var(--ink3); transition:background .12s;
 }
@@ -692,14 +697,16 @@ button{font:inherit; color:inherit; cursor:pointer}
 .ghead .rbar{flex:none; width:var(--guide-w); height:17px; border-radius:2px; background:var(--dc,var(--ink3))}
 
 .ghead.stuck::before{
-  content:""; position:absolute; left:-2px; top:50%; margin-top:-4px; width:8px; height:8px;
+  content:""; position:absolute; left:16px; top:50%; margin-top:-4px; width:8px; height:8px;
   border-radius:2px; background:var(--dc,var(--ink3));
 }
+
 .ghead .gnm{
-  flex:1; min-width:0; font-size:14px; font-weight:600; color:var(--ink);
+  flex:1; min-width:0;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-.ghead .num{flex:none}
+
+.ghead .n{flex:none}
 .ghead .chev{flex:none; width:12px; height:12px; color:var(--ink3); transition:transform .15s}
 .ghead[aria-expanded=true] .chev{transform:rotate(180deg)}
 
@@ -710,14 +717,13 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 @media (hover:hover){.ghead:hover{background-color:var(--hover-bg)}}
 
-.ghead.stuck{border-radius:0}
-
 @media (max-width:899px), (max-height:559px){
   :root{--l1h:48px}
 }
 
 .gintro{
-  margin:0 0 8px; padding:10px 13px 11px; border-radius:0; background:var(--sunk);
+  margin:0 0 14px; padding:8px 0 0 var(--guide-slot);
+  background:none; border:0; border-radius:0; box-shadow:none;
 }
 .gintro .gstyle{display:flex; flex-wrap:wrap; gap:5px; margin:0 0 8px}
 .gintro .gchip{
@@ -830,7 +836,9 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .place-detail .facts, .place-detail .tags, .place-detail .desc,
 .place-detail .flag, .place-detail .acts{margin-left:var(--detail-body-inset)}
-.detail h3{margin:0 0 8px; font-size:12px; color:var(--ink3); font-weight:600; letter-spacing:.06em}
+
+.crumb, .nearby h3{font-size:12px; font-weight:600; color:var(--ink3); letter-spacing:.06em}
+.crumb{margin:0 0 8px}
 .facts{display:grid; grid-template-columns:auto 1fr; gap:2px 14px; font-size:13px; margin-top:0; margin-bottom:10px}   
 .facts dt{color:var(--ink3)}
 .facts dd{margin:0}
@@ -875,7 +883,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .nearby{margin-top:11px; margin-left:-10px; border-top:1px solid var(--hair); padding-top:8px}   
 
-.nearby h3{margin-left:10px}
+.nearby h3{margin:0 0 8px 10px}
 .nearby .row{padding:5px 6px}
 .nearby .nonear{margin:2px 6px 0; font-size:12px; color:var(--ink3); line-height:1.6}
 .wider{border:0; background:none; color:var(--ink3); font-size:12px; text-decoration:underline; padding:4px 6px 0}
@@ -1278,6 +1286,30 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
 .mfbtn[aria-expanded=true]{background:var(--accent); color:var(--on-accent)}
 .mfbtn .mfn{font-size:12.5px; line-height:1; color:var(--accent)}
 
+.fpop{
+  position:absolute; top:100%; left:0; right:0; z-index:410; padding:12px 14px 14px;
+  border:0; border-radius:0;
+  background-color:var(--surface-sheet); background-image:var(--paper-sheet);
+  box-shadow:var(--lift-shadow);
+}
+.fpop .lfilters{padding:0; margin:0; border-bottom:0}
+
+.mfhost{position:relative; flex:none; display:inline-flex}
+.fbhint{
+  position:absolute; top:calc(100% + 7px); right:0; z-index:401; pointer-events:none;
+  padding:6px 10px; max-width:240px; white-space:nowrap;
+  font-size:12px; line-height:1.5; color:var(--ink2);
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+  box-shadow:0 2px 6px rgba(var(--sh),.10);
+  transition:opacity .35s;
+}
+.fbhint::before{
+  content:""; position:absolute; top:-5px; right:14px; width:8px; height:8px;
+  background:var(--panel); border-left:1px solid var(--line); border-top:1px solid var(--line);
+  transform:rotate(45deg);
+}
+.fbhint.out{opacity:0}
+
 .mcondsum{
   position:absolute; top:10px; left:calc(54px + env(safe-area-inset-left)); right:calc(10px + env(safe-area-inset-right));
   z-index:500; display:none; flex-direction:column; align-items:stretch; gap:0;
@@ -1539,7 +1571,7 @@ const ICON = {
 };
 
 const S = { tab:"place", route:new Set(), themes:new Set(), diffs:new Set(), budget:new Set(),
-            inseason:false, q:"", qtags:[], sel:null, open:false,
+            inseason:false, q:"", qtags:[], sel:null, tipSeen:false,
             foldExplore:false, foldToday:null,
             axesOpen:true, routesOpen:false, sort:"total", near:0,
             dirOpen:new Set() };
@@ -1750,7 +1782,7 @@ function save(){
     localStorage.setItem(LSKEY, JSON.stringify({
       route:[...S.route], themes:[...S.themes], diffs:[...S.diffs], budget:[...S.budget],
       inseason:S.inseason, sort:S.sort, plan:PLAN, theme:THEME,
-      seen:true, start:START, stay:STAY, routesOpen:S.routesOpen, open:S.open,
+      seen:true, start:START, stay:STAY, routesOpen:S.routesOpen, tipSeen:S.tipSeen,
       foldExplore:S.foldExplore, foldToday:S.foldToday,
       axesOpen:S.axesOpen, routeView:ROUTE_VIEW,
       nearView:NEAR_VIEW, nearLevel:NEAR_LEVEL
@@ -1773,7 +1805,7 @@ function restore(){
     if (typeof d.start==="number") START=d.start;
     if (d.stay && typeof d.stay==="object") STAY=d.stay;
     if (d.routesOpen) S.routesOpen=true;
-    if (d.open===true) S.open=true;
+    if (d.tipSeen===true) S.tipSeen=true;
     if (typeof d.axesOpen==="boolean") S.axesOpen=d.axesOpen;
     else if (!d.seen && !matchMedia("(min-width:900px) and (min-height:560px)").matches) S.axesOpen=false;
     if (d.routeView) ROUTE_VIEW=true;
@@ -2993,20 +3025,56 @@ function resetAll(){
   save(); render(); fitShown();
 }
 
-function toggleFilters(){
-  const opening=!S.open; S.open=opening;
-  if (opening) SCROLL_RESET=true;
-  save(); render();
+let LF_POP = false;
+function renderFpop(){
+  const p=document.createElement("div"); p.className="fpop";
+  p.appendChild(renderFilters("lfilters"));
+  p.onclick=e=>e.stopPropagation();
+  return p;
 }
+function setFpop(on){
+  LF_POP=!!on;
+  const bar=document.querySelector(".fbar");
+  if (!bar) return;
+  const old=bar.querySelector(":scope > .fpop");
+  if (old) old.remove();
+  if (LF_POP) bar.appendChild(renderFpop());
+  const b=bar.querySelector(".mfbtn");
+  if (b) b.setAttribute("aria-expanded", LF_POP);
+}
+
+function closeFpop(refocus){
+  if (!LF_POP) return;
+  setFpop(false);
+  if (refocus){ const b=document.querySelector(".fbar .mfbtn"); if (b) b.focus({preventScroll:true}); }
+}
+
+document.addEventListener("pointerdown", e=>{
+  if (!LF_POP) return;
+  const bar=document.querySelector(".fbar");
+  if (bar && bar.contains(e.target)) return;
+  closeFpop(false);
+}, true);
 
 function renderFilterBar(){
   const bar=document.createElement("div"); bar.className="fbar";
   const mob=isMobile();
   const sum=document.createElement("div"); sum.className="fsum";
   const thSel=THEMES.filter(t=>S.themes.has(t.id));
-  sum.innerHTML = thSel.length ? thSel.map(t=>ico(t.id,t.color)).join("")
-                               : `<span class="num">${shown().length}/${PLACES.length}</span>`;
-  sum.title = thSel.length ? `主題：${thSel.map(t=>t.name).join("、")}` : `顯示 ${shown().length}／${PLACES.length} 個點`;
+  const n=shown().length;
+  const rs=[...S.route].map(r=>(RT[r]||{}).name||r);
+  let scope, stitle;
+  if (!rs.length){
+    scope=`<span class="fn"><span class="num">${n}/${PLACES.length}</span> 個</span>`;
+    stitle=`顯示 ${n}／${PLACES.length} 個點`;
+  } else {
+    const lab = rs.length===1 ? esc(rs[0]) : `<span class="num">${rs.length}</span> 條路線`;
+    scope=`<span class="fsc">${lab}</span><span class="fsep">·</span>` +
+          `<span class="fn"><span class="num">${n}</span> 個</span>`;
+    stitle = (rs.length===1 ? rs[0] : `${rs.length} 條路線（${rs.join("、")}）`) + `：${n} 個點`;
+  }
+  sum.innerHTML = scope + (thSel.length ? thSel.map(t=>ico(t.id,t.color)).join("") : "");
+  sum.title = thSel.length ? `${stitle}｜主題：${thSel.map(t=>t.name).join("、")}` : stitle;
   bar.appendChild(sum);
   const sel=document.createElement("select");
   sel.id="sort";
@@ -3027,7 +3095,9 @@ function renderFilterBar(){
     clr.onclick=e=>{ e.stopPropagation(); clearPlaceFilters(); };
     bar.appendChild(clr);
   }
-  bar.appendChild(mFilterBtn("place"));
+
+  bar.appendChild(mfHost("place"));
+  if (LF_POP && !mob) bar.appendChild(renderFpop());
   return bar;
 }
 
@@ -3212,11 +3282,45 @@ function mFilterBtn(kind){
   const b=document.createElement("button");
   b.type="button"; b.className="mfbtn";
   b.innerHTML = "篩選" + (n ? `<span class="mfn">${circled(n)}</span>` : "");
-  if (mob) b.setAttribute("aria-haspopup","dialog");
-  b.setAttribute("aria-expanded", mob ? SHEET===kind : S.open);
+  b.setAttribute("aria-haspopup", mob ? "dialog" : "true");
+  b.setAttribute("aria-expanded", mob ? SHEET===kind : LF_POP);
   b.setAttribute("aria-label", n ? `篩選，目前 ${n} 個條件` : "篩選");
-  b.onclick=e=>{ e.stopPropagation(); if (mob) openSheet(kind); else toggleFilters(); };
+  b.onclick=e=>{
+    e.stopPropagation();
+    if (!S.tipSeen) dismissHint(false);
+    if (mob) openSheet(kind); else setFpop(!LF_POP);
+  };
   return b;
+}
+
+const HINT_TEXT = "依主題、時間等條件篩景點";
+const HINT_MS = 8000;
+let HINT_TIMER = null;
+function dismissHint(fade){
+  if (HINT_TIMER){ clearTimeout(HINT_TIMER); HINT_TIMER=null; }
+  const h=document.querySelector(".fbhint");
+  if (!S.tipSeen){ S.tipSeen=true; save(); }
+  if (!h) return;
+  if (!fade || RM.matches){ h.remove(); return; }
+  h.classList.add("out");
+  setTimeout(()=>h.remove(), 400);
+}
+
+function mfHost(kind){
+  const btn=mFilterBtn(kind);
+  if (S.tipSeen) return btn;
+  const host=document.createElement("span"); host.className="mfhost";
+  const h=document.createElement("div"); h.className="fbhint"; h.textContent=HINT_TEXT;
+  host.append(btn, h);
+  if (!HINT_TIMER){
+    setTimeout(()=>{
+      if (S.tipSeen || HINT_TIMER) return;
+      const live=document.querySelector(".fbhint");
+      if (!live || !live.isConnected || !live.offsetParent) return;
+      HINT_TIMER=setTimeout(()=>{ HINT_TIMER=null; dismissHint(true); }, HINT_MS);
+    }, 0);
+  }
+  return host;
 }
 document.getElementById("sheetmask").onclick=closeSheet;
 
@@ -3480,7 +3584,8 @@ function renderDetail(p){
     }).filter(o=>o && o.d<=step.km), step.n);
   const d=document.createElement("div"); d.className="detail place-detail";
   d.innerHTML =
-    `<p class="crumb" style="margin:0 0 8px;font-size:12px;color:var(--ink3)">` +
+
+    `<p class="crumb">` +
       `${esc(RT[p.route].name)}　${esc(TH[p.theme].name)}　${esc(p.kind||"")}</p>` +
     `<dl class="facts">` +
       `<dt>位置</dt><dd>${esc(p.town)}${p.coord_conf==="low"?"（座標估計值）":""}</dd>` +
@@ -3570,9 +3675,10 @@ function renderList(){
     h.className="ghead"; h.setAttribute("aria-expanded", open);
     h.style.setProperty("--dc", DR[r.dir].color);
 
+    
     h.innerHTML=`<span class="rbar"></span>` +
       `<span class="gnm">${esc(r.name)}</span>` +
-      `<span class="num">${g[r.id].length}</span>` +
+      `<span class="n"><span class="num">${g[r.id].length}</span></span>` +
       `<svg class="chev" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg>`;
     h.onclick=()=>{ toggleSet(ROAD_OPEN, r.id); render(); };
     wrap.appendChild(h);
@@ -3654,7 +3760,7 @@ function renderPanel(){
   const mapOnly=panelHidden(); PANEL_MAPONLY=mapOnly;
   if (!mapOnly){
     box.appendChild(renderFilterBar());
-    if (S.open && !isMobile()) box.appendChild(renderFilters("lfilters"));
+
     box.appendChild(renderList());
     const lg=document.createElement("div"); lg.className="legend";
     lg.innerHTML=THEMES.map(t=>`<span>${ico(t.id,t.color)}${t.name}</span>`).join("");
@@ -3949,6 +4055,7 @@ document.getElementById("mcreset").onclick=e=>{ e.stopPropagation(); resetAll();
 
 addEventListener("keydown", e=>{
   if (e.key!=="Escape") return;
+  if (LF_POP){ closeFpop(true); return; }
   if (SHEET){ closeSheet(); return; }
   if (MSEARCH){ exitSearchMode(); return; }
   if (S.sel){ S.sel=null; render(); }
