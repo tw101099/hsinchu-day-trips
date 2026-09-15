@@ -662,7 +662,8 @@ button{font:inherit; color:inherit; cursor:pointer}
   position:relative; display:flex; width:100%; align-items:center; gap:8px; padding:6px 8px; font-size:13px;
   border:1px solid transparent; border-radius:0; background:none; text-align:left; color:var(--ink2);   
 }
-.rrow .rbar{flex:none; width:3px; height:17px; border-radius:2px; background:var(--dc,var(--ink3))}
+
+.rrow .rbar{flex:none; width:var(--guide-w); height:17px; border-radius:2px; background:var(--dc,var(--ink3))}
 
 @media (hover:hover){.rrow:hover{background-color:var(--hover-bg); color:var(--ink)}}
 
@@ -673,8 +674,12 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .results > .ghead, .results > .gintro{margin-left:4px; width:calc(100% - 4px)}
 
-.results > .grp{margin:0 0 0 13px; padding-left:13px; border-left:3px solid var(--line);
-  border-left-color:color-mix(in srgb, var(--dc, var(--line)) 30%, transparent)}
+.results > .grp{position:relative; margin:0 0 0 13px; padding-left:var(--guide-slot); border-left:0}
+.results > .grp::before{
+  content:""; position:absolute; top:0; bottom:0; left:0; width:var(--guide-w);
+  background:color-mix(in srgb, var(--dc, var(--accent)) var(--guide-dim), transparent);
+  pointer-events:none;
+}
 
 .ghead{
   position:relative; display:flex; width:100%; align-items:center; gap:8px;
@@ -684,7 +689,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 @media (hover:hover){.ghead:hover{background-color:var(--hover-bg)}}
 
-.ghead .rbar{flex:none; width:3px; height:17px; border-radius:2px; background:var(--dc,var(--ink3))}
+.ghead .rbar{flex:none; width:var(--guide-w); height:17px; border-radius:2px; background:var(--dc,var(--ink3))}
 
 .ghead.stuck::before{
   content:""; position:absolute; left:-2px; top:50%; margin-top:-4px; width:8px; height:8px;
@@ -787,42 +792,65 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .detail{
   border:1px solid var(--accent); border-top:0; border-radius:0 0 var(--r) var(--r);
-  margin:-1px 9px 10px; padding:11px 13px 13px; background:var(--accent-soft);
+  margin:-1px 9px 10px; padding:11px 13px 13px; background:none;
 }
 
 .place-card{
-  width:100%; border:1px solid var(--accent); border-radius:var(--r);
-  background:var(--accent-soft); overflow:hidden; margin:0 0 10px;
+  position:relative; width:100%; border:0; border-radius:0;
+  background:none; box-shadow:none; margin:0 0 10px;
+}
+
+.place-card.is-expanded::before{
+  content:""; position:absolute; top:0; bottom:0; left:calc(-1 * var(--guide-slot)); width:var(--guide-w);
+  background:color-mix(in srgb, var(--dc, var(--accent)) var(--guide-full), transparent);
+  pointer-events:none;
 }
 
 .results > .grp > .place-card{margin-left:0; width:100%}
 .results > .grp > .place-card > .row{margin:0; width:100%}
+
 .place-card > .place-summary{
-  width:100%; margin:0; border:0; border-radius:0; background:transparent;
+  width:100%; margin:0; border-radius:0; background:transparent;
 }
+
 .place-card > .place-detail{
-  margin:0; border:0; border-top:1px solid var(--line); border-radius:0;
-  padding-left:9px; padding-right:9px; background:transparent;
+  margin:0; border:0; border-top:0; border-radius:0;
+  padding-left:10px; padding-right:9px; background:transparent;
 }
+
 .place-card.is-expanded > .place-summary{
-  background:var(--accent-soft); border-color:var(--accent); transition:none;
+  background:none; box-shadow:none; border-color:transparent; color:inherit; transition:none;
 }
 @media (pointer:coarse){
   .place-card.is-expanded{transform:translateZ(0)}
 }
 .main.nomap .place-card{grid-column:1/-1}
-.main.nomap .place-card > .place-detail{border-top:1px solid var(--line); border-radius:0; margin-top:0}
+
+.main.nomap .place-card > .place-detail{border-top:0; border-radius:0; margin-top:0}
+
+.place-detail .facts, .place-detail .tags, .place-detail .desc,
+.place-detail .flag, .place-detail .acts{margin-left:var(--detail-body-inset)}
 .detail h3{margin:0 0 8px; font-size:12px; color:var(--ink3); font-weight:600; letter-spacing:.06em}
-.facts{display:grid; grid-template-columns:auto 1fr; gap:2px 14px; font-size:13px; margin:0 0 10px}
+.facts{display:grid; grid-template-columns:auto 1fr; gap:2px 14px; font-size:13px; margin-top:0; margin-bottom:10px}   
 .facts dt{color:var(--ink3)}
 .facts dd{margin:0}
 
-.detail .desc{font-size:14px; margin:0 0 9px; -webkit-user-select:text; user-select:text}
+.detail .desc{font-size:14px; margin-top:0; margin-right:0; margin-bottom:9px; -webkit-user-select:text; user-select:text}
 
-.flag{font-size:12.5px; color:var(--ink2); background:var(--panel); border-radius:0; padding:7px 10px; margin:0 0 8px}
-.flag.season{color:var(--warn); background:none; padding:0 0 0 1px}
+.flag{
+  display:flex; align-items:flex-start; gap:7px;
+  font-size:12.5px; line-height:1.65; color:var(--ink2);
+  background:none; box-shadow:none; border:0; border-radius:0; padding:0;
+  margin-top:3px; margin-right:0; margin-bottom:8px;
+}
+.flag .fi{
+  flex:none; width:14px; height:14px; margin-top:3px; color:var(--ink3);
+  stroke:currentColor; fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round;
+}
+.flag.season{color:var(--warn); background:none; padding:0}
+.flag.season .fi{color:var(--warn)}
 
-.tags{display:flex; flex-wrap:wrap; gap:5px; margin:0 0 9px}
+.tags{display:flex; flex-wrap:wrap; gap:5px; margin-top:0; margin-bottom:9px}   
 
 .tags .tag{
   font-size:12px; line-height:1.5; padding:2px 7px; border-radius:999px;
@@ -832,7 +860,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 @media (hover:hover){.tags .tag:hover{color:var(--accent); border-color:var(--accent)}}
 
 .mapcard .tags{margin:8px 0 0}
-.acts{display:flex; gap:7px; flex-wrap:wrap; margin:10px 0 4px}
+
+.acts{display:flex; gap:7px; flex-wrap:wrap; justify-content:flex-end; margin-top:10px; margin-right:0; margin-bottom:4px}
 
 .acts a, .acts button{
   font-size:12.5px; line-height:1.5; text-decoration:none; color:var(--ink2);
@@ -843,7 +872,10 @@ button{font:inherit; color:inherit; cursor:pointer}
 .acts .primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
 
 @media (hover:hover){.acts .primary:hover{color:var(--on-accent); border-color:var(--accent)}}
-.nearby{margin-top:11px; border-top:1px solid var(--hair); padding-top:8px}   
+
+.nearby{margin-top:11px; margin-left:-10px; border-top:1px solid var(--hair); padding-top:8px}   
+
+.nearby h3{margin-left:10px}
 .nearby .row{padding:5px 6px}
 .nearby .nonear{margin:2px 6px 0; font-size:12px; color:var(--ink3); line-height:1.6}
 .wider{border:0; background:none; color:var(--ink3); font-size:12px; text-decoration:underline; padding:4px 6px 0}
@@ -1189,8 +1221,9 @@ html.sheeton .panel{overflow:hidden}
 }
 
 .sheetwrap[data-kind=map] .sheetbody .place-card{margin:6px 0 10px}
+
 .sheetwrap[data-kind=map] .sheetbody .place-card > .place-detail{
-  margin:0; border:0; border-top:1px solid var(--line); border-radius:0;
+  margin:0; border:0; border-top:0; border-radius:0;
 }
 
 .tsheet .tsum{margin:8px 0 6px; font-size:13px; color:var(--ink); font-weight:600; line-height:1.5}
@@ -3455,21 +3488,24 @@ function renderDetail(p){
       `<dt>停留</dt><dd>${esc(p.time||"—")}</dd>` +
       `<dt>整趟</dt><dd><span class="num" title="${rawT(p.total_h*60)}">${estHT(p.total_h)}</span>　${EFFORT[p.diff]||p.diff}</dd>` +
     `</dl>` +
-    (p.desc?`<p class="desc">${esc(p.desc)}</p>`:"") +
+
     tagsHTML(p) +
-    (p.season?`<p class="flag season">${esc(p.season)}</p>`:"") +
-    (p.note?`<p class="flag">${esc(p.note)}</p>`:"");
+    (p.desc?`<p class="desc">${esc(p.desc)}</p>`:"") +
+
+    (p.season?`<p class="flag season"><svg class="fi" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M3.4 12.6l1.3-1.3M11.3 4.7l1.3-1.3"/><circle cx="8" cy="8" r="2.6"/></svg><span>${esc(p.season)}</span></p>`:"") +
+    (p.note?`<p class="flag"><svg class="fi" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.3"/><path d="M8 7.2v4M8 4.8v.2"/></svg><span>${esc(p.note)}</span></p>`:"");
   wireTags(d);
+
   const acts=document.createElement("div"); acts.className="acts";
+  acts.insertAdjacentHTML("beforeend",
+    (p.source?`<a href="${esc(p.source)}" target="_blank" rel="noopener">參考</a>`:"") +
+    `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(gview(p))}" target="_blank" rel="noopener">看 Google 地圖</a>` +
+    `<a href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(HOME.name)}&destination=${encodeURIComponent(gnav(p))}" target="_blank" rel="noopener">導航</a>`);
   const add=document.createElement("button");
   if (!inPlan(p.id)) add.className="primary";
   add.textContent = inPlan(p.id) ? "從行程移除" : "加進行程";
   add.onclick=()=>togglePlan(p.id);
   acts.appendChild(add);
-  acts.insertAdjacentHTML("beforeend",
-    `<a href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(HOME.name)}&destination=${encodeURIComponent(gnav(p))}" target="_blank" rel="noopener">導航</a>` +
-    `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(gview(p))}" target="_blank" rel="noopener">看 Google 地圖</a>` +
-    (p.source?`<a href="${esc(p.source)}" target="_blank" rel="noopener">參考</a>`:""));
   d.appendChild(acts);
   const canWiden = S.near < NEAR_STEPS.length-1;
   if (near.length || canWiden){
