@@ -548,7 +548,7 @@ button{font:inherit; color:inherit; cursor:pointer}
     box-shadow:inset 0 -1px 0 var(--hair);   
   }
   .panel.twolane .lane-today .head .hint{color:var(--ink2); font-weight:400}
-  .panel.twolane .lane-today .head .clock{font-size:12px; color:var(--ink3)}
+
   .panel.twolane .lane-today .sheet{display:block; max-height:none; overflow:visible;
                                     border-top:0; padding:0 14px 16px}
   .panel.twolane .lane-today .plan{max-height:none; overflow:visible}
@@ -837,7 +837,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .place-detail .facts, .place-detail .tags, .place-detail .desc,
 .place-detail .flag, .place-detail .acts{margin-left:var(--detail-body-inset)}
 
-.crumb, .nearby h3{font-size:12px; font-weight:600; color:var(--ink3); letter-spacing:.06em}
+.crumb, .nearby h3, .tnear h3{font-size:12px; font-weight:600; color:var(--ink3); letter-spacing:.06em}
 .crumb{margin:0 0 8px}
 .facts{display:grid; grid-template-columns:auto 1fr; gap:2px 14px; font-size:13px; margin-top:0; margin-bottom:10px}   
 .facts dt{color:var(--ink3)}
@@ -903,12 +903,14 @@ button{font:inherit; color:inherit; cursor:pointer}
   font-size:13.5px;
 }
 .trip .head .hint{flex:1; min-width:0; color:var(--ink2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.trip .head .right{flex:none; display:flex; align-items:center; gap:8px}
-.trip .head .clock{font-family:var(--mono); font-size:12.5px; color:var(--ink2); white-space:nowrap}
+
 .trip .sheet{display:none; max-height:min(60vh,520px); overflow-y:auto; overscroll-behavior:contain; padding:0 14px 14px; border-top:1px solid var(--hair)}   
 .trip.open .sheet{display:block}
 .setrow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 0 4px}
 .setrow .lab{font-size:12px; color:var(--ink3); letter-spacing:.06em}
+
+.backbit{font-size:12px; color:var(--ink3); white-space:nowrap}
+.backbit .num{font-family:var(--mono); color:var(--ink2)}
 
 #start{
   border:1px solid var(--line); background:var(--bg); color:var(--ink2); border-radius:999px;
@@ -924,18 +926,25 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .plan{display:flex; flex-direction:column; margin:6px 0 10px; max-height:38vh; overflow-y:auto; overscroll-behavior:contain}
 
-.plan .end{display:flex; align-items:center; gap:9px; font-size:13px; color:var(--ink3)}
-.plan .end.late{color:var(--warn)}
-.plan .end .home, .setrow .home{
+.setrow .home{
   flex:none; width:22px; height:22px; border-radius:999px; border:1px dashed var(--line2);
   display:grid; place-items:center; font-size:10px; color:var(--ink3);
 }
 
-.plan .end.back{
-  margin-top:var(--rowgap); padding:7px 9px; border:1px solid transparent; border-radius:var(--r);
-  color:var(--ink);
+.ttotal{
+  display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
+  margin-top:10px; padding-top:8px; border-top:1px solid var(--hair);
+  font-size:12.5px; color:var(--ink2);
 }
-.plan .leg{display:inline-flex; align-items:center; font-size:11.5px; color:var(--ink3); font-family:var(--mono); white-space:nowrap}
+.ttotal.late{color:var(--warn)}
+.ttotal .warn{font-size:11.5px; color:var(--warn)}
+
+.tnear{margin-top:11px; border-top:1px solid var(--hair); padding-top:8px}
+.tnear h3{margin:0 0 6px}
+.tnear .row{padding:5px 6px}
+.tnear .nonear{margin:2px 6px 0; font-size:12px; color:var(--ink3); line-height:1.6}
+
+.tnearacts{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
 
 .mi{display:inline-flex; align-items:baseline; gap:3px}
 
@@ -952,7 +961,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .stopwrap + .stopwrap{margin-top:var(--rowgap)}
 
-.stop, .plan .end.back{
+.stop{
   background-color:var(--surface-sheet);
   background-image:var(--card-lift),var(--paper-sheet);
   box-shadow:var(--lift-shadow);
@@ -969,19 +978,18 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .row[aria-pressed="true"] .m, .row[aria-pressed="true"] .tag, .rrow[aria-pressed="true"] .n{color:var(--ink)}
 
-@media (hover:hover){.nearby .row:hover{background-color:var(--state-hover)}}
-.nearby .row[aria-pressed="true"]{
+@media (hover:hover){.nearby .row:hover, .tnear .row:hover{background-color:var(--state-hover)}}
+.nearby .row[aria-pressed="true"], .tnear .row[aria-pressed="true"]{
   background-color:var(--state-selected); background-image:none; box-shadow:none;
 }
 
 .stop{
-  display:grid; grid-template-columns:var(--leadw,max-content) 1fr auto; column-gap:10px;
-  align-items:center; padding:7px 9px; position:relative; z-index:1;
+  padding:7px 9px; position:relative; z-index:1;
   border:1px solid transparent; border-radius:var(--r);
   touch-action:pan-y; cursor:grab; user-select:none; -webkit-touch-callout:none;
 }
 
-.stop button.nm, .stop .stepper button, .stop .ops button{cursor:pointer}
+.stop button.nm, .stop .stepper button, .stop .x{cursor:pointer}
 .stopwrap.dragging{z-index:5}
 
 .stopwrap.dragging .stop{box-shadow:0 4px 14px rgba(var(--sh),.20); cursor:grabbing}
@@ -996,14 +1004,14 @@ button{font:inherit; color:inherit; cursor:pointer}
 .swipebg svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.5;
              stroke-linecap:round; stroke-linejoin:round}
 .stopwrap.swiping .swipebg, .stopwrap.del-armed .swipebg{opacity:1}
-.stop .lead{display:flex; align-items:center; gap:4px; min-width:0; overflow:hidden}
+
 .stop .no{
   flex:none; width:22px; height:22px; border-radius:999px; background:var(--accent); color:var(--on-accent);
   font-size:11px; font-weight:700; text-align:center; line-height:22px; font-family:var(--mono);
 }
 .stop .nm{border:0; background:none; padding:0; text-align:left; font-size:14px; font-weight:600; white-space:nowrap}
 @media (hover:hover){.stop button.nm:hover{color:var(--accent)}}
-.stop .meta{display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-width:0}
+
 .stop .win{font-size:12px; color:var(--ink2); font-family:var(--mono); white-space:nowrap}
 .stop .warn{font-size:11.5px; color:var(--warn)}
 
@@ -1011,41 +1019,41 @@ button{font:inherit; color:inherit; cursor:pointer}
 .stepper button{border:0; background:none; color:var(--ink3); width:20px; height:20px; border-radius:999px; line-height:1; font-size:14px; padding:0}
 @media (hover:hover){.stepper button:hover{color:var(--accent)}}
 .stepper .v{font-size:11.5px; color:var(--ink2); font-family:var(--mono); min-width:52px; text-align:center; white-space:nowrap}
-.stop .ops{flex:none; display:flex; align-items:center; gap:2px}
-.stop .ops .grip{
-  display:grid; place-items:center; width:20px; height:28px; color:var(--ink3);
-  cursor:grab; touch-action:none; flex:none;
+
+.stop.dstop{
+  display:grid; grid-template-columns:minmax(0,1fr) 28px; column-gap:8px; row-gap:3px;
+  grid-template-areas:"ra grip" "rb x" "warn warn"; align-items:center;
 }
-.stop .ops .grip svg{width:13px; height:13px; fill:currentColor}
-.stop .ops .grip:active{cursor:grabbing}
-.stop .ops button{
+.dstop .ra{grid-area:ra; display:flex; align-items:center; gap:8px; min-width:0}
+.dstop .rb{grid-area:rb; display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-width:0}
+.dstop .warn{grid-area:warn; padding-left:30px}
+
+.dstop .nm{white-space:normal; line-height:1.35; min-width:0}
+
+.dstop .grip{
+  grid-area:grip; display:grid; place-items:center; width:28px; height:28px; justify-self:end;
+  color:var(--ink3); cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none;
+}
+.dstop .grip svg{width:13px; height:13px; fill:currentColor}
+.dstop .grip:active{cursor:grabbing}
+.dstop .x{
+  grid-area:x; justify-self:end;
   border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2);
   width:28px; height:28px; border-radius:999px; line-height:1; font-size:12px; padding:0;
 }
-.stop .ops button:disabled{color:var(--line2); cursor:default}
-@media (hover:hover){.stop .ops button:hover:not(:disabled){border-color:var(--accent); color:var(--accent)}}
-
-.trip.stacked .stop{
-  grid-template-columns:1fr auto;
-  grid-template-areas:"lead lead" "meta ops";
-  row-gap:4px;
-}
-
-.trip.stacked .stop .lead{grid-area:lead; flex-wrap:wrap; overflow:visible}
-.trip.stacked .stop .nm{white-space:normal}
-
-.trip.stacked .stop .meta{grid-area:meta; min-width:0}
-.trip.stacked .stop .ops{grid-area:ops; align-self:center; justify-self:end}
-.trip.stacked .stop .ops .grip{width:18px}
-.trip.stacked .stop .ops button{width:24px; height:24px}
-.trip.stacked .stop .ops{gap:1px}
-.trip.stacked .stepper .v{min-width:46px}
+@media (hover:hover){.dstop .x:hover{border-color:var(--accent); color:var(--accent)}}
 
 .trip .go{display:flex; gap:6px; flex-wrap:wrap; padding-bottom:4px}
 .trip .go a.primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
 @media (hover:hover){.trip .go a.primary:hover{color:var(--on-accent); border-color:var(--accent)}}
 
-.trip .go .infobtn{border:0; background:none; color:var(--ink3); padding:4px 3px; display:grid; place-items:center; margin-left:auto}
+.trip .go{justify-content:flex-end}
+.trip .go .infobtn{order:-1; margin-right:auto}
+.trip .go .quiet{order:1}
+.trip .go > button:not(.quiet):not(.infobtn){order:2}
+.trip .go a.primary{order:3}
+
+.trip .go .infobtn{border:0; background:none; color:var(--ink3); padding:4px 3px; display:grid; place-items:center}
 @media (hover:hover){.trip .go .infobtn:hover{color:var(--accent)}}
 .trip .go .infobtn[aria-expanded=true]{color:var(--accent)}
 .trip .tfoot{font-size:11.5px; color:var(--ink3); margin:8px 0 0; line-height:1.7}
@@ -1107,7 +1115,6 @@ button{font:inherit; color:inherit; cursor:pointer}
   }
 
   #tripview .head .hint{color:var(--ink2); font-weight:400}
-  #tripview .head .clock{font-size:12px; color:var(--ink3)}
 
   
   #tripview .sheet{display:block; max-height:none; overflow:visible; border-top:0;
@@ -1155,13 +1162,9 @@ button{font:inherit; color:inherit; cursor:pointer}
 
   #tripview .stopwrap.dragging .stop{opacity:.92}
 
-  #tripview .plan .end.back{flex-wrap:wrap; margin:0 0 0 5px}
+  
 
-  #tripview .go{padding-top:6px; justify-content:flex-end}
-  #tripview .go .infobtn{order:-1; margin-left:0; margin-right:auto}
-  #tripview .go .quiet{order:1}
-  #tripview .go > button:not(.quiet):not(.infobtn){order:2}
-  #tripview .go a.primary{order:3}
+  #tripview .go{padding-top:6px}
   #tripview .empty{padding:26px 20px}
 
   .totop{bottom:calc(16px + var(--navh) + env(safe-area-inset-bottom))}
@@ -1381,6 +1384,13 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
   inset:-3px; border-width:2px;
   box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 12%, transparent);
 }
+
+.pin.cand, .poidot.cand, .dotpin.cand{position:relative}
+.pin.cand::before, .poidot.cand::before, .dotpin.cand::before{
+  content:""; position:absolute; z-index:-1; pointer-events:none; border-radius:999px;
+  inset:-4px; border:2px dashed var(--accent);
+}
+.poidot.cand::before{inset:-3px; border-width:1.5px}
 
 .leaflet-marker-icon .pin, .leaflet-marker-icon .dotpin, .poidot .pd{transition:transform .12s}
 .leaflet-marker-icon.hot .pin, .leaflet-marker-icon.hot .dotpin, .poidot.hot .pd{transform:scale(1.3)}
@@ -1644,59 +1654,11 @@ function railBtn(which){
 
 let ROUTE_VIEW = false;
 
-let NEAR_VIEW = false, NEAR_LEVEL = 0;
-
-let NEAR_SET = null;
-function refreshNearSet(){ NEAR_SET = (NEAR_VIEW && PLAN.length) ? nearViewSet() : null; }
-
-function nearPool(st){
-  const maxKm=NEAR_STEPS[NEAR_STEPS.length-1].km;
-  return PLACES.filter(x=>x.id!==st.id && nkm(st,x)<=maxKm)
-    .sort((a,b)=>nkm(st,a)-nkm(st,b));
-}
-function nearViewSet(){
-  const stops=PLAN.map(id=>BY_ID[id]).filter(Boolean);
-  const lim=NEAR_STEPS[Math.min(NEAR_LEVEL, NEAR_STEPS.length-1)].km;
-  const out=new Set();
-  stops.forEach(st=>{
-    out.add(st.id);
-    const road=NEAR[st.id];
-    nearPool(st).forEach(x=>{
-      if (out.has(x.id)) return;
-      const r=road&&road[x.id];
-      if (r && r.km<=lim) out.add(x.id);
-    });
-  });
-  return out;
-}
-
-function primeNearData(){
-  PLAN.map(id=>BY_ID[id]).filter(Boolean).forEach(st=>{
-    if (!NEAR_DONE.has(st.id)) fetchNear(st, nearPool(st));
-  });
-}
-function primeNearView(){ if (NEAR_VIEW) primeNearData(); }
-
-function nearestStop(p){
-  let best=null;
-  PLAN.map(id=>BY_ID[id]).filter(Boolean).forEach(st=>{
-    if (st.id===p.id) return;
-    const r=NEAR[st.id] && NEAR[st.id][p.id];
-    if (r && (!best || r.km<best.km)) best={stop:st, km:r.km, min:r.min, real:true};
-  });
-  return best;
-}
-
 function planRouteSet(){
   const s=new Set();
   PLAN.forEach(id=>{ const p=BY_ID[id]; if (!p) return;
     s.add(p.route); (VIA[p.route]||[]).forEach(r=>s.add(r)); });
   return s;
-}
-function syncNearView(){
-  if (!NEAR_VIEW) return;
-  if (!PLAN.length){ NEAR_VIEW=false; NEAR_LEVEL=0; return; }
-  primeNearView();
 }
 function syncRouteView(){
   if (!ROUTE_VIEW) return;
@@ -1784,8 +1746,7 @@ function save(){
       inseason:S.inseason, sort:S.sort, plan:PLAN, theme:THEME,
       seen:true, start:START, stay:STAY, routesOpen:S.routesOpen, tipSeen:S.tipSeen,
       foldExplore:S.foldExplore, foldToday:S.foldToday,
-      axesOpen:S.axesOpen, routeView:ROUTE_VIEW,
-      nearView:NEAR_VIEW, nearLevel:NEAR_LEVEL
+      axesOpen:S.axesOpen, routeView:ROUTE_VIEW
     }));
   }catch(e){}
 }
@@ -1809,8 +1770,6 @@ function restore(){
     if (typeof d.axesOpen==="boolean") S.axesOpen=d.axesOpen;
     else if (!d.seen && !matchMedia("(min-width:900px) and (min-height:560px)").matches) S.axesOpen=false;
     if (d.routeView) ROUTE_VIEW=true;
-    if (d.nearView) NEAR_VIEW=true;
-    if (typeof d.nearLevel==="number") NEAR_LEVEL=d.nearLevel;
   }catch(e){}
   readHash();
 }
@@ -1857,7 +1816,6 @@ function termHit(p, hay, t){
 }
 
 const PASS_AXES = [
-  {id:"near",     blocks:p=>NEAR_SET      && !NEAR_SET.has(p.id),          clear:()=>{ NEAR_VIEW=false; NEAR_LEVEL=0; NEAR_SET=null; }},
   {id:"route",    blocks:p=>S.route.size  && !S.route.has(p.route),        clear:()=>{ S.route=new Set(); ROUTE_VIEW=false; }},
   {id:"themes",   blocks:p=>S.themes.size && !S.themes.has(p.theme),       clear:()=>{ S.themes=new Set(); }},
   {id:"diffs",    blocks:p=>S.diffs.size  && !S.diffs.has(p.diff),         clear:()=>{ S.diffs=new Set(); }},
@@ -1913,8 +1871,6 @@ function legOf(a,b){
   return r ? {km:r.km, min:r.min, real:true} : legEstimate(a,b);
 }
 
-const NEAR={}, NEAR_DONE=new Set();
-
 let NEIGH_TRI=null;
 try{
   if (NEIGH_B64){
@@ -1940,12 +1896,6 @@ function neighGet(aid,bid){
   const k=(ia*(2*n-ia-1)/2 + (ib-ia-1))*2;   // 上三角列序的格位
   const km10=NEIGH_TRI[k];
   return km10===65535 ? null : {km:km10/10, min:NEIGH_TRI[k+1]};
-}
-function fetchNear(p, pool){
-  if (NEAR_DONE.has(p.id) || !pool.length) return;
-  const m=NEAR[p.id]||(NEAR[p.id]={});
-  pool.forEach(x=>{ if (!(x.id in m)) m[x.id]=neighGet(p.id,x.id); });
-  NEAR_DONE.add(p.id);
 }
 
 const esc = s => (s||"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -2082,7 +2032,11 @@ function initOSM(why){
   if (S.sel && BY_ID[S.sel]) map.setView([BY_ID[S.sel].lat, BY_ID[S.sel].lng], 13, {animate:false});
 }
 
-const pinState = (p, plan) => (p.id===S.sel ? " on" : "") + ((p.id===S.sel || plan) ? " has-halo" : "");
+const pinState = (p, plan) => {
+  const sel = p.id===S.sel;
+  const cand = !sel && !plan && TODAY_NEAR_SET && TODAY_NEAR_SET.has(p.id);
+  return (sel ? " on" : "") + ((sel || plan) ? " has-halo" : "") + (cand ? " cand" : "");
+};
 function markerHTML(p){
   const c=(TH[p.theme]||{}).color||"#888";
   return `<div class="pin${pinState(p,false)}" style="color:${c}">` +
@@ -2116,6 +2070,10 @@ function draw(){
   const ids=new Set(list.map(p=>p.id));
   if (S.sel && BY_ID[S.sel] && !ids.has(S.sel)){ list.push(BY_ID[S.sel]); ids.add(S.sel); }
   PLAN.forEach(id=>{ const p=BY_ID[id]; if (p && !ids.has(id)){ list.push(p); ids.add(id); } });
+
+  if (TODAY_NEAR_SET) TODAY_NEAR_SET.forEach(id=>{
+    const p=BY_ID[id]; if (p && !ids.has(id)){ list.push(p); ids.add(id); }
+  });
   const planRoutes=new Set();
   PLAN.forEach(id=>{ const p=BY_ID[id]; if (p) planRoutes.add(p.route); });
   if (engine==="osm"){
@@ -2199,7 +2157,7 @@ function toggleRouteView(){
   if (ROUTE_VIEW){
     ROUTE_VIEW=false; S.route=new Set();
   } else {
-    ROUTE_VIEW=true; NEAR_VIEW=false; NEAR_LEVEL=0;   // 兩種檢視互斥
+    ROUTE_VIEW=true;   // （「兩種檢視互斥」那半 2026-09-15 棒 J5 退役：`NEAR_VIEW` 不在了）
     S.themes=new Set(); S.diffs=new Set(); S.budget=new Set();
     S.inseason=false; resetQ();
     S.route=planRouteSet();
@@ -2209,20 +2167,7 @@ function toggleRouteView(){
   }
   S.sel=null; EXTRA=new Set(); save(); render();
 }
-function cycleNearView(){
-  if (NEAR_VIEW && NEAR_LEVEL < NEAR_STEPS.length-1){
-    NEAR_LEVEL++;                       // 放寬一級
-  } else if (NEAR_VIEW){
-    NEAR_VIEW=false; NEAR_LEVEL=0;      // 已在最寬，再按就取消
-  } else {
-    NEAR_VIEW=true; NEAR_LEVEL=0; ROUTE_VIEW=false;
-    S.route=new Set(); S.themes=new Set(); S.diffs=new Set(); S.budget=new Set();
-    S.inseason=false; resetQ();
-    SCROLL_RESET=true;
-  }
-  primeNearView();
-  S.sel=null; EXTRA=new Set(); save(); render();
-}
+
 function renderMapBtns(){
   const box=document.getElementById("mapbtns");
   if (!box) return;
@@ -2236,18 +2181,12 @@ function renderMapBtns(){
   only.title="清掉其他篩選，顯示行程往返新竹的路上會經過或可順遊的那幾條路線上的點";
   only.onclick=toggleRouteView;
 
-  const near=document.createElement("button");
-  near.textContent = NEAR_VIEW ? `行程 ${NEAR_STEPS[NEAR_LEVEL].km} 公里內` : "看行程附近地點";
-  near.setAttribute("aria-pressed", NEAR_VIEW);
-  near.title="只看到行程任何一站的實際車程在範圍內的點；再按放寬距離，最後一次按取消";
-  near.onclick=cycleNearView;
-
   const all=document.createElement("button");
   all.textContent="行程為中心";
   all.title="把地圖縮放到剛好涵蓋行程裡的所有點";
   all.onclick=()=>fit(ps);
 
-  box.append(only, near, all);
+  box.append(only, all);
 }
 function resizeMap(){
   if (!ready) return;
@@ -2358,7 +2297,7 @@ function togglePlan(id){
     PLAN.push(id);
     maybeAutoOpenToday();
   } else PLAN.splice(i,1);
-  syncRouteView(); syncNearView();   // 兩種檢視都以行程為前提，行程一動就重算
+  syncRouteView();   // 這個檢視以行程為前提，行程一動就重算（`syncNearView()` 棒 J5 退役）
   save(); render();
 }
 function movePlan(i, dir){
@@ -2438,6 +2377,84 @@ function syncBadge(){
   BADGE_LAST=n;
 }
 
+const TODAY_NEAR_STEPS = [10, 20, 30];
+const TODAY_NEAR_PEEK = 3;     // 收合時顯示幾筆（規格 §3.2「預設 3 筆」）
+let TODAY_NEAR_OPEN = false, TODAY_NEAR_LEVEL = 0, TODAY_NEAR_SET = null;
+
+function nearestStop(p){
+  let best=null;
+  PLAN.forEach(id=>{
+    const st=BY_ID[id];
+    if (!st || st.id===p.id) return;
+    const r=neighGet(st.id, p.id);
+    if (r && (!best || r.min<best.min)) best={stop:st, km:r.km, min:r.min};
+  });
+  return best;
+}
+
+function todayNearList(level){
+  const lim=TODAY_NEAR_STEPS[Math.min(level, TODAY_NEAR_STEPS.length-1)];
+  const out=[];
+  PLACES.forEach(p=>{
+    if (inPlan(p.id)) return;
+    const ns=nearestStop(p);
+    if (ns && ns.min<=lim) out.push({p, ns});
+  });
+  out.sort((a,b)=>a.ns.min-b.ns.min);
+  return out;
+}
+
+let TODAY_NEAR_ROWS = [];
+function syncTodayNear(){
+  const live = PLAN.length && (isMobile() || !todayFolded());
+  TODAY_NEAR_ROWS = live ? todayNearList(TODAY_NEAR_LEVEL) : [];
+  TODAY_NEAR_SET = (TODAY_NEAR_OPEN && TODAY_NEAR_ROWS.length)
+    ? new Set(TODAY_NEAR_ROWS.map(o=>o.p.id)) : null;
+}
+
+function tripNearSection(){
+  if (!PLAN.length) return null;
+  const lim=TODAY_NEAR_STEPS[Math.min(TODAY_NEAR_LEVEL, TODAY_NEAR_STEPS.length-1)];
+  const canWiden = TODAY_NEAR_LEVEL < TODAY_NEAR_STEPS.length-1;
+  const rows=TODAY_NEAR_ROWS;
+  if (!rows.length && !canWiden && !TODAY_NEAR_OPEN) return null;
+  const box=document.createElement("div"); box.className="tnear";
+  const h=document.createElement("h3");
+  h.textContent=`順遊推薦（車程 ${lim} 分內）`;
+  box.appendChild(h);
+  const list = TODAY_NEAR_OPEN ? rows : rows.slice(0, TODAY_NEAR_PEEK);
+  list.forEach(({p,ns})=>
+    box.appendChild(rowFor(p, null, {min:ns.min, km:ns.km, stop:ns.stop}, ()=>openFromToday(p.id))));
+  if (!list.length){
+    const e=document.createElement("p"); e.className="nonear";
+    e.textContent="這個車程範圍內沒有還沒排的點。可以放寬時間再看。";
+    box.appendChild(e);
+  }
+  const acts=document.createElement("div"); acts.className="tnearacts";
+  if (!TODAY_NEAR_OPEN){
+    if (rows.length>TODAY_NEAR_PEEK || canWiden){
+      const more=document.createElement("button"); more.className="wider";
+      more.textContent="查看更多順遊";
+      more.setAttribute("aria-expanded","false");
+      more.onclick=()=>{ TODAY_NEAR_OPEN=true; render(); };
+      acts.appendChild(more);
+    }
+  } else {
+    if (canWiden){
+      const w=document.createElement("button"); w.className="wider";
+      w.textContent=`再遠一點（${TODAY_NEAR_STEPS[TODAY_NEAR_LEVEL+1]} 分內）`;
+      w.onclick=()=>{ TODAY_NEAR_LEVEL++; render(); };
+      acts.appendChild(w);
+    }
+    const c=document.createElement("button"); c.className="wider";
+    c.textContent="收起"; c.setAttribute("aria-expanded","true");
+    c.onclick=()=>{ TODAY_NEAR_OPEN=false; render(); };
+    acts.appendChild(c);
+  }
+  if (acts.childNodes.length) box.appendChild(acts);
+  return box;
+}
+
 function renderTrip(){
   const mob=isMobile();
   const el = mob ? document.getElementById("tripview")
@@ -2452,7 +2469,6 @@ function renderTrip(){
   const keep = mob ? (TJUMP!=null ? TJUMP : el.scrollTop) : LANE_KEEP.today;
   TJUMP=null;
   el.innerHTML="";
-  el.style.removeProperty("--leadw");   // 先解除鎖定寬度，這一輪才會照新內容重新量
 
   if (!st){
 
@@ -2481,12 +2497,8 @@ function renderTrip(){
   head.className="head";
   {
     const hint=document.createElement("span"); hint.className="hint";
-    hint.textContent=`${st.ps.length} 站 · 停留 ${hmT(st.stayMin)} · 車程約 ${estT(st.driveTotal)} · 共 ${estT(st.totalMin)}`;
-    hint.title=`車程合計 ${rawT(st.driveTotal)}　總時程 ${rawT(st.totalMin)}`;
-    const right=document.createElement("span"); right.className="right";
-    const clock=document.createElement("span"); clock.className="clock"; clock.textContent=`${fmt(START)}–${fmt(st.backTime)}`;
-    right.appendChild(clock);
-    head.append(hint,right);
+    hint.textContent=`今天 · ${st.ps.length} 站`;
+    head.appendChild(hint);
   }
   el.appendChild(head);
 
@@ -2500,8 +2512,10 @@ function renderTrip(){
     const [hh,mm]=(time.value||"09:00").split(":").map(Number);
     START=(hh||0)*60+(mm||0); save(); renderTrip();
   };
-  const lab=document.createElement("label"); lab.className="lab"; lab.textContent="新竹市出發"; lab.htmlFor="start";
-  set.append(home,time,lab);
+  const lab=document.createElement("label"); lab.className="lab"; lab.textContent="出發"; lab.htmlFor="start";
+  const backbit=document.createElement("span"); backbit.className="backbit";
+  backbit.innerHTML=`→ 預計 <span class="num">${fmt(st.backTime)}</span> 回新竹`;
+  set.append(home,time,lab,backbit);
 
   const plan=document.createElement("div"); plan.className="plan";
 
@@ -2527,7 +2541,7 @@ function renderTrip(){
     const wrap=document.createElement("div"); wrap.className="stopwrap"; wrap.dataset.id=it.p.id;
     const swipebg=document.createElement("div"); swipebg.className="swipebg";
     swipebg.innerHTML = BIN_SVG + "<span>移出行程</span>";
-    const stop=document.createElement("div"); stop.className= mob ? "stop mstop" : "stop"; stop.dataset.id=it.p.id;
+    const stop=document.createElement("div"); stop.className= mob ? "stop mstop" : "stop dstop"; stop.dataset.id=it.p.id;
 
     const no=document.createElement("span"); no.className="no"; no.textContent=it.n;
     const nm=document.createElement(mob ? "span" : "button"); nm.className="nm"; nm.textContent=it.p.name;
@@ -2550,42 +2564,13 @@ function renderTrip(){
     const x=document.createElement("button"); x.textContent="×"; x.title="移出行程"; x.setAttribute("aria-label","移出行程");
     x.onclick=()=>togglePlan(it.p.id);
 
-    if (mob){
-      const ra=document.createElement("div"); ra.className="ra"; ra.append(no,nm);
-      const rb=document.createElement("div"); rb.className="rb"; rb.append(win,step);
-      x.className="x";
-      stop.append(ra,grip,rb,x);
-      if (it.warn){
-        const w=document.createElement("span"); w.className="warn"; w.textContent=it.warn;
-        stop.appendChild(w);
-      }
-    } else {
-      const lead=document.createElement("div"); lead.className="lead";
-      const lg=document.createElement("span"); lg.className="leg"; lg.title=`車程 ${it.legRaw}`;
-      lg.innerHTML = CAR_SVG;
-      const dot=it.leg.indexOf(" · ");
-      lg.appendChild(document.createTextNode(dot<0 ? it.leg : it.leg.slice(0,dot)));
-      if (dot>=0){
-        const kmp=document.createElement("span"); kmp.className="km"; kmp.textContent=it.leg.slice(dot);
-        lg.appendChild(kmp);
-      }
-      lead.append(no,nm,lg);
-
-      const meta=document.createElement("div"); meta.className="meta";
-      meta.append(win,step);
-      if (it.warn){
-        const w=document.createElement("span"); w.className="warn"; w.textContent=it.warn;
-        meta.appendChild(w);
-      }
-
-      const ops=document.createElement("span"); ops.className="ops";
-      const up=document.createElement("button"); up.textContent="↑"; up.title="往前一站"; up.setAttribute("aria-label","往前一站");
-      up.disabled=i===0; up.onclick=()=>movePlan(i,-1);
-      const down=document.createElement("button"); down.textContent="↓"; down.title="往後一站"; down.setAttribute("aria-label","往後一站");
-      down.disabled=i===st.items.length-1; down.onclick=()=>movePlan(i,1);
-      ops.append(grip,up,down,x);
-
-      stop.append(lead,meta,ops);
+    const ra=document.createElement("div"); ra.className="ra"; ra.append(no,nm);
+    const rb=document.createElement("div"); rb.className="rb"; rb.append(win,step);
+    x.className="x";
+    stop.append(ra,grip,rb,x);
+    if (it.warn){
+      const w=document.createElement("span"); w.className="warn"; w.textContent=it.warn;
+      stop.appendChild(w);
     }
     wrap.append(swipebg,stop);
     plan.appendChild(wrap);
@@ -2594,12 +2579,17 @@ function renderTrip(){
 
   const late=st.backTime>18*60;
   if (mob) plan.appendChild(legRow(st.ps[st.ps.length-1].name, "新竹市", legText(st.back, st.backKm, st.backReal), rawT(st.back, st.backKm)));
-  const back=document.createElement("div"); back.className="end back" + (late?" late":"");
-  back.innerHTML=`<span class="home">家</span>` +
-    `<span>回到新竹 <span class="num">${fmt(st.backTime)}</span></span>` +
-    (mob ? "" : `<span class="leg" title="車程 ${rawT(st.back, st.backKm)}">${CAR_SVG}${legText(st.back, st.backKm, st.backReal)}</span>`) +
-    (late?`<span class="warn" style="font-size:11.5px;color:var(--warn)">天已經黑了，山路請留餘裕</span>`:"");
-  plan.appendChild(back);
+
+  const sum=document.createElement("div"); sum.className="ttotal" + (late?" late":"");
+  const sumv=document.createElement("span");
+  sumv.textContent=`停留 ${hmT(st.stayMin)} · 車程約 ${estT(st.driveTotal)} · 共約 ${estT(st.totalMin)}`;
+  sumv.title=`車程合計 ${rawT(st.driveTotal)}　總時程 ${rawT(st.totalMin)}`;
+  sum.appendChild(sumv);
+  if (late){
+    const w=document.createElement("span"); w.className="warn";
+    w.textContent="天已經黑了，山路請留餘裕";
+    sum.appendChild(w);
+  }
 
   const go=document.createElement("div"); go.className="go";
   const a=document.createElement("a");
@@ -2638,9 +2628,11 @@ function renderTrip(){
   foot.textContent="點與點之間的車程會去算真實路線；算不到時退回估算值，會標「約」。"
                  + "不含塞車與找停車位，停留時間可以自己加減。";
 
-  sheet.append(set,plan,go,foot);
+  const near=tripNearSection();
+  sheet.append(set,plan,sum);
+  if (near) sheet.appendChild(near);
+  sheet.append(go,foot);
   el.appendChild(sheet);
-  alignLeadColumn(el);
 
   el.scrollTop=keep;
   syncStuck(el);
@@ -2684,39 +2676,6 @@ document.addEventListener("pointermove", e=>{
 const MSCROLL={place:0, trip:0};
 let MAPKEEP=null, MJUMP=null, TJUMP=null;
 
-function alignLeadColumn(root){
-  root.classList.remove("stacked");
-  root.style.removeProperty("--leadw");
-  const leads=root.querySelectorAll(".stop .lead");
-  if (!leads.length) return;
-  let max=0;
-  leads.forEach(l=>{ max=Math.max(max, l.getBoundingClientRect().width); });
-  if (!max) return;   // 面板收合中量到的都是 0（display:none），維持原狀，等展開再量
-  const opsEl=root.querySelector(".stop .ops");
-  const opsW = opsEl ? opsEl.getBoundingClientRect().width : 100;
-  const avail = root.getBoundingClientRect().width || innerWidth;
-  const META_MIN = 130;   // 中間欄（時間窗＋停留）擠到這個寬度以下就不好讀了
-  const needed = max + 10 + META_MIN + 10 + opsW;
-  if (needed > avail) root.classList.add("stacked");
-  else root.style.setProperty("--leadw", Math.ceil(max)+"px");
-}
-
-(function(){
-  if (typeof ResizeObserver === "undefined") return;
-
-  const tripHome = () => document.querySelector("#panel > .lane-today:not(.rail)")
-                      || document.getElementById("tripview");
-  ["panel","tripview"].forEach(function(id){
-    const host = document.getElementById(id);
-    if (!host) return;
-    let t = null;
-    new ResizeObserver(function(){
-      if (t) clearTimeout(t);
-      t = setTimeout(function(){ const el=tripHome(); if (el) alignLeadColumn(el); }, 100);
-    }).observe(host);
-  });
-})();
-
 function wireStopGestures(wrap, stop, grip, id){
   grip.addEventListener("pointerdown", e=>{
     if (e.pointerType==="mouse" && e.button!==0) return;
@@ -2746,7 +2705,8 @@ function wireStopGestures(wrap, stop, grip, id){
     if (GESTURE.dir==null){
       if (Math.abs(dx)<8 && Math.abs(dy)<8) return;
       clearTimeout(PRESS_TIMER);   // 位移已經超過長按門檻，不會再是長按
-      if (GESTURE.mouse && Math.abs(dy)>=Math.abs(dx)){
+
+      if (GESTURE.mouse){
         const ev=e; GESTURE=null;
         startDrag(id, wrap, ev);
         return;
@@ -2949,10 +2909,6 @@ function toggle(set,v){ toggleSet(set,v); filterChanged(); }
 
 function condBits(){
   const out=[];
-  if (NEAR_VIEW && PLAN.length){
-    const km=NEAR_STEPS[Math.min(NEAR_LEVEL, NEAR_STEPS.length-1)].km;
-    out.push(["行程附近", `${km} 公里內`]);
-  }
   if (S.route.size)  out.push([ROUTE_VIEW ? "往返路線" : "路線", [...S.route].map(r=>(RT[r]||{}).name||r).join("、")]);
   if (S.inseason)    out.push(["季節", `${MONTH} 月當季`]);
   if (S.budget.size) out.push(["時間", [...S.budget].map(b=>(BUDGETS.find(x=>x.id===b)||{}).label||b).join("、")]);
@@ -3016,7 +2972,7 @@ function syncNavDots(){
 }
 
 function resetAll(){
-  ROUTE_VIEW=false; NEAR_VIEW=false; NEAR_LEVEL=0;   // 清除篩選也離開這兩種檢視
+  ROUTE_VIEW=false;   // 清除篩選也離開往返路線檢視（`NEAR_VIEW` 那半棒 J5 退役）
   S.route=new Set(); S.themes=new Set(); S.diffs=new Set(); S.budget=new Set();
   S.inseason=false; S.sel=null; EXTRA=new Set(); resetQ();
   S.dirOpen=new Set();
@@ -3109,7 +3065,7 @@ const circled = n => (n>=1 && n<=20) ? "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬�
 
 function placeFilterCount(){
   return S.themes.size + S.diffs.size + S.budget.size + (S.inseason?1:0) +
-         (ROUTE_VIEW ? 1 : S.route.size) + ((NEAR_VIEW && PLAN.length) ? 1 : 0);
+         (ROUTE_VIEW ? 1 : S.route.size);
 }
 
 function clearPlaceFilters(){
@@ -3451,8 +3407,6 @@ function renderFilters(cls){
     f.appendChild(frow("季節", [chip(`${MONTH} 月當季<span class="cnt num">${sc}</span>`, S.inseason,
       ()=>{ S.inseason=!S.inseason; filterChanged(); })]));
     if (PLAN.length) f.appendChild(frow("行程", [
-      chip(NEAR_VIEW ? `行程 ${NEAR_STEPS[NEAR_LEVEL].km} 公里內` : "行程附近",
-           NEAR_VIEW, cycleNearView),
       chip("往返路線", ROUTE_VIEW, toggleRouteView),
     ]));
   }
@@ -3497,31 +3451,21 @@ function renderRoutes(){
   return f;
 }
 
-const shortStop = n => n.length>5 ? n.slice(0,4)+"…" : n;
-
 function legBit(p, rel){
-  if (rel) return `<span class="mi" title="車程 ${rawT(rel.min, rel.km)}">${CAR_SVG}` +
-    (rel.min!=null ? `${est(rel.min)}<span class="sep"> · </span>` : ``) +
-    `${rel.real?"":`<span class="sep">直線 </span>`}${kmv(rel.km)}</span>`;
-  if (NEAR_SET){
-    const ns=nearestStop(p);
-    if (ns){
-      const many=PLAN.length>1;
-      return `<span class="mi" title="離${esc(ns.stop.name)} ${rawT(ns.min, ns.km)}">${CAR_SVG}` +
-        (many ? `<span class="sep">離${esc(shortStop(ns.stop.name))} </span>` : ``) +
-        (ns.min!=null ? `${ns.real?"":`<span class="sep">約 </span>`}${est(ns.min)}<span class="sep"> · </span>` : ``) +
-        `${kmv(ns.km)}</span>`;
-    }
-  }
+  if (rel) return `<span class="mi" title="${rel.stop?`離${esc(rel.stop.name)} `:`車程 `}${rawT(rel.min, rel.km)}">${CAR_SVG}` +
+    (rel.stop ? `<span class="sep">最近站 </span>` : ``) +
+    `${est(rel.min)}</span>`;
   return `<span class="mi" title="車程 ${rawT(p.drive_min)}">${CAR_SVG}${est(p.drive_min)}</span>`;
 }
-function rowFor(p, extra, rel){
+
+function rowFor(p, extra, rel, onOpen){
+  const open = onOpen || (()=>select(p.id));
   const b=document.createElement("div");
   b.className="row place-summary"; b.dataset.id=p.id; b.setAttribute("aria-expanded", S.sel===p.id);
   b.setAttribute("role","button"); b.tabIndex=0;
   b.addEventListener("keydown", e=>{
     if (e.target!==b) return;
-    if (e.key==="Enter" || e.key===" "){ e.preventDefault(); select(p.id); }
+    if (e.key==="Enter" || e.key===" "){ e.preventDefault(); open(); }
   });
   const off = !pass(p);
   const body=document.createElement("div"); body.className="rbody";
@@ -3530,7 +3474,7 @@ function rowFor(p, extra, rel){
     `<span>${esc(p.name)}</span>` +
     `<span class="tag ${HARD.has(p.diff)?"hard":""}">${EFFORT[p.diff]||p.diff}</span>` +
     (off?`<span class="off">不在篩選內</span>`:"") + `</div>` +
-    `<div class="m">${(NEAR_SET||rel)?"":esc(p.town)+"　"}${legBit(p, rel)}　` +
+    `<div class="m">${rel?"":esc(p.town)+"　"}${legBit(p, rel)}　` +
     `<span class="mi" title="停留">${HOURGLASS_SVG}<span class="num">${hmHT(p.stay_h)}</span></span>` +
     `${extra||""}</div>`;
   const add=document.createElement("button");
@@ -3540,13 +3484,13 @@ function rowFor(p, extra, rel){
   add.setAttribute("aria-label", (inPlan(p.id) ? "移出行程：" : "加進行程：") + p.name);
   add.onclick=e=>{ e.stopPropagation(); togglePlan(p.id); };
   b.append(body,add);
-  b.onclick=()=>select(p.id);
+  b.onclick=()=>open();
   b.addEventListener("mouseenter", ()=>emphasize(p.id,true));
   b.addEventListener("mouseleave", ()=>emphasize(p.id,false));
   return b;
 }
 
-const NEAR_STEPS = [{km:10,n:5},{km:20,n:8},{km:30,n:10},{km:40,n:12}];
+const NEAR_STEPS = [{min:15,n:5},{min:30,n:8},{min:45,n:10},{min:60,n:12}];
 
 function pickNearby(list, n){
   const groups=new Map();
@@ -3574,14 +3518,12 @@ function pickNearby(list, n){
 }
 function renderDetail(p){
   const step=NEAR_STEPS[Math.min(S.near, NEAR_STEPS.length-1)];
-  const full=nearPool(p);
-  fetchNear(p, full);
-  const pool=full.filter(x=>x.theme!==p.theme);
-  const road=NEAR[p.id];
-  const near=pickNearby(pool.map(x=>{
-      const r=road&&road[x.id];
-      return r ? {x, d:r.km, min:r.min, real:true} : null;
-    }).filter(o=>o && o.d<=step.km), step.n);
+
+  const near=pickNearby(PLACES.map(x=>{
+      if (x.id===p.id || x.theme===p.theme) return null;
+      const r=neighGet(p.id, x.id);
+      return r ? {x, d:r.min, km:r.km} : null;
+    }).filter(o=>o && o.d<=step.min), step.n);
   const d=document.createElement("div"); d.className="detail place-detail";
   d.innerHTML =
 
@@ -3615,17 +3557,17 @@ function renderDetail(p){
   const canWiden = S.near < NEAR_STEPS.length-1;
   if (near.length || canWiden){
     const n=document.createElement("div"); n.className="nearby";
-    n.innerHTML=`<h3>附近精選地點（車程 ${step.km} 公里內）</h3>`;
-    if (near.length) near.forEach(({x,d:dd,min,real})=>
-      n.appendChild(rowFor(x, null, {km:dd, min, real})));
+    n.innerHTML=`<h3>附近精選地點（車程 ${step.min} 分內）</h3>`;
+    if (near.length) near.forEach(({x,d:dd,km})=>
+      n.appendChild(rowFor(x, null, {min:dd, km})));
     else {
       const e=document.createElement("p"); e.className="nonear";
-      e.textContent="這個車程範圍內沒有別的點。山上繞路遠，可以放寬距離再看。";
+      e.textContent="這個車程範圍內沒有別的點。山上繞路遠，可以放寬時間再看。";
       n.appendChild(e);
     }
     if (canWiden){
       const more=document.createElement("button"); more.className="wider";
-      more.textContent=`再遠一點（${NEAR_STEPS[S.near+1].km} 公里內）`;
+      more.textContent=`再遠一點（${NEAR_STEPS[S.near+1].min} 分內）`;
       more.onclick=()=>{ S.near++; render(); };
       n.appendChild(more);
     }
@@ -4012,8 +3954,9 @@ document.getElementById("totop").onclick=()=>{
   scrollBox().scrollTo({top:0, behavior: RM.matches ? "auto" : "smooth"});
 };
 function render(){
-  refreshNearSet();
-  primeNearView();   // fetchNear 現在是同步查內嵌表（NEIGH），重複呼叫有完成標記守門
+
+  
+  syncTodayNear();
   draw(); renderPanel(); renderTrip(); renderMapBtns(); renderMapCond(); updateTotop();
   syncReset();   // 頁首 ⟲ 是靜態節點，renderPanel 重建面板碰不到它（2026-09-12 棒 DA）
   syncMSearch(); // 手機頁首兩態＋搜尋鈕狀態點＋ #mcond 條件數（2026-09-12 棒 DB2）
