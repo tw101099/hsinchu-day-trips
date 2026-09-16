@@ -380,6 +380,7 @@ button{font:inherit; color:inherit; cursor:pointer}
   border-radius:999px; padding:5px 12px; font-size:12.5px; white-space:nowrap;
   box-shadow:0 1px 6px rgba(var(--sh),.20);
 }
+
 .mapbtns button[aria-pressed=true]{background:var(--accent-soft); border-color:var(--accent); color:var(--ink); font-weight:600}
 
 .leaflet-bar a.locbtn{display:flex; align-items:center; justify-content:center; cursor:pointer}
@@ -416,10 +417,11 @@ button{font:inherit; color:inherit; cursor:pointer}
   bottom:calc(env(safe-area-inset-bottom) + 16px);
   width:40px; height:40px;
   border-radius:50%; display:flex; align-items:center; justify-content:center;
-  background:var(--panel); border:1px solid var(--line2); color:var(--ink2);
+  background:var(--panel); border:1px solid var(--hair); color:var(--ink2);   
   box-shadow:0 2px 10px rgba(var(--sh),.24); opacity:0; pointer-events:none;
   transition:opacity .15s, border-color .15s, color .15s;
 }
+
 .totop[hidden]{display:none}
 .totop svg{width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
 .totop.show{opacity:1; pointer-events:auto}
@@ -501,7 +503,8 @@ button{font:inherit; color:inherit; cursor:pointer}
   }
   .railbtn{
 
-    width:100%; height:100%; border:0; background:var(--surface-map); color:var(--ink2);
+    width:100%; height:100%; border:0; color:var(--ink2);
+    background-color:var(--surface-map); background-image:var(--paper-base-sheet);
     font-size:12.5px; letter-spacing:.12em;
 
     display:flex; align-items:center; justify-content:center; gap:8px; padding:12px 0;
@@ -575,6 +578,13 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 
 @media (hover:hover){.trip .go a:hover, .trip .go button:hover{border-color:var(--accent); color:var(--accent)}}
+
+@media (hover:hover){
+  #theme:hover, #qreset:hover, #sort:hover, .chip:hover, .tags .tag:hover,
+  .mapbtns button:hover, .totop:hover, .add:hover, .clear:hover, .ghost:hover{
+    border-color:var(--accent)!important; color:var(--accent)!important;
+  }
+}
 #sort{
   flex:none; border:1px solid var(--hair); border-radius:999px; background:var(--chip-bg); color:var(--ink2);   
   font:inherit; font-size:12.5px; padding:3px 10px; max-width:120px;
@@ -746,6 +756,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 .add[data-in=true]{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
 
+@media (hover:hover){.add[data-in=true]:hover{color:var(--on-accent)!important; background-color:color-mix(in srgb, var(--accent) 88%, var(--ink))!important}}   
+
 .tag{font-size:11px; padding:0 7px; border-radius:999px; border:1px solid transparent; background:var(--tint); color:var(--ink2); white-space:nowrap}
 
 .tag.hard{color:var(--ink)}
@@ -916,7 +928,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .ttotal.late{color:var(--warn)}
 .ttotal .warn{font-size:11.5px; color:var(--warn)}
 
-.tnear{margin-top:11px; border-top:1px solid var(--hair); padding-top:8px}
+.tnear{margin-top:11px; margin-bottom:11px; border-top:1px solid var(--hair); padding-top:8px}
 .tnear h3{margin:0 0 6px}
 .tnear .row{padding:5px 6px}
 .tnear .nonear{margin:2px 6px 0; font-size:12px; color:var(--ink3); line-height:1.6}
@@ -991,6 +1003,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .stepper{display:inline-flex; align-items:center; gap:2px; border:1px solid var(--hair); background:var(--chip-bg); border-radius:999px; padding:1px 2px}   
 .stepper button{border:0; background:none; color:var(--ink3); width:20px; height:20px; border-radius:999px; line-height:1; font-size:14px; padding:0}
+
+@media (hover:hover){.stepper button:hover{color:var(--accent)}}
 .stepper .v{font-size:11.5px; color:var(--ink2); font-family:var(--mono); min-width:52px; text-align:center; white-space:nowrap}
 
 .stop.dstop{
@@ -999,7 +1013,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 .dstop .ra{grid-area:ra; display:flex; align-items:center; gap:8px; min-width:0}
 .dstop .rb{grid-area:rb; display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-width:0}
-.dstop .warn{grid-area:warn; padding-left:30px}
+
+.dstop .warn{grid-area:warn}
 
 .dstop .nm{white-space:normal; line-height:1.35; min-width:0}
 
@@ -1101,7 +1116,8 @@ button{font:inherit; color:inherit; cursor:pointer}
   }
   #tripview .mstop .ra{grid-area:ra; display:flex; align-items:center; gap:9px; min-width:0}
   #tripview .mstop .rb{grid-area:rb; display:flex; align-items:center; gap:10px; flex-wrap:wrap; min-width:0}
-  #tripview .mstop .warn{grid-area:warn; padding-left:35px}
+
+  #tripview .mstop .warn{grid-area:warn}
   #tripview .mstop .no{width:26px; height:26px; line-height:26px; font-size:12px}
   #tripview .mstop .nm{white-space:normal; font-size:15px; line-height:1.35; text-align:left; min-width:0}
   #tripview .mstop .win{font-size:12.5px}
@@ -3415,9 +3431,15 @@ function renderRoutes(){
   return f;
 }
 
+const NEAR_REF_MAX = 6;
+function shortRef(s){
+  const n = String(s || "");
+  return n.length > NEAR_REF_MAX ? n.slice(0, NEAR_REF_MAX) + "…" : n;
+}
+
 function legBit(p, rel){
   if (rel) return `<span class="mi" title="${rel.stop?`離${esc(rel.stop.name)} `:`車程 `}${rawT(rel.min, rel.km)}">${CAR_SVG}` +
-    (rel.stop ? `<span class="sep">最近站 </span>` : ``) +
+    (rel.stop ? `<span class="sep">離${esc(shortRef(rel.stop.name))} </span>` : ``) +
     `${est(rel.min)}</span>`;
   return `<span class="mi" title="車程 ${rawT(p.drive_min)}">${CAR_SVG}${est(p.drive_min)}</span>`;
 }
