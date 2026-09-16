@@ -253,20 +253,21 @@ button{font:inherit; color:inherit; cursor:pointer}
 .qtok .x{font-size:14px; line-height:1; opacity:.8}
 
 #theme{
-  flex:none; border:1px solid var(--line); background:var(--chip-bg); border-radius:999px;
+  flex:none; border:1px solid var(--hair); background:var(--chip-bg); border-radius:999px;   
   padding:5px 9px; line-height:1; color:var(--ink2);
 }
-@media (hover:hover){#theme:hover{border-color:var(--accent); color:var(--accent)}}
+
+@media (hover:hover){#theme:hover{color:var(--accent)}}
 #theme svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.6;
            stroke-linecap:round; stroke-linejoin:round; vertical-align:-2px}
 
 #qreset{
   flex:none; display:inline-flex; align-items:center; gap:4px; white-space:nowrap;
-  border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2);
+  border:1px solid var(--hair); background:var(--chip-bg); color:var(--ink2);   
   border-radius:999px; padding:3px 10px; font-size:12.5px; line-height:1.5; font-family:inherit;
 }
 #qreset[hidden]{display:none}
-@media (hover:hover){#qreset:hover{border-color:var(--accent); color:var(--accent)}}
+@media (hover:hover){#qreset:hover{color:var(--accent)}}   
 
 #qreset .gl{display:inline-flex; line-height:1}
 #qreset .gl svg{
@@ -378,11 +379,11 @@ button{font:inherit; color:inherit; cursor:pointer}
 .mapoverlay > *{pointer-events:auto}
 .mapbtns{display:flex; flex-direction:column; align-items:flex-start; gap:6px; max-width:100%}
 .mapbtns button{
-  border:1px solid var(--line); background:var(--panel); color:var(--ink2);
+  border:1px solid var(--hair); background:var(--panel); color:var(--ink2);   
   border-radius:999px; padding:5px 12px; font-size:12.5px; white-space:nowrap;
   box-shadow:0 1px 6px rgba(var(--sh),.20);
 }
-@media (hover:hover){.mapbtns button:hover{border-color:var(--accent); color:var(--accent)}}
+@media (hover:hover){.mapbtns button:hover{color:var(--accent)}}   
 .mapbtns button[aria-pressed=true]{background:var(--accent-soft); border-color:var(--accent); color:var(--ink); font-weight:600}
 
 .leaflet-bar a.locbtn{display:flex; align-items:center; justify-content:center; cursor:pointer}
@@ -425,7 +426,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 .totop[hidden]{display:none}
 .totop svg{width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
-@media (hover:hover){.totop:hover{border-color:var(--accent); color:var(--accent)}}
+@media (hover:hover){.totop:hover{color:var(--accent)}}   
 .totop.show{opacity:1; pointer-events:auto}
 .totop.docked{right:calc(100vw - var(--explorew, 394px) + 16px + env(safe-area-inset-right))}
 
@@ -443,14 +444,14 @@ button{font:inherit; color:inherit; cursor:pointer}
 .mapcard .acts{display:flex; flex-wrap:wrap; gap:6px; margin-top:9px}
 
 .mapcard .acts a, .mapcard .acts button{
-  border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2); text-decoration:none;
+  border:1px solid var(--hair); background:var(--chip-bg); color:var(--ink2); text-decoration:none;   
   border-radius:999px; padding:3px 10px; font-size:12.5px; line-height:1.5; white-space:nowrap;
 }
 
 @media (hover:hover){.mapcard .acts a:hover, .mapcard .acts button:hover{border-color:var(--accent); color:var(--accent)}}
 .mapcard .acts .primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
 
-@media (hover:hover){.mapcard .acts .primary:hover{color:var(--on-accent); border-color:var(--accent)}}
+@media (hover:hover){.mapcard .acts .primary:hover{color:var(--on-accent); border-color:var(--accent); background-color:color-mix(in srgb, var(--accent) 88%, var(--ink))}}
 
 .pinlbl{
   position:absolute; left:30px; top:50%; transform:translateY(-50%); white-space:nowrap;
@@ -573,25 +574,25 @@ button{font:inherit; color:inherit; cursor:pointer}
       stroke-linejoin:round; margin-left:4px; vertical-align:-1px; transition:transform .15s}
 
 .clear, .ghost, .trip .go a, .trip .go button, .mfbtn{
-  border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2);
+  border:1px solid var(--hair); background:var(--chip-bg); color:var(--ink2);   
   border-radius:999px; padding:3px 10px; font-size:12.5px; white-space:nowrap;
   text-decoration:none; font-family:inherit; line-height:1.5;
 }
 
-@media (hover:hover){.clear:hover, .ghost:hover, .trip .go a:hover, .trip .go button:hover, .mfbtn:hover{border-color:var(--accent); color:var(--accent)}}
+@media (hover:hover){.trip .go a:hover, .trip .go button:hover{border-color:var(--accent); color:var(--accent)}}
 #sort{
-  flex:none; border:1px solid var(--line); border-radius:999px; background:var(--chip-bg); color:var(--ink2);
+  flex:none; border:1px solid var(--hair); border-radius:999px; background:var(--chip-bg); color:var(--ink2);   
   font:inherit; font-size:12.5px; padding:3px 10px; max-width:120px;
 
   height:calc(12.5px * 1.5 + 8px);
 }
 
-@media (hover:hover){#sort:hover{border-color:var(--accent); color:var(--accent)}}
+@media (hover:hover){#sort:hover{color:var(--accent)}}   
 
 .sortwrap{flex:none; position:relative; display:inline-flex}
 .sortlbl{
   display:none; align-items:center; white-space:nowrap; font-family:inherit;
-  border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2);
+  border:1px solid var(--hair); background:var(--chip-bg); color:var(--ink2);   
   border-radius:999px; padding:3px 10px; font-size:12.5px; line-height:1.5;
 }
 .sortlbl .chev{margin-left:3px}
@@ -603,7 +604,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .fkey{flex:none; width:52px; padding-top:4px; font-size:11.5px; color:var(--ink3); letter-spacing:.06em}
 .chips{display:flex; flex-wrap:wrap; gap:5px; flex:1; min-width:0}
 .chip{
-  border:1px solid var(--line); background:var(--chip-bg); border-radius:999px;
+  border:1px solid var(--hair); background:var(--chip-bg); border-radius:999px;   
 
   padding:2px 7px; font-size:12px; color:var(--ink2); line-height:1.5;
 
@@ -611,7 +612,7 @@ button{font:inherit; color:inherit; cursor:pointer}
   transition:border-color .15s, background .15s, color .15s;
 }
 
-@media (hover:hover){.chip:hover{border-color:var(--accent); color:var(--accent)}}
+@media (hover:hover){.chip:hover{color:var(--accent)}}   
 
 .chip[aria-pressed=true]{background:var(--accent-soft); border-color:var(--accent); color:var(--ink); font-weight:600}
 .chip:disabled{opacity:.45; cursor:default; pointer-events:none}
@@ -740,7 +741,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 
 @media (hover:hover){.row:hover{background-color:var(--hover-bg)}}
-.row[aria-expanded=true]{background:var(--accent-soft); border-color:var(--accent)}
+
 .row .rbody{flex:1; min-width:0}
 .row .t{display:flex; gap:6px; align-items:center; font-size:14.5px; font-weight:600}
 
@@ -748,14 +749,14 @@ button{font:inherit; color:inherit; cursor:pointer}
 .row .off{color:var(--ink3); font-size:11px; border:1px dashed var(--line2); border-radius:999px; padding:0 6px}
 
 .add{
-  flex:none; align-self:center; border:1px solid var(--line); background:var(--chip-bg);
+  flex:none; align-self:center; border:1px solid var(--hair); background:var(--chip-bg);   
   width:26px; height:26px; border-radius:999px; font-size:14px; line-height:1;
   color:var(--ink3); padding:0;
 }
-@media (hover:hover){.add:hover{border-color:var(--accent); color:var(--accent)}}
+@media (hover:hover){.add:hover{color:var(--accent)}}   
 .add[data-in=true]{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
 
-@media (hover:hover){.add[data-in=true]:hover{border-color:var(--accent); color:var(--on-accent)}}
+@media (hover:hover){.add[data-in=true]:hover{color:var(--on-accent)}}   
 
 .tag{font-size:11px; padding:0 7px; border-radius:999px; border:1px solid transparent; background:var(--tint); color:var(--ink2); white-space:nowrap}
 
@@ -767,12 +768,12 @@ button{font:inherit; color:inherit; cursor:pointer}
 .empty .ec{margin:7px 0 0; font-size:12.5px; line-height:1.7; color:var(--ink3)}
 .empty .ea{margin-top:12px; display:flex; flex-wrap:wrap; gap:7px}
 .ebtn{
-  font-size:12.5px; line-height:1.5; color:var(--ink2); border:1px solid var(--line);
+  font-size:12.5px; line-height:1.5; color:var(--ink2); border:1px solid var(--hair);   
   border-radius:999px; padding:3px 10px; background:var(--chip-bg); font-family:inherit;
 }
 @media (hover:hover){.ebtn:hover{color:var(--accent); border-color:var(--accent)}}
 .ebtn.primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
-@media (hover:hover){.ebtn.primary:hover{color:var(--on-accent); border-color:var(--accent)}}
+@media (hover:hover){.ebtn.primary:hover{color:var(--on-accent); border-color:var(--accent); background-color:color-mix(in srgb, var(--accent) 88%, var(--ink))}}
 
 .qglobal{padding:26px 6px 4px}
 .qglobal .qgt{margin:0; font-size:14px; line-height:1.7; color:var(--ink)}
@@ -851,9 +852,9 @@ button{font:inherit; color:inherit; cursor:pointer}
 .tags .tag{
   font-size:12px; line-height:1.5; padding:2px 7px; border-radius:999px;
   background:var(--chip-bg);
-  border:1px solid var(--line); color:var(--ink2); white-space:nowrap; cursor:pointer;
+  border:1px solid var(--hair); color:var(--ink2); white-space:nowrap; cursor:pointer;   
 }
-@media (hover:hover){.tags .tag:hover{color:var(--accent); border-color:var(--accent)}}
+@media (hover:hover){.tags .tag:hover{color:var(--accent)}}   
 
 .mapcard .tags{margin:8px 0 0}
 
@@ -861,13 +862,13 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .acts a, .acts button{
   font-size:12.5px; line-height:1.5; text-decoration:none; color:var(--ink2);
-  border:1px solid var(--line);
+  border:1px solid var(--hair);   
   border-radius:999px; padding:3px 10px; background:var(--chip-bg);
 }
 @media (hover:hover){.acts a:hover, .acts button:hover{color:var(--accent); border-color:var(--accent)}}
 .acts .primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
 
-@media (hover:hover){.acts .primary:hover{color:var(--on-accent); border-color:var(--accent)}}
+@media (hover:hover){.acts .primary:hover{color:var(--on-accent); border-color:var(--accent); background-color:color-mix(in srgb, var(--accent) 88%, var(--ink))}}
 
 .nearby{margin-top:11px; margin-left:-10px; border-top:1px solid var(--hair); padding-top:8px}   
 
@@ -901,11 +902,12 @@ button{font:inherit; color:inherit; cursor:pointer}
 .backbit .num{font-family:var(--mono); color:var(--ink2)}
 
 #start{
-  border:1px solid var(--line); background:var(--bg); color:var(--ink2); border-radius:999px;
+
+  border:1px solid var(--hair2); background:var(--bg); color:var(--ink2); border-radius:999px;
   padding:2px 7px; font:inherit; font-size:16px; line-height:1.15; font-family:var(--mono);
   cursor:pointer; color-scheme:light;
 }
-@media (hover:hover){#start:hover{border-color:var(--accent)}}
+
 #start:focus{outline:1px solid var(--accent); border-color:var(--accent)}
 
 #start::-webkit-calendar-picker-indicator{ cursor:pointer; filter:opacity(.42); }
@@ -1000,7 +1002,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .stop .win{font-size:12px; color:var(--ink2); font-family:var(--mono); white-space:nowrap}
 .stop .warn{font-size:11.5px; color:var(--warn)}
 
-.stepper{display:inline-flex; align-items:center; gap:2px; border:1px solid var(--line); background:var(--chip-bg); border-radius:999px; padding:1px 2px}
+.stepper{display:inline-flex; align-items:center; gap:2px; border:1px solid var(--hair); background:var(--chip-bg); border-radius:999px; padding:1px 2px}   
 .stepper button{border:0; background:none; color:var(--ink3); width:20px; height:20px; border-radius:999px; line-height:1; font-size:14px; padding:0}
 @media (hover:hover){.stepper button:hover{color:var(--accent)}}
 .stepper .v{font-size:11.5px; color:var(--ink2); font-family:var(--mono); min-width:52px; text-align:center; white-space:nowrap}
@@ -1023,14 +1025,14 @@ button{font:inherit; color:inherit; cursor:pointer}
 .dstop .grip:active{cursor:grabbing}
 .dstop .x{
   grid-area:x; justify-self:end;
-  border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2);
+  border:1px solid var(--hair); background:var(--chip-bg); color:var(--ink2);   
   width:28px; height:28px; border-radius:999px; line-height:1; font-size:12px; padding:0;
 }
-@media (hover:hover){.dstop .x:hover{border-color:var(--accent); color:var(--accent)}}
+@media (hover:hover){.dstop .x:hover{color:var(--accent)}}   
 
 .trip .go{display:flex; gap:6px; flex-wrap:wrap; padding-bottom:4px}
 .trip .go a.primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
-@media (hover:hover){.trip .go a.primary:hover{color:var(--on-accent); border-color:var(--accent)}}
+@media (hover:hover){.trip .go a.primary:hover{color:var(--on-accent); border-color:var(--accent); background-color:color-mix(in srgb, var(--accent) 88%, var(--ink))}}
 
 .trip .go{justify-content:flex-end}
 .trip .go .infobtn{order:-1; margin-right:auto}
@@ -1131,11 +1133,11 @@ button{font:inherit; color:inherit; cursor:pointer}
   #tripview .mstop .stepper .v{font-size:12.5px; min-width:56px}
   #tripview .mstop .x{
     grid-area:x; justify-self:end; position:relative; width:32px; height:32px; margin-right:6px;
-    border:1px solid var(--line); background:var(--chip-bg); color:var(--ink2);
+    border:1px solid var(--hair); background:var(--chip-bg); color:var(--ink2);   
     border-radius:999px; line-height:1; font-size:14px; padding:0; cursor:pointer;
   }
   #tripview .mstop .x::after{content:""; position:absolute; inset:-6px}
-  @media (hover:hover){#tripview .mstop .x:hover{border-color:var(--accent); color:var(--accent)}}
+  @media (hover:hover){#tripview .mstop .x:hover{color:var(--accent)}}   
 
   #tripview .legrow{
     display:flex; align-items:center; gap:7px; flex-wrap:wrap;
@@ -1271,8 +1273,9 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
   position:relative; display:inline-flex; align-items:center; gap:5px;
 
 }
-.mfbtn[aria-expanded=true]{background:var(--accent-soft); border-color:var(--accent); font-weight:600}
-.mfbtn[aria-expanded=true]{background:var(--accent); color:var(--on-accent)}
+
+.mfbtn[aria-expanded=true]{background:var(--accent); border-color:var(--accent); color:var(--on-accent); font-weight:600}
+.mfbtn[aria-expanded=true] .mfn{color:inherit}
 .mfbtn .mfn{font-size:12.5px; line-height:1; color:var(--accent)}
 
 .fpop{
@@ -1288,7 +1291,7 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
   position:absolute; top:calc(100% + 7px); right:0; z-index:401; pointer-events:none;
   padding:6px 10px; max-width:240px; white-space:nowrap;
   font-size:12px; line-height:1.5; color:var(--ink2);
-  background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+  background:var(--panel); border:1px solid var(--line); border-radius:8px;   
   box-shadow:0 2px 6px rgba(var(--sh),.10);
   transition:opacity .35s;
 }
