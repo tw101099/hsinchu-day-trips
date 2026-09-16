@@ -257,7 +257,6 @@ button{font:inherit; color:inherit; cursor:pointer}
   padding:5px 9px; line-height:1; color:var(--ink2);
 }
 
-@media (hover:hover){#theme:hover{color:var(--accent)}}
 #theme svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.6;
            stroke-linecap:round; stroke-linejoin:round; vertical-align:-2px}
 
@@ -267,7 +266,6 @@ button{font:inherit; color:inherit; cursor:pointer}
   border-radius:999px; padding:3px 10px; font-size:12.5px; line-height:1.5; font-family:inherit;
 }
 #qreset[hidden]{display:none}
-@media (hover:hover){#qreset:hover{color:var(--accent)}}   
 
 #qreset .gl{display:inline-flex; line-height:1}
 #qreset .gl svg{
@@ -296,7 +294,6 @@ button{font:inherit; color:inherit; cursor:pointer}
 
   #qreset .lbl{display:none}
   #qreset{min-width:40px; min-height:40px; padding:0; border:0; background:none; justify-content:center; color:var(--ink2)}
-  @media (hover:hover){#qreset:hover{color:var(--accent)}}
   #qreset:focus-visible{outline:2px solid var(--accent); outline-offset:-2px; border-radius:999px}
   #qreset .gl svg{width:20px; height:20px}   
 
@@ -383,7 +380,6 @@ button{font:inherit; color:inherit; cursor:pointer}
   border-radius:999px; padding:5px 12px; font-size:12.5px; white-space:nowrap;
   box-shadow:0 1px 6px rgba(var(--sh),.20);
 }
-@media (hover:hover){.mapbtns button:hover{color:var(--accent)}}   
 .mapbtns button[aria-pressed=true]{background:var(--accent-soft); border-color:var(--accent); color:var(--ink); font-weight:600}
 
 .leaflet-bar a.locbtn{display:flex; align-items:center; justify-content:center; cursor:pointer}
@@ -426,7 +422,6 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 .totop[hidden]{display:none}
 .totop svg{width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
-@media (hover:hover){.totop:hover{color:var(--accent)}}   
 .totop.show{opacity:1; pointer-events:auto}
 .totop.docked{right:calc(100vw - var(--explorew, 394px) + 16px + env(safe-area-inset-right))}
 
@@ -587,8 +582,6 @@ button{font:inherit; color:inherit; cursor:pointer}
   height:calc(12.5px * 1.5 + 8px);
 }
 
-@media (hover:hover){#sort:hover{color:var(--accent)}}   
-
 .sortwrap{flex:none; position:relative; display:inline-flex}
 .sortlbl{
   display:none; align-items:center; white-space:nowrap; font-family:inherit;
@@ -611,8 +604,6 @@ button{font:inherit; color:inherit; cursor:pointer}
   display:inline-flex; align-items:center; gap:4px;
   transition:border-color .15s, background .15s, color .15s;
 }
-
-@media (hover:hover){.chip:hover{color:var(--accent)}}   
 
 .chip[aria-pressed=true]{background:var(--accent-soft); border-color:var(--accent); color:var(--ink); font-weight:600}
 .chip:disabled{opacity:.45; cursor:default; pointer-events:none}
@@ -753,10 +744,7 @@ button{font:inherit; color:inherit; cursor:pointer}
   width:26px; height:26px; border-radius:999px; font-size:14px; line-height:1;
   color:var(--ink3); padding:0;
 }
-@media (hover:hover){.add:hover{color:var(--accent)}}   
 .add[data-in=true]{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
-
-@media (hover:hover){.add[data-in=true]:hover{color:var(--on-accent)}}   
 
 .tag{font-size:11px; padding:0 7px; border-radius:999px; border:1px solid transparent; background:var(--tint); color:var(--ink2); white-space:nowrap}
 
@@ -854,7 +842,6 @@ button{font:inherit; color:inherit; cursor:pointer}
   background:var(--chip-bg);
   border:1px solid var(--hair); color:var(--ink2); white-space:nowrap; cursor:pointer;   
 }
-@media (hover:hover){.tags .tag:hover{color:var(--accent)}}   
 
 .mapcard .tags{margin:8px 0 0}
 
@@ -1004,7 +991,6 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .stepper{display:inline-flex; align-items:center; gap:2px; border:1px solid var(--hair); background:var(--chip-bg); border-radius:999px; padding:1px 2px}   
 .stepper button{border:0; background:none; color:var(--ink3); width:20px; height:20px; border-radius:999px; line-height:1; font-size:14px; padding:0}
-@media (hover:hover){.stepper button:hover{color:var(--accent)}}
 .stepper .v{font-size:11.5px; color:var(--ink2); font-family:var(--mono); min-width:52px; text-align:center; white-space:nowrap}
 
 .stop.dstop{
