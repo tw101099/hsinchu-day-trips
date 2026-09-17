@@ -587,7 +587,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 
 #sort{
-  position:absolute; left:0; right:0; top:0; bottom:0; width:100%; height:auto;
+  position:absolute; left:0; right:0; top:-6px; bottom:-6px; width:100%; height:auto;
   margin:0; padding:0; border:0; max-width:none; min-height:0;
 
   font:inherit; font-size:12.5px;
@@ -871,7 +871,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 @media (hover:hover){.acts .primary:hover{color:var(--on-accent); border-color:var(--accent); background-color:color-mix(in srgb, var(--accent) 88%, var(--ink))}}
 
-.nearby{margin-top:11px; margin-left:-10px; border-top:1px solid var(--hair); padding-top:8px}   
+.nearby{margin-top:14px; margin-left:-10px; padding-top:0; border-top:0}
 
 .nearby h3{margin:0 0 8px 10px}
 .nearby .row{padding:5px 6px}
@@ -922,7 +922,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .ttotal{
   display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
-  margin-top:10px; padding-top:8px; border-top:1px solid var(--hair);
+  margin-top:10px; padding-top:8px; border-top:0;
   font-size:12.5px; color:var(--ink2);
 }
 .ttotal.late{color:var(--warn)}
@@ -1479,7 +1479,6 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
   input, textarea, select, #q, #sort, #start{font-size:16px}
 
   .sortlbl{min-height:32px}
-  #sort{top:-6px; bottom:-6px}
 }
 
 @media (prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important} }
