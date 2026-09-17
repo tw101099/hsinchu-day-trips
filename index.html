@@ -1294,6 +1294,17 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
 }
 .fpop .lfilters{padding:0; margin:0; border-bottom:0}
 
+.stickpop{
+  position:fixed; z-index:420; padding:12px 14px 14px;
+  border:0; border-radius:0;
+  background-color:var(--surface-sheet); background-image:var(--paper-sheet);
+  box-shadow:var(--lift-shadow);
+  overflow:auto; overscroll-behavior:contain;
+}
+
+.stickpop .rgroups{padding:0}
+.stickpop .gintro{margin:0; padding:0}
+
 .mfhost{position:relative; flex:none; display:inline-flex}
 .fbhint{
   position:absolute; top:calc(100% + 7px); right:0; z-index:401; pointer-events:none;
@@ -3006,6 +3017,102 @@ document.addEventListener("pointerdown", e=>{
   closeFpop(false);
 }, true);
 
+const SP_GAP = 12;    // 浮層下緣與 lane 底之間留的邊距
+const SP_MIN = 120;   // 矮視窗的高度地板：視窗矮到 560 仍看得到一段內容並可內捲
+let STICKPOP = null;  // null | {kind, key}；**模組層旗標，不進 `S`、不存檔**（同 `LF_POP`）
+
+const SP_KINDS = {
+  routes: { sel:".secroutes", key:null,
+            body:()=>renderRoutes(),  base:()=>S.routesOpen },
+  intro:  { sel:".ghead",     key:el=>el.dataset.spkey,
+            body:k=>gintroFor(RT[k]), base:k=>ROAD_OPEN.has(k) },
+};
+
+function spDisplaced(el){
+  const now=el.getBoundingClientRect().top;
+  const prev=el.style.position; el.style.position="static";
+  const flow=el.getBoundingClientRect().top;
+  el.style.position=prev;
+  return Math.abs(now-flow) > 1;
+}
+function spStuck(el){ return !!el && el.classList.contains("stuck") && spDisplaced(el); }
+
+function spVisible(el, box){
+  const r=el.getBoundingClientRect(), b=box.getBoundingClientRect();
+  return r.bottom > b.top+0.5 && r.top < b.bottom-0.5;
+}
+
+function spIsCurrent(el, k, box){
+  const st=[...box.querySelectorAll(k.sel)].filter(x=>x.classList.contains("stuck"));
+  return !st.length || st[st.length-1]===el;
+}
+
+function stickpopAnchor(){
+  if (!STICKPOP) return null;
+  const k=SP_KINDS[STICKPOP.kind], box=scrollBox();
+  if (!k || !box) return null;
+  const all=[...box.querySelectorAll(k.sel)];
+  return k.key ? (all.find(el=>k.key(el)===STICKPOP.key) || null) : (all[0] || null);
+}
+function spAria(el, k){
+  if (el && k) el.setAttribute("aria-expanded", !!k.base(k.key ? k.key(el) : null));
+}
+
+function setStickpop(spec){
+  const prev=stickpopAnchor(), pk=STICKPOP && SP_KINDS[STICKPOP.kind];
+  spAria(prev, pk);                       // 舊錨列的 `aria-expanded` 翻回它自己的真值
+  STICKPOP = spec || null;
+  const old=document.querySelector(".stickpop");
+  if (old) old.remove();
+  if (STICKPOP) stickpopSync(true);
+}
+
+function stickpopSync(rebuild){
+  const old=document.querySelector(".stickpop");
+  if (!STICKPOP){ if (old) old.remove(); return; }
+  const k=SP_KINDS[STICKPOP.kind], box=scrollBox(), a=stickpopAnchor();
+  if (!k || !box || !a || !spVisible(a,box) || (k.key && !spIsCurrent(a,k,box))){
+    STICKPOP=null; if (old) old.remove(); spAria(a,k); return;
+  }
+  let p=old;
+  if (!p){
+    p=document.createElement("div"); p.className="stickpop";
+    p.onclick=e=>e.stopPropagation();     // 浮層內的點擊不算「點到外面」（同 `.fpop`）
+    document.body.appendChild(p); rebuild=true;
+  }
+  if (rebuild){
+    const keep=p.scrollTop;               // 重造內容不該把人捲回浮層頂端
+    p.innerHTML=""; p.appendChild(k.body(STICKPOP.key));
+    p.scrollTop=keep;
+  }
+  a.setAttribute("aria-expanded", true);
+
+  const r=a.getBoundingClientRect(), lr=box.getBoundingClientRect();
+  p.style.top       = r.bottom+"px";
+  p.style.left      = r.left+"px";
+  p.style.width     = r.width+"px";
+  p.style.maxHeight = Math.max(SP_MIN, lr.bottom-r.bottom-SP_GAP)+"px";
+}
+
+function stickpopHit(el, kind, key){
+  if (!spStuck(el)) return false;
+  const kk = (key==null) ? null : key;
+  const same = STICKPOP && STICKPOP.kind===kind && STICKPOP.key===kk;
+  setStickpop(same ? null : {kind, key:kk});
+  return true;
+}
+
+document.addEventListener("pointerdown", e=>{
+  if (!STICKPOP) return;
+  const p=document.querySelector(".stickpop");
+  if (p && p.contains(e.target)) return;
+  const a=stickpopAnchor();
+  if (a && a.contains(e.target)) return;
+  setStickpop(null);
+}, true);
+
+addEventListener("resize", ()=>{ if (STICKPOP) stickpopSync(false); });
+
 function renderFilterBar(){
   const bar=document.createElement("div"); bar.className="fbar";
   const mob=isMobile();
@@ -3436,6 +3543,18 @@ function renderRoutes(){
   return f;
 }
 
+function gintroFor(r){
+  const rd=document.createElement("div"); rd.className="gintro";
+  if (!r) return rd;
+  const chips=(r.style||"").split("、").filter(Boolean)
+    .map(s=>`<span class="gchip">${esc(s)}</span>`).join("");
+  rd.innerHTML =
+    (chips ? `<div class="gstyle">${chips}</div>` : "") +
+    (r.desc ? `<p class="gdesc">${esc(r.desc)}</p>` : "") +
+    (r.road ? `<p class="groads">${esc(r.road)}</p>` : "");
+  return rd;
+}
+
 const NEAR_REF_MAX = 99;   
 function shortRef(s){
   const n = String(s || "");
@@ -3606,6 +3725,8 @@ function renderList(){
     const open=ROAD_OPEN.has(r.id);
     const h=document.createElement("button");
     h.className="ghead"; h.setAttribute("aria-expanded", open);
+
+    h.dataset.spkey=r.id;
     h.style.setProperty("--dc", DR[r.dir].color);
 
     
@@ -3613,18 +3734,13 @@ function renderList(){
       `<span class="gnm">${esc(r.name)}</span>` +
       `<span class="n"><span class="num">${g[r.id].length}</span></span>` +
       `<svg class="chev" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg>`;
-    h.onclick=()=>{ toggleSet(ROAD_OPEN, r.id); render(); };
+
+    h.onclick=()=>{
+      if (stickpopHit(h, "intro", r.id)) return;
+      toggleSet(ROAD_OPEN, r.id); render();
+    };
     wrap.appendChild(h);
-    if (open){
-      const rd=document.createElement("div"); rd.className="gintro";
-      const chips=(r.style||"").split("、").filter(Boolean)
-        .map(s=>`<span class="gchip">${esc(s)}</span>`).join("");
-      rd.innerHTML =
-        (chips ? `<div class="gstyle">${chips}</div>` : "") +
-        (r.desc ? `<p class="gdesc">${esc(r.desc)}</p>` : "") +
-        (r.road ? `<p class="groads">${esc(r.road)}</p>` : "");
-      wrap.appendChild(rd);
-    }
+    if (open) wrap.appendChild(gintroFor(r));   // 內容抽成 `gintroFor()`，與浮層同一支
 
     const gb=document.createElement("div"); gb.className="grp";
     gb.style.setProperty("--dc", DR[r.dir].color);
@@ -3670,6 +3786,7 @@ function renderPanel(){
     const todayHost=document.createElement("div"); todayHost.className="lane lane-today trip";
     expHost.addEventListener("scroll", updateTotop, {passive:true});
     expHost.addEventListener("scroll", ()=>syncStuck(expHost), {passive:true});
+    expHost.addEventListener("scroll", ()=>stickpopSync(false), {passive:true});
     todayHost.addEventListener("scroll", ()=>syncStuck(todayHost), {passive:true});
     panel.append(expHost, todayHost);
     box=expLane=expHost;
@@ -3686,9 +3803,14 @@ function renderPanel(){
     if (!foldE) panel.appendChild(laneFoldBtn("explore"));
     if (!foldT) panel.appendChild(laneFoldBtn("today"));
   }
-  box.appendChild(section("路線",
+
+  const secR=section("路線",
     S.route.size ? `${S.route.size}/${ROUTES.length} 條` : `${ROUTES.length} 條`, S.routesOpen,
-    ()=>{ S.routesOpen=!S.routesOpen; save(); render(); }, "toplevel secroutes"));
+    ()=>{
+      if (stickpopHit(secR, "routes", null)) return;
+      S.routesOpen=!S.routesOpen; save(); render();
+    }, "toplevel secroutes");
+  box.appendChild(secR);
   if (S.routesOpen) box.appendChild(renderRoutes());
   const mapOnly=panelHidden(); PANEL_MAPONLY=mapOnly;
   if (!mapOnly){
@@ -3924,6 +4046,7 @@ function updateTotop(){
 
 document.getElementById("panel").addEventListener("scroll", updateTotop, {passive:true});
 document.getElementById("panel").addEventListener("scroll", ()=>syncStuck(document.getElementById("panel")), {passive:true});
+document.getElementById("panel").addEventListener("scroll", ()=>stickpopSync(false), {passive:true});
 document.getElementById("tripview").addEventListener("scroll", ()=>syncStuck(document.getElementById("tripview")), {passive:true});
 
 function syncStuck(box){
@@ -3958,6 +4081,8 @@ function render(){
 
   syncStuck(scrollBox());
   syncStuck(document.querySelector("#panel > .lane-today:not(.rail)"));
+
+  stickpopSync(true);
 }
 
 let Q_COMPOSING=false;
@@ -3989,6 +4114,8 @@ document.getElementById("mcreset").onclick=e=>{ e.stopPropagation(); resetAll();
 
 addEventListener("keydown", e=>{
   if (e.key!=="Escape") return;
+
+  if (STICKPOP){ const a=stickpopAnchor(); setStickpop(null); if (a) a.focus({preventScroll:true}); return; }
   if (LF_POP){ closeFpop(true); return; }
   if (SHEET){ closeSheet(); return; }
   if (MSEARCH){ exitSearchMode(); return; }
