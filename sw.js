@@ -42,6 +42,15 @@
 // v4→v5：2026-09-06 增補規格 v2「紋理加強」把亮色 --bg 提到 #fdfbf6，manifest 的
 // background_color 跟著走（既有邏輯＝manifest 底色就是站的亮色底）——manifest.webmanifest
 // 走 cache-first，跟 v2→v3 完全同一種情形，照檔頭規則推號。
+// v5（不推號）：2026-09-25 棒 DD（可用性總審第一節 #11，本人 2026-09-25 裁；照多日遊 2026-09-24
+// 棒 AA／AB 同型修法移植）兩刀，都在導覽請求那條 network-first 路上：
+//   (a) 頁面副本的快取鑰匙去掉查詢字串、並清掉累積的帶查詢字串副本（見 pageKey／prunePageCopies）；
+//   (b) 導覽請求改帶 `cache: "no-cache"`（見 networkFirst）。
+// **照上面那條紀律不推**：兩刀動的是 network-first 那條路的存取鑰匙、整理與取用方式，不是
+// 「殼層資源要不要重新抓」——manifest／icons 一個位元組沒變。推號的代價正是檔頭講的那一件：
+// activate 會把整份 v5 清掉，逾時閘門要倚靠的那份頁面副本一起消失，下一次開站在網路半死時就
+// 沒有東西可退。舊副本改由 activate 與每次成功導覽時用 keys() 過濾清掉，效果相同、不賠掉備援。
+// 新版 SW 本身靠 sw.js 位元組比對生效，不需要版本號。
 const CACHE_VERSION = "v5";
 const CACHE_NAME = `hsinchu-day-trips-${CACHE_VERSION}`;
 
@@ -79,6 +88,12 @@ self.addEventListener("activate", (event) => {
           .filter((n) => n.startsWith("hsinchu-day-trips-") && n !== CACHE_NAME)
           .map((n) => caches.delete(n))
       );
+      // 2026-09-25 棒 DD（#11 (a)）：改版前累積下來的帶查詢字串頁面副本，在新版 SW 接手的這一刻
+      // 清一次（CACHE_VERSION 刻意沒推，舊快取不會被整個刪掉，所以要在這裡清；理由見檔頭 v5 那段）。
+      // 失敗不擋 activate。
+      try {
+        await prunePageCopies(await caches.open(CACHE_NAME));
+      } catch (e) {}
       await self.clients.claim();
     })()
   );
@@ -109,10 +124,38 @@ function timeoutAfter(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms, TIMED_OUT));
 }
 
-// 快取裡的備援副本：先找這個請求自己的，再退到殼層那兩把鑰匙。
+// ── 頁面副本一律存在「不帶查詢字串」的鑰匙底下（2026-09-25 棒 DD，可用性總審第一節 #11 (a)）──
+// 改前導覽請求原樣 `put(request)`，快取鑰匙含查詢字串：`?fbclid=…`、`utm_*`、測試用的
+// `?nc=…` 每一種各存一份整頁，而且從來不清。這個站是單頁：查詢字串不改變頁面內容（狀態全在
+// `#hash` 與 localStorage），所以同一個路徑只該有一份副本。另一個好處：平常從帶查詢字串的網址
+// 進站的人，`./` 那份副本可能是很久以前的——鑰匙統一之後，每一次成功的導覽都在刷新同一份，
+// 離線退到的就是最近一次看到的版本。（照多日遊 2026-09-24 棒 AA 的 pageKey 移植；本站沒有
+// `data/` 那條路由，所以下面的清理只需要避開殼層資源。）
+function pageKey(request) {
+  const u = new URL(request.url);
+  u.search = "";
+  u.hash = "";
+  return u.href;
+}
+
+// 清掉同快取裡其他「帶查詢字串的頁面副本」。**只認頁面**：manifest／icons 是殼層資源（見
+// isShellAsset，走 cache-first），就算哪天帶了查詢字串也不碰。
+async function prunePageCopies(cache) {
+  const keys = await cache.keys();
+  await Promise.all(
+    keys
+      .filter((req) => {
+        const u = new URL(req.url);
+        return u.search !== "" && !isShellAsset(u);
+      })
+      .map((req) => cache.delete(req))
+  );
+}
+
+// 快取裡的備援副本：先找這個頁面自己的（不帶查詢字串那把鑰匙，棒 DD），再退到殼層那兩把鑰匙。
 function cachedFallback(cache, request) {
   return cache
-    .match(request)
+    .match(pageKey(request))
     .then((hit) => hit || cache.match("./"))
     .then((hit) => hit || cache.match("./index.html"));
 }
@@ -129,12 +172,23 @@ function offlinePage() {
 async function networkFirst(request, event) {
   // 先發車再開快取：`caches.open()` 不 await，fetch 就不必等它。
   const opening = caches.open(CACHE_NAME);
-  const network = fetch(request).then(async (fresh) => {
+  // `cache: "no-cache"`（2026-09-25 棒 DD，可用性總審第一節 #11 (b)；照多日遊 2026-09-24 棒 AB）：
+  // 每一趟都帶 ETag／Last-Modified 回伺服器驗證，沒有新版只回 304（瀏覽器用它 HTTP 快取裡那份，
+  // 不重下整頁）。改前是預設的 `cache: "default"`——主機給 `max-age=600`，發布後十分鐘內 SW 這一趟
+  // 「網路」其實是瀏覽器 HTTP 快取直接回的舊頁，network-first 在那十分鐘裡形同 cache-first。
+  // **只動這一條（導覽請求）**：殼層資源是刻意的 cache-first，不碰。這個選項只改取用方式、不改
+  // 存哪裡（鑰匙見 pageKey）。第二個參數會讓 fetch 內部重建 Request，`mode:"navigate"` 依規格轉成
+  // `same-origin`——這裡本來就只處理同源（fetch handler 開頭擋掉跨源），行為不變。
+  // CDN 那一層（邊緣節點自己的快取）這一刀管不到，本來就不在 SW 的權限裡。
+  const network = fetch(request, { cache: "no-cache" }).then(async (fresh) => {
     // 只快取成功的同源回應；opaque/失敗回應不寫入快取。
     // **put 刻意不 await**（跟加 timeout 之前逐字相同）：等寫完才回應會替
     // 正常路徑平白加上一次寫入的時間。
     if (fresh && fresh.ok) {
-      (await opening).put(request, fresh.clone());
+      // 存進不帶查詢字串的鑰匙（棒 DD，見 pageKey）；舊的帶查詢字串副本順手清掉。
+      // put 與清理照舊不 await（上面那條理由），清理的失敗吞掉——它是整理，不是正確性的一部分。
+      const cache = await opening;
+      cache.put(pageKey(request), fresh.clone()).then(() => prunePageCopies(cache)).catch(() => {});
     }
     return fresh;
   });
