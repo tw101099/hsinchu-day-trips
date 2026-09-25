@@ -2028,33 +2028,61 @@ function note(html){
   if (!html){ el.style.display="none"; return; }
   el.style.display="block"; el.innerHTML=html;
 }
-function loadOSM(why){
-  if (engine) return;
+
+const LEAF_CSS_URL="vendor/leaflet/leaflet.css", LEAF_JS_URL="vendor/leaflet/leaflet.js";
+let LEAFLET_CSS=null, LEAF_JS=null, LEAF_OK=false, LEAF_PRE=null;
+function loadOSM(why, pre){
+  if (ready) return;
+  if (LEAF_OK){ if (!pre) initOSM(why); return; }   // 引擎已在、圖還沒建：看得見就當場建
+  if (LEAF_JS) return;                                // script 標籤已在路上，onload 接手
+  if (pre && LEAF_PRE) return;                        // 預熱的 fetch 已在路上
   engine="loading";
-  const css=document.createElement("link");
-  css.rel="stylesheet"; css.href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-  document.head.appendChild(css);
+  const msg=document.getElementById("mapmsg");
+  if (msg) msg.style.display="none";
+  if (pre){
+    const low=u=>fetch(u, {priority:"low"}).then(r=>{ if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); });
+    LEAF_PRE=Promise.all([low(LEAF_CSS_URL), low(LEAF_JS_URL)]).then(
+      ()=>{ LEAF_PRE=null; if (!LEAF_JS && !LEAF_OK) addLeaflet(why); },
+      ()=>{ LEAF_PRE=null; if (!LEAF_JS && !LEAF_OK) engine=null; });
+    return;
+  }
+  addLeaflet(why);
+}
+function addLeaflet(why){
+  if (!LEAFLET_CSS){
+    LEAFLET_CSS=document.createElement("link");
+    LEAFLET_CSS.rel="stylesheet"; LEAFLET_CSS.href=LEAF_CSS_URL;
+    document.head.appendChild(LEAFLET_CSS);
+  }
   const js=document.createElement("script");
-  js.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-  js.onload=()=>initOSM(why);
+  js.src=LEAF_JS_URL;
+
+  js.onload=()=>{ LEAF_OK=true; if (mapShown()) initOSM(why); else whenIdle(()=>initOSM(why)); };
   js.onerror=()=>{
+    LEAF_JS=null;
     engine=null;
     const m=document.getElementById("mapmsg");
     m.style.display="flex";
     m.textContent="底圖載不進來，可能是沒連網。切到「清單」，內容一樣看得到。";
   };
+  LEAF_JS=js;
   document.head.appendChild(js);
 }
+
+let TILES=null;
+function showTiles(){ if (TILES && map && !map.hasLayer(TILES)) TILES.addTo(map); }
 function initOSM(why){
+  if (ready) return;
   engine="osm";
   map=L.map("map",{zoomControl:true, preferCanvas:true}).setView([24.76,121.06],11);
 
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  TILES=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
               {maxZoom:18,
                attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" ' +
                            'target="_blank" rel="noopener">OpenStreetMap</a> contributors' +
                            ' · <a href="https://opendatacommons.org/licenses/odbl/" ' +
-                           'target="_blank" rel="noopener">ODbL</a>'}).addTo(map);
+                           'target="_blank" rel="noopener">ODbL</a>'});
+  if (!isMobile()) TILES.addTo(map);
   map.createPane("routes").style.zIndex=350;
   lines=L.layerGroup().addTo(map);
   pts=L.layerGroup().addTo(map);
@@ -2077,8 +2105,15 @@ function initOSM(why){
   });
   ready=true;
   note(why ? "底圖用 OpenStreetMap：" + why : "");
-  draw();
-  if (S.sel && BY_ID[S.sel]) map.setView([BY_ID[S.sel].lat, BY_ID[S.sel].lng], 13, {animate:false});
+
+  if (mapShown()){
+    draw();
+    if (S.sel && BY_ID[S.sel]) map.setView([BY_ID[S.sel].lat, BY_ID[S.sel].lng], 13, {animate:false});
+    if (isMobile()) enterMap();
+  } else {
+    if (S.sel && BY_ID[S.sel]) map.setView([BY_ID[S.sel].lat, BY_ID[S.sel].lng], 13, {animate:false});
+    drawChunked();
+  }
 }
 
 const pinState = (p, plan) => {
@@ -2113,8 +2148,7 @@ function tipHTML(p){
     (inPlan(p.id)?`<i>✓ 已在行程裡</i>`:"");
 }
 
-function draw(){
-  if (!ready) return;
+function drawList(){
   const list=shown().slice();
   const ids=new Set(list.map(p=>p.id));
   if (S.sel && BY_ID[S.sel] && !ids.has(S.sel)){ list.push(BY_ID[S.sel]); ids.add(S.sel); }
@@ -2123,14 +2157,59 @@ function draw(){
   if (TODAY_NEAR_SET) TODAY_NEAR_SET.forEach(id=>{
     const p=BY_ID[id]; if (p && !ids.has(id)){ list.push(p); ids.add(id); }
   });
+  return list;
+}
+
+let DRAW_SIG=null, DRAW_GEN=0;
+function drawSig(list, asIcon){
+  return [asIcon ? 1 : 0, S.sel || "", PLAN.join(","),
+          TODAY_NEAR_SET ? [...TODAY_NEAR_SET].join(",") : "",
+          [...S.route].join(","), list.map(p=>p.id).join(",")].join("|");
+}
+const planNos = () => { const o={}; PLAN.forEach((id,i)=>{ o[id]=i+1; }); return o; };
+function draw(){
+  if (!ready) return;
+  const list=drawList();
   const planRoutes=new Set();
   PLAN.forEach(id=>{ const p=BY_ID[id]; if (p) planRoutes.add(p.route); });
   if (engine==="osm"){
+    const asIcon = zoom >= ICON_ZOOM;
+    const sig = drawSig(list, asIcon);
+    if (isMobile() && (!mapShown() || sig===DRAW_SIG)) return;   // 手機兩條規則，見上面那段
+    DRAW_GEN++;
     pts.clearLayers(); marks={};
     drawLines();
-    const asIcon = zoom >= ICON_ZOOM;
-    const planNo={}; PLAN.forEach((id,i)=>{ planNo[id]=i+1; });
-    list.forEach(p=>{
+    const planNo=planNos();
+    list.forEach(p=>addMark(p, asIcon, planNo));
+    DRAW_SIG=sig;
+
+  }
+}
+
+const MARK_BATCH=50;
+function drawChunked(){
+  if (!ready || engine!=="osm") return;
+  const gen=++DRAW_GEN;
+  const list=drawList();
+  const asIcon = zoom >= ICON_ZOOM;
+  const sig=drawSig(list, asIcon);
+  const planNo=planNos();
+  DRAW_SIG=null;
+  pts.clearLayers(); marks={};
+  let i=-1;
+  const step=()=>{
+    if (gen!==DRAW_GEN) return;
+    if (i<0){ drawLines(); i=0; }
+    else {
+      const end=Math.min(i+MARK_BATCH, list.length);
+      for (; i<end; i++) addMark(list[i], asIcon, planNo);
+    }
+    if (i<list.length) yieldThen(step); else DRAW_SIG=sig;
+  };
+  yieldThen(step);
+}
+
+function addMark(p, asIcon, planNo){
       const on=p.id===S.sel;
       const n=planNo[p.id];
 
@@ -2160,9 +2239,6 @@ function draw(){
       m.on("mouseout", ()=>highlightRow(p.id,false));
       m.on("click", ()=>select(p.id));
       marks[p.id]=m;
-    });
-
-  }
 }
 
 function fit(items, opts){
@@ -2238,7 +2314,7 @@ function renderMapBtns(){
 }
 function resizeMap(){
   if (!ready) return;
-  setTimeout(()=>map.invalidateSize({animate:false}),60);
+  setTimeout(()=>{ map.invalidateSize({animate:false}); if (mapShown()) showTiles(); },60);
 }
 
 let LOC={watch:null, dot:null, ring:null, first:false, btn:null};
@@ -4088,7 +4164,10 @@ function syncViews(){
   document.querySelectorAll("#mnav button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.t===S.tab));
   document.getElementById("app").dataset.mtab = S.tab;
   document.getElementById("main").classList.toggle("nomap", MOBILE_STATE && S.tab!=="map");
+  ensureMap();      // 地圖露臉才當場建（2026-09-25 棒 DM，效能 M2，見下面那支）
 }
+
+function ensureMap(){ if (mapShown()) loadOSM(""); }
 
 const panelHidden = () => isMobile() && S.tab!=="place";
 
@@ -4112,13 +4191,14 @@ function enterMap(){
   if (!ready) return;
   setTimeout(()=>{
     map.invalidateSize({animate:false});
-    if (FIT_PENDING){ FIT_PENDING=false; if (!S.sel){ fit(shown(), {animate:false}); return; } }
+    if (FIT_PENDING){ FIT_PENDING=false; if (!S.sel){ fit(shown(), {animate:false}); showTiles(); return; } }
     if (S.sel && BY_ID[S.sel] && !(MAPKEEP && MAPKEEP.sel===S.sel)){
       const q=BY_ID[S.sel];
       map.setView([q.lat,q.lng], Math.max(map.getZoom(),13), {animate:false});
     } else if (MAPKEEP && MAPKEEP.c){
       map.setView(MAPKEEP.c, MAPKEEP.z, {animate:false});
     }
+    showTiles();
   }, 60);
 }
 
@@ -4311,14 +4391,30 @@ document.getElementById("theme").onclick=()=>{
   THEME = THEME==="auto" ? "light" : (THEME==="light" ? "dark" : "auto");
   applyTheme(); save(); render();
 };
+
 syncViews();
-loadOSM("");
 render();
 save();
 
 applyHash(true);
 
 applySharePending();
+
+const whenIdle = (fn) => ("requestIdleCallback" in window)
+  ? requestIdleCallback(()=>fn(), {timeout:2000})
+  : setTimeout(fn, 1200);
+
+const yieldThen = (fn) => (window.scheduler && typeof scheduler.postTask === "function")
+  ? scheduler.postTask(fn, {priority:"background"})
+  : ("requestIdleCallback" in window)
+    ? requestIdleCallback(()=>fn(), {timeout:500})
+    : setTimeout(fn, 0);
+function preheatMap(){
+  if (ready || mapShown()) return;
+  loadOSM("", true);
+}
+if (document.readyState==="complete") whenIdle(preheatMap);
+else addEventListener("load", ()=>whenIdle(preheatMap), {once:true});
 </script>
 <script>
 
@@ -4532,8 +4628,15 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     logo.addEventListener("contextmenu", function(e){ e.preventDefault(); });
   }
 
-  ping();
-  fetchTotal();
+  function later(fn){
+    const idle = function(){
+      if ("requestIdleCallback" in window) requestIdleCallback(fn, {timeout:3000});
+      else setTimeout(fn, 1200);
+    };
+    if (document.readyState === "complete") idle();
+    else window.addEventListener("load", idle, {once:true});
+  }
+  later(function(){ ping(); fetchTotal(); });
 })();
 </script>
 

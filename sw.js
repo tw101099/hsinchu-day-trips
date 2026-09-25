@@ -4,7 +4,8 @@
 //   - 頁面本體（導覽請求、./、./index.html）一律 network-first——本人一定要
 //     看到最新版，快取只當「查不到網路時」的備援，絕不准變成 cache-first
 //     讓本人卡在舊版。
-//   - manifest／icons 這類幾乎不變的殼層資源才 cache-first。
+//   - manifest／icons 這類幾乎不變的殼層資源才 cache-first（v6 起加上站內託管的
+//     vendor/leaflet/，2026-09-25 棒 DM，見下面 v5→v6 那段）。
 //   - OSM 圖磚（tile.openstreetmap.org 等）完全不經手，第一版不快取，
 //     交給瀏覽器預設行為。
 //
@@ -51,7 +52,19 @@
 // activate 會把整份 v5 清掉，逾時閘門要倚靠的那份頁面副本一起消失，下一次開站在網路半死時就
 // 沒有東西可退。舊副本改由 activate 與每次成功導覽時用 keys() 過濾清掉，效果相同、不賠掉備援。
 // 新版 SW 本身靠 sw.js 位元組比對生效，不需要版本號。
-const CACHE_VERSION = "v5";
+// v5→v6：2026-09-25 棒 DM（效能 D4，本人裁；PERF 報告 §5 D4；照多日遊 2026-09-25 棒 AI 的 v6→v7
+// 同一刀）把 Leaflet 1.9.4 從 unpkg 搬進站內 `vendor/leaflet/`（leaflet.js／leaflet.css＋CSS 引用的
+// images/ 五張，逐位元組同多日遊那一份），並列進下面的 SHELL_ASSETS 走 cache-first——**殼層資源多了，
+// 照檔頭那條規則推號**（任務書也明文要推）。推號的代價就是檔頭講的那一件：activate 清掉整份 v5，
+// 逾時閘門倚靠的那份頁面副本要等下一次成功造訪才補回來；換到的是「install 那一刻就把地圖引擎放進
+// 快取」——離線再訪時地圖殼（控制項、圖釘、路線）載得起來，只有跨源的 OSM 圖磚是空白（本來就不
+// 快取）。改前 Leaflet 走 unpkg，跨源請求這支 SW 一律不經手，離線時連引擎都載不進來。
+// 同一棒頁面那側加了「閒置預熱」（template.html 的 preheatMap）：SW 接管之後的造訪，預熱抓 Leaflet
+// 那一趟由這裡的 cache-first 直接回，不上網路。
+// **往後升 Leaflet 版本＝整組換檔＋改 template.html 的兩個路徑常數（LEAF_CSS_URL／LEAF_JS_URL）＋
+// 再推一號**：cache-first 命中不 revalidate，不推號的話回訪者會永遠拿到舊版引擎（同 v1→v2 icons
+// 那一次的病）。
+const CACHE_VERSION = "v6";
 const CACHE_NAME = `hsinchu-day-trips-${CACHE_VERSION}`;
 
 // 殼層資源：install 時預熱，之後 cache-first。都是同源、幾乎不變的檔案。
@@ -63,6 +76,16 @@ const SHELL_ASSETS = [
   "./icons/icon-192-maskable.png",
   "./icons/icon-512-maskable.png",
   "./icons/apple-touch-icon.png",
+  // Leaflet 站內託管（v6，2026-09-25 棒 DM，效能 D4）。五張圖是 leaflet.css 的 `url(images/…)`
+  // （layers／layers-2x／marker-icon）加上 Leaflet 預設圖示在 JS 裡會用到的另外兩張；站上的圖釘
+  // 全是 `L.divIcon`，預設圖示目前用不到，但檔案跟著引擎走，預熱它們只多 3 KB（同多日遊 v7）。
+  "./vendor/leaflet/leaflet.js",
+  "./vendor/leaflet/leaflet.css",
+  "./vendor/leaflet/images/layers.png",
+  "./vendor/leaflet/images/layers-2x.png",
+  "./vendor/leaflet/images/marker-icon.png",
+  "./vendor/leaflet/images/marker-icon-2x.png",
+  "./vendor/leaflet/images/marker-shadow.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -111,7 +134,11 @@ function isNavigationRequest(request) {
 
 function isShellAsset(url) {
   // manifest 與 icons：同源、路徑在 scope 底下的 manifest.webmanifest 或 icons/*
-  return /\/manifest\.webmanifest$/.test(url.pathname) || /\/icons\//.test(url.pathname);
+  // vendor/*：站內託管的第三方靜態資源（v6 起＝Leaflet，2026-09-25 棒 DM）。檔名不帶內容摘要，
+  // 版本靠 CACHE_VERSION 推號換新（見檔頭 v5→v6 那段）。prunePageCopies 以這支排除殼層資源，
+  // vendor 跟著被排除、不會被當成頁面副本清掉。
+  return /\/manifest\.webmanifest$/.test(url.pathname) || /\/icons\//.test(url.pathname) ||
+    /\/vendor\//.test(url.pathname);
 }
 
 // 「慢到不正常」的門檻（見檔頭）。網路正常的一趟遠遠碰不到它。
