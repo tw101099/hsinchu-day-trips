@@ -64,6 +64,14 @@
 // **往後升 Leaflet 版本＝整組換檔＋改 template.html 的兩個路徑常數（LEAF_CSS_URL／LEAF_JS_URL）＋
 // 再推一號**：cache-first 命中不 revalidate，不推號的話回訪者會永遠拿到舊版引擎（同 v1→v2 icons
 // 那一次的病）。
+// v6（不推號）：2026-09-25 棒 WT（效能 D2，本人裁；照多日遊 2026-09-10 棒 SPLIT 的 `data/` 路由）把頁內的
+// 車程矩陣 `NEIGH_B64` 拆成 `data/neighbors.bin?v=<內容摘要>`，本檔新增 `data/` 這條路由（見下面
+// isDataAsset／networkFirstData／pruneOldVersions，逐字照多日遊）。**照上面那條紀律不推**：動的是
+// 「多一條 network-first 的資料路由」，不是「殼層資源要不要重新抓」——manifest／icons／vendor 一個
+// 位元組沒變。推號的代價正是檔頭講的那一件：activate 清掉整份 v6，逾時閘門倚靠的頁面副本一起消失。
+// 改前那份內嵌矩陣的整頁副本不必靠推號清：頁面副本存在不帶查詢字串的單一鑰匙（pageKey）底下，下一次
+// 成功導覽就被新版蓋掉。**同一刀補一個洞**：prunePageCopies 原本只排除殼層資源，`data/…?v=` 也帶
+// 查詢字串，不排除的話每次導覽都會把剛存的矩陣當成「帶查詢字串的頁面副本」清掉（離線就讀不到了）。
 const CACHE_VERSION = "v6";
 const CACHE_NAME = `hsinchu-day-trips-${CACHE_VERSION}`;
 
@@ -141,6 +149,11 @@ function isShellAsset(url) {
     /\/vendor\//.test(url.pathname);
 }
 
+// 拆出頁面外的資料檔（2026-09-25 棒 WT，效能 D2）：目前只有 `data/neighbors.bin`（車程矩陣）。
+function isDataAsset(url) {
+  return /\/data\//.test(url.pathname);
+}
+
 // 「慢到不正常」的門檻（見檔頭）。網路正常的一趟遠遠碰不到它。
 const NET_TIMEOUT_MS = 3000;
 // 用一個獨一無二的哨兵區分「網路回來了」與「時間到了」——`undefined`／`null`
@@ -156,8 +169,8 @@ function timeoutAfter(ms) {
 // `?nc=…` 每一種各存一份整頁，而且從來不清。這個站是單頁：查詢字串不改變頁面內容（狀態全在
 // `#hash` 與 localStorage），所以同一個路徑只該有一份副本。另一個好處：平常從帶查詢字串的網址
 // 進站的人，`./` 那份副本可能是很久以前的——鑰匙統一之後，每一次成功的導覽都在刷新同一份，
-// 離線退到的就是最近一次看到的版本。（照多日遊 2026-09-24 棒 AA 的 pageKey 移植；本站沒有
-// `data/` 那條路由，所以下面的清理只需要避開殼層資源。）
+// 離線退到的就是最近一次看到的版本。（照多日遊 2026-09-24 棒 AA 的 pageKey 移植；移植當時本站
+// 沒有 `data/` 那條路由，2026-09-25 棒 WT 起有了，下面的清理因此也避開它。）
 function pageKey(request) {
   const u = new URL(request.url);
   u.search = "";
@@ -166,14 +179,15 @@ function pageKey(request) {
 }
 
 // 清掉同快取裡其他「帶查詢字串的頁面副本」。**只認頁面**：manifest／icons 是殼層資源（見
-// isShellAsset，走 cache-first），就算哪天帶了查詢字串也不碰。
+// isShellAsset，走 cache-first），就算哪天帶了查詢字串也不碰；`data/` 的 `?v=` 是它自己的版本
+// 鑰匙（由 pruneOldVersions 管，2026-09-25 棒 WT 起），也不碰。
 async function prunePageCopies(cache) {
   const keys = await cache.keys();
   await Promise.all(
     keys
       .filter((req) => {
         const u = new URL(req.url);
-        return u.search !== "" && !isShellAsset(u);
+        return u.search !== "" && !isDataAsset(u) && !isShellAsset(u);
       })
       .map((req) => cache.delete(req))
   );
@@ -243,6 +257,57 @@ async function networkFirst(request, event) {
   }
 }
 
+// `data/` 資料檔（2026-09-25 棒 WT，效能 D2；逐字照多日遊 sw.js 的 networkFirstData／pruneOldVersions）：
+// **跟導覽請求同款的 network-first ＋ 快取後備**，兩個地方不同：
+//
+//   1. **後備只認自己那一份**。`cachedFallback` 會退到 `./`／`./index.html`——那對頁面是對的
+//      （拿舊頁總比空白好），對 `.bin` 是災難：前端會拿一份 HTML 去灌 Uint16Array。查不到就讓它
+//      失敗，前端有降級態接得住（行程腿標「約」、附近精選／順遊印「暫時載不到」）。
+//   2. **同一份資料的舊版本要清掉**。URL 帶 `?v=<內容摘要>`（見 build.py），每改一次資料就是一把
+//      新鑰匙，不清的話使用者手機上會一版一版疊著。清的時機是「新版已經抓到手」，所以不會出現
+//      「舊的刪了新的沒到」的空窗。
+//
+// 逾時那道閘（NET_TIMEOUT_MS）照樣有：網路半死時先給快取那一份讓站可用，網路那一趟仍然跑完、
+// 仍然寫進快取。**不帶 `cache: "no-cache"`**：內容變了網址就變，不需要每次回伺服器驗證。
+async function pruneOldVersions(cache, url) {
+  const keys = await cache.keys();
+  await Promise.all(
+    keys
+      .filter((req) => {
+        const u = new URL(req.url);
+        return u.origin === url.origin && u.pathname === url.pathname && u.search !== url.search;
+      })
+      .map((req) => cache.delete(req))
+  );
+}
+
+async function networkFirstData(request, event) {
+  const url = new URL(request.url);
+  const opening = caches.open(CACHE_NAME);
+  const network = fetch(request).then(async (fresh) => {
+    if (fresh && fresh.ok) {
+      const cache = await opening;
+      await cache.put(request, fresh.clone());
+      await pruneOldVersions(cache, url);
+    }
+    return fresh;
+  });
+  if (event) event.waitUntil(network.catch(() => {}));
+  else network.catch(() => {});
+
+  try {
+    const first = await Promise.race([network, timeoutAfter(NET_TIMEOUT_MS)]);
+    if (first !== TIMED_OUT) return first;
+    const cached = await (await opening).match(request);
+    if (cached) return cached;
+    return await network;
+  } catch (err) {
+    const cached = await (await opening).match(request);
+    if (cached) return cached;
+    throw err; // 前端的 fetch 因此 reject → 降級態＋一行 console 警告
+  }
+}
+
 async function cacheFirst(request) {
   const cache = await caches.open(CACHE_NAME);
   const cached = await cache.match(request);
@@ -268,6 +333,11 @@ self.addEventListener("fetch", (event) => {
 
   if (isShellAsset(url)) {
     event.respondWith(cacheFirst(request));
+    return;
+  }
+
+  if (isDataAsset(url)) {
+    event.respondWith(networkFirstData(request, event));
     return;
   }
 
