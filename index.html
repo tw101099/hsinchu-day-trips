@@ -5,7 +5,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>新竹出發一日遊｜出發前挑地方</title>
-<meta name="description" content="從新竹市出發、當天來回的步道、老街、海岸與吃的：555 個點，依路線、時間、費力與主題篩選，可以直接排成一天的行程。">
+<meta name="description" content="從新竹市出發、當天來回的步道、老街、海岸與吃的：555 個點，依路段、時間、費力與主題篩選，可以直接排成一天的行程。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="新竹出發一日遊｜出發前挑地方">
 <meta property="og:description" content="桃園到苗栗之間，一日來回的點。挑完直接開 Google 地圖導航。">
@@ -1596,11 +1596,38 @@ function scrollBox(){
 }
 
 let TODAY_AUTO_OPENED = false;
+
+let CLR_UNDO = null;
+const CLR_UNDO_MS = 6000;
 const todayFolded = () => {
   if (S.foldToday===true) return true;
   if (S.foldToday===false) return false;
-  return !(TODAY_AUTO_OPENED && PLAN.length>0);
+  return !(TODAY_AUTO_OPENED && (PLAN.length>0 || !!CLR_UNDO));
 };
+
+function dropClrUndo(redraw){
+  if (!CLR_UNDO) return;
+  clearTimeout(CLR_UNDO.timer);
+  CLR_UNDO=null;
+  if (redraw){ render(); resizeMap(); }
+}
+function clearPlan(){
+  if (CLR_UNDO) clearTimeout(CLR_UNDO.timer);
+  CLR_UNDO={plan:PLAN.slice(), stay:Object.assign({}, STAY), timer:0};
+  CLR_UNDO.timer=setTimeout(()=>dropClrUndo(true), CLR_UNDO_MS);
+  PLAN=[]; STAY={}; save(); render();
+  const u=document.querySelector(".trip .tundo");
+  if (u) u.focus({preventScroll:true});
+}
+function undoClear(){
+  if (!CLR_UNDO) return;
+  const snap=CLR_UNDO;
+  clearTimeout(snap.timer); CLR_UNDO=null;
+  PLAN=snap.plan.filter(id=>BY_ID[id]); STAY=snap.stay;
+  save(); render(); resizeMap();
+  const c=document.querySelector(".trip .go .quiet");
+  if (c) c.focus({preventScroll:true});
+}
 
 const LANE_KEEP = {exp:0, today:0};
 const isRail = el => !!(el && el.classList && el.classList.contains("rail"));
@@ -1770,26 +1797,67 @@ function restore(){
   readHash();
 }
 
+let SHARE_PENDING = null;
 function readHash(){
   const h=(location.hash||"").replace(/^#/,"");
   if (!h) return;
-  const q={};
-  h.split("&").forEach(kv=>{ const i=kv.indexOf("="); if (i>0) q[kv.slice(0,i)]=decodeURIComponent(kv.slice(i+1)); });
-  if (q.plan){
-    const raw=q.plan.split(",");
-    const ids=raw.filter(id=>BY_ID[id]);
-    if (ids.length){
-      PLAN=ids;
-      if (q.stay!=null){
-        const st=q.stay.split(",");
-        raw.forEach((id,i)=>{ const v=parseFloat(st[i]); if (BY_ID[id] && Number.isFinite(v) && v>0) STAY[id]=v; });
-      }
-    }
+  const q={}, rest=[];
+  let hit=false;
+  h.split("&").forEach(kv=>{
+    const i=kv.indexOf("=");
+    const k= i>0 ? kv.slice(0,i) : "";
+    if (k==="plan" || k==="start" || k==="stay"){
+      hit=true;
+      try{ q[k]=decodeURIComponent(kv.slice(i+1)); }catch(e){ q[k]=""; }
+    } else if (kv) rest.push(kv);
+  });
+  if (!hit) return;
+  history.replaceState(history.state, "", location.pathname + location.search + (rest.length ? "#" + rest.join("&") : ""));
+  if (!q.plan) return;
+  const raw=q.plan.split(",");
+  const ids=raw.filter(id=>BY_ID[id]);
+  if (!ids.length) return;
+  const stay={};
+  if (q.stay!=null){
+    const st=q.stay.split(",");
+    raw.forEach((id,i)=>{ const v=parseFloat(st[i]); if (BY_ID[id] && Number.isFinite(v) && v>0) stay[id]=v; });
   }
+  let start=null;
   if (/^\d{1,2}:\d{2}$/.test(q.start||"")){
     const [hh,mm]=q.start.split(":").map(Number);
-    START=(hh||0)*60+(mm||0);
+    start=(hh||0)*60+(mm||0);
   }
+  SHARE_PENDING={ids, stay, start};
+}
+
+function applySharePending(){
+  const sp=SHARE_PENDING; SHARE_PENDING=null;
+  if (!sp) return;
+  const cur=PLAN.filter(id=>BY_ID[id]);
+  const stayOr=(o,id)=> o[id]==null ? null : o[id];
+  const same = cur.join(",")===sp.ids.join(",")
+            && (sp.start==null || sp.start===START)
+            && sp.ids.every(id=>stayOr(STAY,id)===stayOr(sp.stay,id));
+  const apply=()=>{
+    PLAN=sp.ids.slice();
+    sp.ids.forEach(id=>{ delete STAY[id]; });
+    Object.assign(STAY, sp.stay);
+    if (sp.start!=null) START=sp.start;
+    if (CLR_UNDO) dropClrUndo(false);   // 行程換了一份，「清空」的復原窗不再成立（見那段）
+    syncRouteView();   // 「往返路線」檢視以行程為前提，行程一換就重算（同 `togglePlan()`）
+    if (isTwoLane()){
+      if (S.foldToday===true) S.foldToday=null;
+      TODAY_AUTO_OPENED=true;
+    } else gotoTab("trip");
+    save(); render(); resizeMap();
+  };
+  if (!cur.length || same){ apply(); return; }
+  setTimeout(()=>{
+    const n=PLAN.filter(id=>BY_ID[id]).length;
+    if (!n){ apply(); return; }
+    const ok=confirm(`用分享的行程（${sp.ids.length} 站）取代你現在排的 ${n} 站？\n\n按「取消」會保留你自己的行程。`);
+    if (ok) apply();
+  }, 60);
 }
 
 function shareURL(){
@@ -2152,8 +2220,8 @@ function renderMapCond(){
     box.appendChild(b);
   };
   if (n) row("行程", `${n} 站`, ()=>openSheet("mtrip"), `查看今天的行程（${n} 站）`);
-  if (routes.length) row(ROUTE_VIEW ? "往返路線" : "路線", esc(routes.join("、")), ()=>openSheet("mapplace"),
-                         `調整路線條件：${routes.join("、")}`);
+  if (routes.length) row(ROUTE_VIEW ? "往返路線" : "路段", esc(routes.join("、")), ()=>openSheet("mapplace"),
+                         `調整路段條件：${routes.join("、")}`);
   if (themes.length) row("主題", `<span class="mcsicons">${themes.map(t=>ico(t,(TH[t]||{}).color)).join("")}</span>`,
                          ()=>openSheet("mapplace"), `調整主題條件：${themes.map(t=>TH[t].name).join("、")}`);
 }
@@ -2183,7 +2251,7 @@ function renderMapBtns(){
   const only=document.createElement("button");
   only.textContent="看往返路線地點";
   only.setAttribute("aria-pressed", ROUTE_VIEW);
-  only.title="清掉其他篩選，顯示行程往返新竹的路上會經過或可順遊的那幾條路線上的點";
+  only.title="清掉其他篩選，顯示行程往返新竹的路上會經過或可順遊的那幾條路段上的點";
   only.onclick=toggleRouteView;
 
   const all=document.createElement("button");
@@ -2297,6 +2365,7 @@ function adjustStay(p, delta){
   save(); renderTrip();
 }
 function togglePlan(id){
+  if (CLR_UNDO) dropClrUndo(false);
   const i=PLAN.indexOf(id);
   if (i<0){
     PLAN.push(id);
@@ -2488,6 +2557,14 @@ function renderTrip(){
           const box=scrollBox();
           if (box) box.scrollTo({top:0, behavior: RM.matches ? "auto" : "smooth"});
         };
+
+    if (CLR_UNDO){
+      const u=document.createElement("button"); u.type="button"; u.className="ebtn tundo";
+      u.textContent="已清空・復原";
+      u.title=`把剛剛清掉的 ${CLR_UNDO.plan.length} 站放回來`;
+      u.onclick=undoClear;
+      a.appendChild(u);
+    }
     a.appendChild(go); d.append(h,c,a);
     el.appendChild(d);
     el.scrollTop=0;
@@ -2618,7 +2695,7 @@ function renderTrip(){
   };
   const clr=document.createElement("button");
   clr.className="quiet"; clr.textContent="清空";
-  clr.onclick=()=>{ PLAN=[]; STAY={}; save(); render(); };
+  clr.onclick=clearPlan;
   const info=document.createElement("button");
   info.className="infobtn"; info.setAttribute("aria-expanded", INFO_OPEN);
   info.setAttribute("aria-controls", "tfoot-note");
@@ -2916,7 +2993,7 @@ function toggle(set,v){ toggleSet(set,v); filterChanged(); }
 
 function condBits(){
   const out=[];
-  if (S.route.size)  out.push([ROUTE_VIEW ? "往返路線" : "路線", [...S.route].map(r=>(RT[r]||{}).name||r).join("、")]);
+  if (S.route.size)  out.push([ROUTE_VIEW ? "往返路線" : "路段", [...S.route].map(r=>(RT[r]||{}).name||r).join("、")]);
   if (S.inseason)    out.push(["季節", `${MONTH} 月當季`]);
   if (S.budget.size) out.push(["時間", [...S.budget].map(b=>(BUDGETS.find(x=>x.id===b)||{}).label||b).join("、")]);
   if (S.diffs.size)  out.push(["費力", [...S.diffs].map(d=>EFFORT[d]||d).join("、")]);
@@ -3127,10 +3204,10 @@ function renderFilterBar(){
     scope=`<span class="fn"><span class="num">${n}/${PLACES.length}</span> 個</span>`;
     stitle=`顯示 ${n}／${PLACES.length} 個點`;
   } else {
-    const lab = rs.length===1 ? esc(rs[0]) : `<span class="num">${rs.length}</span> 條路線`;
+    const lab = rs.length===1 ? esc(rs[0]) : `<span class="num">${rs.length}</span> 條路段`;
     scope=`<span class="fsc">${lab}</span><span class="fsep">·</span>` +
           `<span class="fn"><span class="num">${n}</span> 個</span>`;
-    stitle = (rs.length===1 ? rs[0] : `${rs.length} 條路線（${rs.join("、")}）`) + `：${n} 個點`;
+    stitle = (rs.length===1 ? rs[0] : `${rs.length} 條路段（${rs.join("、")}）`) + `：${n} 個點`;
   }
   sum.innerHTML = scope + (thSel.length ? thSel.map(t=>ico(t.id,t.color)).join("") : "");
   sum.title = thSel.length ? `${stitle}｜主題：${thSel.map(t=>t.name).join("、")}` : stitle;
@@ -3806,7 +3883,8 @@ function renderPanel(){
     if (!foldT) panel.appendChild(laneFoldBtn("today"));
   }
 
-  const secR=section("路線",
+  
+  const secR=section("路段",
     S.route.size ? `${S.route.size}/${ROUTES.length} 條` : `${ROUTES.length} 條`, S.routesOpen,
     ()=>{
       if (stickpopHit(secR, "routes", null)) return;
@@ -4136,6 +4214,8 @@ render();
 save();
 
 applyHash(true);
+
+applySharePending();
 </script>
 <script>
 
