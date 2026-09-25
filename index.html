@@ -3650,7 +3650,7 @@ function legBit(p, rel){
 }
 
 function rowFor(p, extra, rel, onOpen){
-  const open = onOpen || (()=>select(p.id));
+  const open = onOpen || (()=>select(p.id, undefined, !rel));
   const b=document.createElement("div");
   b.className="row place-summary"; b.dataset.id=p.id; b.setAttribute("aria-expanded", S.sel===p.id);
   b.setAttribute("role","button"); b.tabIndex=0;
@@ -3949,10 +3949,37 @@ function renderPanel(){
     }
     SCROLL_TO=null;
   }
+
+  if (PIN){
+    const el=expLane.querySelector(`.results > .grp > .place-card > .row[data-id="${PIN.id}"]`)
+          || expLane.querySelector(`.results > .grp > .row[data-id="${PIN.id}"]`);
+    if (el && el.offsetParent) expLane.scrollTop += (el.getBoundingClientRect().top - PIN.top);
+  }
+  PIN=null;
+
+  if (SCROLL_NEAR){
+    const el=expLane.querySelector(`.results > .grp > .place-card > .row[data-id="${SCROLL_NEAR}"]`)
+          || expLane.querySelector(`.results > .grp > .row[data-id="${SCROLL_NEAR}"]`);
+    if (el && el.offsetParent){
+      const floorY=stopAt(true, expLane) + (el.closest(".place-card") ? 0 : 10);
+      const ceilY=expLane.getBoundingClientRect().bottom;
+      const r=el.getBoundingClientRect();
+      const nx=el.nextElementSibling;
+      const bodyTop=(nx && nx.classList.contains("place-detail")) ? nx.getBoundingClientRect().top : r.bottom;
+      let d=0;
+      if (bodyTop > ceilY) d = Math.max(0, Math.min(bodyTop - ceilY + r.height, r.top - floorY));
+      if (d) expLane.scrollTop += d;
+    }
+    SCROLL_NEAR=null;
+  }
 }
 
 let SCROLL_TO=null;
-function select(id, mode){
+
+let SCROLL_NEAR=null;
+let PIN=null;
+
+function select(id, mode, inPlace){
 
   const fromTrip = isMobile() && S.tab==="trip" && !HASH_APPLYING;
   if (S.sel===id && !fromTrip){
@@ -3973,7 +4000,18 @@ function select(id, mode){
 
   
   if (fromTrip) gotoTab("place");
-  if (!isMapOnly()){ SCROLL_TO = mode ? {id, mode} : id; }
+
+  if (!isMapOnly()){
+    if (inPlace){
+      const b=scrollBox();
+      const el=b.querySelector(`.results > .grp > .place-card > .row[data-id="${id}"]`)
+            || b.querySelector(`.results > .grp > .row[data-id="${id}"]`);
+      PIN = el ? {id, top:el.getBoundingClientRect().top} : null;
+      SCROLL_NEAR=id;
+    } else {
+      SCROLL_TO = mode ? {id, mode} : id;
+    }
+  }
   if (isMapOnly()) setSheet("mplace");
   render();
 }
