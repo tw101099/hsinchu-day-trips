@@ -660,6 +660,8 @@ button{font:inherit; color:inherit; cursor:pointer}
   pointer-events:none;
 }
 
+.results > .grp > .row{content-visibility:auto; contain-intrinsic-size:auto 44.86px}
+
 .ghead{
   position:relative; display:flex; width:100%; align-items:center; gap:8px;
   margin:14px 0 6px; padding:6px 14px 6px 27px; border:0; border-radius:0;   
@@ -3841,6 +3843,41 @@ function stopAt(withGroup, box){
   return y;
 }
 
+const CV_ROW_SEL=".results > .grp > .row";
+let CV_MEM=null;
+function cvRemember(cur){
+  if (!cur) return CV_MEM;
+  if (!CV_MEM || Math.abs(CV_MEM.w - cur.w) > 0.5) CV_MEM={w:cur.w, hs:new Map()};
+  cur.hs.forEach((h, id)=>CV_MEM.hs.set(id, h));
+  return CV_MEM;
+}
+function cvHarvest(root, oldBox){
+  if (!oldBox || isRail(oldBox)) return null;
+  const extra=new Map(), hs=new Map();
+  for (const r of root.querySelectorAll(`${CV_ROW_SEL}, .results > .grp > .place-card > .row`)){
+    const id=r.dataset.id;
+    if (!id || hs.has(id)) continue;
+    const h=r.getBoundingClientRect().height;
+    if (!h) continue;                       // 手機另一頁籤 `display:none` 的那一族：沒有高可搬
+    let ex=extra.get(r.className);
+    if (ex==null){
+      const cs=getComputedStyle(r);
+      ex=parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom)+parseFloat(cs.borderTopWidth)+parseFloat(cs.borderBottomWidth);
+      extra.set(r.className, ex);
+    }
+    if (h-ex>0) hs.set(id, h-ex);
+  }
+  return hs.size ? {w:oldBox.clientWidth, hs} : null;
+}
+function cvApply(box, carry){
+  if (!carry || !box || isRail(box)) return;
+  const done=[];
+  for (const r of box.querySelectorAll(CV_ROW_SEL)){
+    const h=carry.hs.get(r.dataset.id);
+    if (h){ r.style.containIntrinsicSize=`auto ${h}px`; done.push(r); }
+  }
+  if (done.length && Math.abs(box.clientWidth - carry.w) > 0.5) done.forEach(r=>{ r.style.containIntrinsicSize=""; });
+}
 function renderPanel(){
   const panel=document.getElementById("panel");
   const two=isTwoLane();
@@ -3851,6 +3888,7 @@ function renderPanel(){
   const oldToday=panel.querySelector(":scope > .lane-today");
   if (oldToday && !isRail(oldToday)) LANE_KEEP.today=oldToday.scrollTop;
   if (LF_POP) fpopKeep();
+  const cvCarry=cvRemember(cvHarvest(panel, oldExp));
   panel.innerHTML="";
   panel.classList.toggle("twolane", two);
 
@@ -3900,6 +3938,10 @@ function renderPanel(){
     box.appendChild(f);
   }   // !mapOnly
 
+  
+  cvApply(expLane, cvCarry);
+  if (CV_RO){ CV_RO.disconnect(); const res=expLane.querySelector(":scope > .results"); if (res) CV_RO.observe(res); }
+  if (SCROLL_RESET || MJUMP!=null || SCROLL_GROUP || SCROLL_TO || PIN || SCROLL_NEAR) REFIX=null;
   if (SCROLL_RESET){
     expLane.scrollTop = 0;
     SCROLL_RESET = false;
@@ -3938,6 +3980,9 @@ function renderPanel(){
       const max=expLane.scrollHeight-expLane.clientHeight;
       if (desired<=max){
         expLane.scrollTop=Math.max(0, desired);
+
+        REFIX={id:wantId, top:wantTop, target, passes:0};
+        requestAnimationFrame(()=>requestAnimationFrame(()=>refixLanding(true))); setTimeout(refixLanding, 0);
       } else {
         const rowOffset=r.top-expLane.getBoundingClientRect().top+expLane.scrollTop;
         expLane.scrollTop = (rowOffset+r.height<expLane.clientHeight) ? 0 : max;
@@ -3971,7 +4016,29 @@ function renderPanel(){
     }
     SCROLL_NEAR=null;
   }
+
 }
+
+let REFIX=null;
+function refixLanding(fromFrame){
+  const R=REFIX;
+  if (!R) return;
+  if (R.passes>=3){ REFIX=null; return; }
+  const box=scrollBox();
+  if (!box || isRail(box)){ REFIX=null; return; }
+  const row=box.querySelector(`.results > .grp > .place-card > .row[data-id="${R.id}"]`)
+         || box.querySelector(`.results > .grp > .row[data-id="${R.id}"]`);
+  const el=(R.top && row) ? (row.closest(".place-card") || row) : row;
+  if (!el || !el.offsetParent){ REFIX=null; return; }
+  const diff=el.getBoundingClientRect().top - R.target;
+  if (Math.abs(diff)<1){ if (fromFrame && REFIX===R) REFIX=null; return; }
+  R.passes++;
+  box.scrollTop=Math.max(0, box.scrollTop+diff);
+  syncStuck(box);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>refixLanding(true)));
+}
+
+const CV_RO = (typeof ResizeObserver==="function") ? new ResizeObserver(()=>refixLanding()) : null;
 
 let SCROLL_TO=null;
 
