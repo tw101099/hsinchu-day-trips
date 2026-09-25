@@ -3932,7 +3932,8 @@ function renderPanel(){
            || expLane.querySelector(`.results > .grp > .row[data-id="${wantId}"]`);
 
     const el = (wantTop && row) ? (row.closest(".place-card") || row) : row;
-    const pad = (wantTop && el && el.classList.contains("place-card")) ? 0 : 10;
+
+    const pad = (el && el.closest(".place-card.is-expanded")) ? 0 : 10;
     if (el){
       const r=el.getBoundingClientRect();
       const target=stopAt(true, expLane)+pad;   // 地板見 stopAt（2026-09-12 棒 DS）
@@ -3967,7 +3968,8 @@ function renderPanel(){
       const nx=el.nextElementSibling;
       const bodyTop=(nx && nx.classList.contains("place-detail")) ? nx.getBoundingClientRect().top : r.bottom;
       let d=0;
-      if (bodyTop > ceilY) d = Math.max(0, Math.min(bodyTop - ceilY + r.height, r.top - floorY));
+
+      if (bodyTop + r.height > ceilY) d = Math.max(0, Math.min(bodyTop - ceilY + r.height, r.top - floorY));
       if (d) expLane.scrollTop += d;
     }
     SCROLL_NEAR=null;
