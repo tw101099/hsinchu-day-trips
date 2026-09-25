@@ -466,8 +466,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 @media (max-width:899px), (max-height:559px){
   .main:not(.nomap) .results,
   .main:not(.nomap) .legend,
-  .main:not(.nomap) .foot,
-  .main:not(.nomap) .sec.toplevel{display:none}
+  .main:not(.nomap) .foot{display:none}
+
   .main:not(.nomap) .stage{min-height:280px}
 }
 
@@ -568,7 +568,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 
 .fbar{
-  position:sticky; top:var(--l1h); z-index:400; display:flex; align-items:center; gap:8px;
+  position:sticky; top:0; z-index:400; display:flex; align-items:center; gap:8px;
   padding:4px 14px; min-height:var(--l1h); background:var(--panel); background-image:var(--paper-panel);
   box-shadow:inset 0 -1px 0 var(--hair);   
 }
@@ -638,56 +638,18 @@ button{font:inherit; color:inherit; cursor:pointer}
 .chips .chip{position:relative}
 .chips .chip::after{content:""; position:absolute; inset:-2.5px 0}
 
-.sec, .fsum, .ghead .gnm{font-size:12.5px; font-weight:400; color:var(--ink2)}
-.sec .n, .ghead .n{font-size:12.5px; color:var(--ink3)}
-.sec{
-  display:flex; align-items:center; gap:7px; width:100%; border:0; background:none;
-  padding:9px 0 0; margin-top:11px; border-top:1px solid var(--hair);   
-  text-align:left;
-}
-@media (hover:hover){.sec:hover{color:var(--accent)}}
-.sec .n{color:var(--ink3); font-family:var(--mono)}
-
-.sec .n .ic{width:13px; height:13px; vertical-align:-2px; margin-left:3px}
-
-.sec.toplevel, .sec.toplevel[aria-expanded=false]{
-  position:sticky; z-index:400; min-height:var(--l1h);
-  padding:0 14px; margin-top:0; border-top:0; border-bottom:0;
-  background:var(--panel); background-image:var(--paper-panel);
-  box-shadow:inset 0 -1px 0 var(--hair);   
-}
-.sec.toplevel.secroutes{top:0}
-
-.sec.toplevel.secroutes .n{margin-left:auto}
-.sec.toplevel.secroutes .chev{margin-left:0}
+.fsum, .ghead .gnm{font-size:12.5px; font-weight:400; color:var(--ink2)}
+.ghead .n{font-size:12.5px; color:var(--ink3)}
 
 .stuck-last{box-shadow:inset 0 -1px 0 var(--hair), 0 2px 4px rgb(60 45 30 / 6%) !important}   
-.sec .chev{margin-left:auto}
-.sec[aria-expanded=true] .chev{transform:rotate(180deg)}
 
-.rgroups{padding:0 14px 10px}
-.rgroup{margin-top:6px}
-
-.dirsec{border-top:0; margin-top:4px; padding-top:4px; padding-left:2px; gap:6px; font-size:12px}
-
-.rgroup.first .dirsec{margin-top:0}
-
-.dirsec::before{content:""; flex:none; width:8px; height:8px; border-radius:2px; background:var(--dc,var(--ink3))}
-.dirsec .n{font-family:var(--mono)}
-
-.rlist{display:flex; flex-direction:column; gap:0; margin:2px 0 0 4px; width:calc(100% - 4px)}
-
-.rrow{
-  position:relative; display:flex; width:100%; align-items:center; gap:8px; padding:6px 8px; font-size:13px;
-  border:1px solid transparent; border-radius:0; background:none; text-align:left; color:var(--ink2);   
+.rdirs{flex:1; min-width:0; display:flex; flex-direction:column; gap:8px}
+.rdirh{
+  display:flex; align-items:center; gap:6px; padding-top:4px; margin-bottom:4px;
+  font-size:12px; color:var(--ink2); line-height:1.5;
 }
-
-.rrow .rbar{flex:none; width:var(--guide-w); height:17px; border-radius:2px; background:var(--dc,var(--ink3))}
-
-@media (hover:hover){.rrow:hover{background-color:var(--hover-bg); color:var(--ink)}}
-
-.rrow .nm{flex:1; min-width:0}
-.rrow .n{flex:none; font-size:11.5px; color:var(--ink3)}
+.rdirh::before{content:""; flex:none; width:8px; height:8px; border-radius:2px; background:var(--dc,var(--ink3))}
+.rdirh .n{color:var(--ink3); font-family:var(--mono)}
 
 .results{padding:2px 14px 20px}
 
@@ -726,7 +688,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .ghead[aria-expanded=true] .chev{transform:rotate(180deg)}
 
 .ghead{
-  position:sticky; top:calc(var(--l1h) * 2); z-index:398; min-height:var(--l1h);
+  position:sticky; top:var(--l1h); z-index:398; min-height:var(--l1h);
   border-bottom:0; box-shadow:inset 0 -1px 0 var(--hair);   
   background:var(--panel); background-image:var(--paper-panel);
 }
@@ -970,16 +932,6 @@ button{font:inherit; color:inherit; cursor:pointer}
   box-shadow:var(--lift-shadow);
   border-color:transparent;
 }
-.rrow[aria-pressed="true"]{
-  background-color:var(--state-selected-row);
-  background-image:var(--paper-base-sheet);
-  box-shadow:var(--sel-shadow);
-  border-color:transparent;
-  color:var(--ink);
-  font-weight:600;
-}
-
-.rrow[aria-pressed="true"] .n{color:var(--ink)}
 
 @media (hover:hover){.nearby .row:hover, .tnear .row:hover{background-color:var(--state-hover)}}
 
@@ -1327,8 +1279,9 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
   overflow:auto; overscroll-behavior:contain;
 }
 
-.stickpop .rgroups{padding:0}
 .stickpop .gintro{margin:0; padding:0}
+
+.fpop{overflow:auto; overscroll-behavior:contain}
 
 .mfhost{position:relative; flex:none; display:inline-flex}
 .fbhint{
@@ -1607,8 +1560,7 @@ const ICON = {
 const S = { tab:"place", route:new Set(), themes:new Set(), diffs:new Set(), budget:new Set(),
             inseason:false, q:"", qtags:[], sel:null, tipSeen:false,
             foldExplore:false, foldToday:null,
-            routesOpen:false, sort:"total", near:0,   
-            dirOpen:new Set() };
+            sort:"total", near:0 };
 
 let PLAN = [], EXTRA = new Set(), INFO_OPEN = false;
 
@@ -1795,7 +1747,7 @@ function save(){
     localStorage.setItem(LSKEY, JSON.stringify({
       route:[...S.route], themes:[...S.themes], diffs:[...S.diffs], budget:[...S.budget],
       inseason:S.inseason, sort:S.sort, plan:PLAN, theme:THEME,
-      seen:true, start:START, stay:STAY, routesOpen:S.routesOpen, tipSeen:S.tipSeen,
+      seen:true, start:START, stay:STAY, tipSeen:S.tipSeen,
       foldExplore:S.foldExplore, foldToday:S.foldToday,
       routeView:ROUTE_VIEW   
     }));
@@ -1816,7 +1768,6 @@ function restore(){
     if (["auto","light","dark"].includes(d.theme)) THEME=d.theme;
     if (typeof d.start==="number") START=d.start;
     if (d.stay && typeof d.stay==="object") STAY=d.stay;
-    if (d.routesOpen) S.routesOpen=true;
     if (d.tipSeen===true) S.tipSeen=true;
     if (d.routeView) ROUTE_VIEW=true;
   }catch(e){}
@@ -2261,7 +2212,6 @@ function toggleRouteView(){
     S.inseason=false; resetQ();
     S.route=planRouteSet();
     SCROLL_GROUP=true;
-    if (!isMapOnly()){ S.routesOpen=true; }
     fit(PLACES.filter(p=>S.route.has(p.route)));
   }
   S.sel=null; EXTRA=new Set(); save(); render();
@@ -2971,13 +2921,6 @@ function frow(key,nodes){
   nodes.forEach(n=>c.appendChild(n));
   r.append(k,c); return r;
 }
-function section(label, count, open, fn, cls){
-  const b=document.createElement("button");
-  b.className="sec"+(cls?" "+cls:""); b.setAttribute("aria-expanded",open);
-  b.innerHTML=`${label}${count!=null?`<span class="n">${count}</span>`:""}` +
-              `<svg class="chev" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg>`;
-  b.onclick=fn; return b;
-}
 
 let FIT_PENDING=false;
 function fitShown(){
@@ -3109,29 +3052,46 @@ function resetAll(){
   ROUTE_VIEW=false;   // 清除篩選也離開往返路線檢視（`NEAR_VIEW` 那半棒 J5 退役）
   S.route=new Set(); S.themes=new Set(); S.diffs=new Set(); S.budget=new Set();
   S.inseason=false; S.sel=null; EXTRA=new Set(); resetQ();
-  S.dirOpen=new Set();
   S.near=0;
   SCROLL_RESET=true; MSCROLL.place=0;     // 景點頁的捲動記憶也歸零——從行程／地圖頁按 ⟲，回景點頁該是頁頂
   save(); render(); fitShown();
 }
 
 let LF_POP = false;
+
+let FPOP_TOP = 0;
+function fpopKeep(){
+  const p=document.querySelector(".fbar > .fpop");
+  if (p) FPOP_TOP=p.scrollTop;
+}
 function renderFpop(){
   const p=document.createElement("div"); p.className="fpop";
   p.appendChild(renderFilters("lfilters"));
   p.onclick=e=>e.stopPropagation();
   return p;
 }
+
+function fpopFit(){
+  if (!LF_POP) return;
+  const p=document.querySelector(".fbar > .fpop"), box=scrollBox();
+  if (!p || !box || !p.isConnected) return;
+  const bar=p.parentElement.getBoundingClientRect(), lr=box.getBoundingClientRect();
+  p.style.maxHeight = Math.max(SP_MIN, lr.bottom - bar.bottom - SP_GAP) + "px";
+  p.scrollTop = FPOP_TOP;
+}
 function setFpop(on){
+  if (on && !LF_POP) FPOP_TOP=0;   // 從收合打開＝新的一次，從頂端開始
+  else fpopKeep();                 // 開著再掛一次（重建）＝保住內捲
   LF_POP=!!on;
   const bar=document.querySelector(".fbar");
   if (!bar) return;
   const old=bar.querySelector(":scope > .fpop");
   if (old) old.remove();
-  if (LF_POP) bar.appendChild(renderFpop());
+  if (LF_POP){ bar.appendChild(renderFpop()); fpopFit(); }
   const b=bar.querySelector(".mfbtn");
   if (b) b.setAttribute("aria-expanded", LF_POP);
 }
+addEventListener("resize", fpopFit);
 
 function closeFpop(refocus){
   if (!LF_POP) return;
@@ -3151,8 +3111,6 @@ const SP_MIN = 120;   // 矮視窗的高度地板：視窗矮到 560 仍看得�
 let STICKPOP = null;  // null | {kind, key}；**模組層旗標，不進 `S`、不存檔**（同 `LF_POP`）
 
 const SP_KINDS = {
-  routes: { sel:".secroutes", key:null,
-            body:()=>renderRoutes(),  base:()=>S.routesOpen },
   intro:  { sel:".ghead",     key:el=>el.dataset.spkey,
             body:k=>gintroFor(RT[k]), base:k=>ROAD_OPEN.has(k) },
 };
@@ -3301,7 +3259,6 @@ function placeFilterCount(){
 function clearPlaceFilters(){
   PASS_AXES.forEach(a=>a.clear());
   S.sel=null; EXTRA=new Set(); S.near=0;
-  S.dirOpen=new Set();
   save(); render(); fitShown();
 }
 
@@ -3479,7 +3436,7 @@ function mFilterBtn(kind){
   return b;
 }
 
-const HINT_TEXT = "依主題、時間等條件篩景點";
+const HINT_TEXT = "依路段、主題、時間篩景點";
 const HINT_MS = 8000;
 let HINT_TIMER = null;
 function dismissHint(fade){
@@ -3631,45 +3588,40 @@ function renderFilters(cls){
   if (PLAN.length) f.appendChild(frow("行程", [
     chip("往返路線", ROUTE_VIEW, toggleRouteView),
   ]));
+  f.appendChild(routeFilterRow());
   return f;
 }
 
-function renderRoutes(){
-  const f=document.createElement("div"); f.className="rgroups";
+function routeFilterRow(){
+  const r=document.createElement("div"); r.className="frow froute";
+  const k=document.createElement("div"); k.className="fkey"; k.textContent="路段";
+  const box=document.createElement("div"); box.className="rdirs";
   const rtBase=PLACES.filter(p=>passExcept(p,"route"));
-  let firstDir=true;
   DIRS.forEach(d=>{
-    const rs=ROUTES.filter(r=>r.dir===d.id);
+    const rs=ROUTES.filter(x=>x.dir===d.id);
     if (!rs.length) return;
-    const selN=rs.filter(r=>S.route.has(r.id)).length;
-    const dopen=S.dirOpen.has(d.id) || selN>0;
-    const g=document.createElement("div"); g.className="rgroup"+(firstDir?" first":"");
-    firstDir=false;
-    const hd=section(d.name, `${selN}/${rs.length}`, dopen,
-      ()=>{ if (!selN) toggleSet(S.dirOpen, d.id); render(); }, "dirsec");
+    const selN=rs.filter(x=>S.route.has(x.id)).length;
+    const g=document.createElement("div"); g.className="rdir";
+    const hd=document.createElement("div"); hd.className="rdirh";
     hd.style.setProperty("--dc", d.color);
+    hd.innerHTML=`${esc(d.name)}<span class="n">${selN}/${rs.length}</span>`;
     g.appendChild(hd);
-    if (dopen){
-      const list=document.createElement("div"); list.className="rlist";
-      rs.forEach(r=>{
-        const b=document.createElement("button");
-        b.className="rrow"; b.setAttribute("aria-pressed", S.route.has(r.id));
-        b.style.setProperty("--dc", d.color);
-        b.innerHTML=`<span class="rbar"></span>` +
-                    `<span class="nm">${esc(r.name)}</span>` +
-                    `<span class="n num">${rtBase.filter(p=>p.route===r.id).length} 處</span>`;
-        b.onclick=()=>{
+    const cs=document.createElement("div"); cs.className="chips";
+    rs.forEach(rt=>{
+      const b=chip(`${esc(rt.name)}<span class="cnt num">${rtBase.filter(p=>p.route===rt.id).length}</span>`,
+        S.route.has(rt.id), ()=>{
 
-          toggleSet(S.route, r.id); filterChanged();
+          toggleSet(S.route, rt.id); filterChanged();
           if (S.route.size) fit(PLACES.filter(p=>S.route.has(p.route)));
-        };
-        list.appendChild(b);
-      });
-      g.appendChild(list);
-    }
-    f.appendChild(g);
+        });
+      b.title=rt.name;
+      cs.appendChild(b);
+    });
+    g.appendChild(cs);
+    box.appendChild(g);
   });
-  return f;
+  r.append(k, box);
+  return r;
 }
 
 function gintroFor(r){
@@ -3901,6 +3853,7 @@ function renderPanel(){
   const keep=LANE_KEEP.exp;
   const oldToday=panel.querySelector(":scope > .lane-today");
   if (oldToday && !isRail(oldToday)) LANE_KEEP.today=oldToday.scrollTop;
+  if (LF_POP) fpopKeep();
   panel.innerHTML="";
   panel.classList.toggle("twolane", two);
 
@@ -3933,15 +3886,6 @@ function renderPanel(){
     if (!foldT) panel.appendChild(laneFoldBtn("today"));
   }
 
-  
-  const secR=section("路段",
-    S.route.size ? `${S.route.size}/${ROUTES.length} 條` : `${ROUTES.length} 條`, S.routesOpen,
-    ()=>{
-      if (stickpopHit(secR, "routes", null)) return;
-      S.routesOpen=!S.routesOpen; save(); render();
-    }, "toplevel secroutes");
-  box.appendChild(secR);
-  if (S.routesOpen) box.appendChild(renderRoutes());
   const mapOnly=panelHidden(); PANEL_MAPONLY=mapOnly;
   if (!mapOnly){
     box.appendChild(renderFilterBar());
@@ -4216,6 +4160,8 @@ function render(){
   syncStuck(document.querySelector("#panel > .lane-today:not(.rail)"));
 
   stickpopSync(true);
+
+  fpopFit();
 }
 
 let Q_COMPOSING=false;
