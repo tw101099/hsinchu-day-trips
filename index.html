@@ -2058,9 +2058,11 @@ function addLeaflet(why){
   js.src=LEAF_JS_URL;
 
   js.onload=()=>{ LEAF_OK=true; if (mapShown()) initOSM(why); else whenIdle(()=>initOSM(why)); };
+
   js.onerror=()=>{
     LEAF_JS=null;
     engine=null;
+    js.remove();
     const m=document.getElementById("mapmsg");
     m.style.display="flex";
     m.textContent="底圖載不進來，可能是沒連網。切到「清單」，內容一樣看得到。";
@@ -4176,6 +4178,8 @@ function gotoTab(t){
 
   if (SHEET && SHEET_PUSHED && HSTEP>0) history.back();
   savePage(S.tab);
+
+  if (S.tab==="place") cvRemember(cvHarvest(document.getElementById("panel"), scrollBox()));
   S.tab=t;
   if (t==="place") MJUMP=MSCROLL.place||0;
   if (t==="trip") TJUMP=MSCROLL.trip||0;
