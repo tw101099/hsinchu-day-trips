@@ -209,7 +209,10 @@ body{
 }
 button{font:inherit; color:inherit; cursor:pointer}
 
-.num{font-family:var(--mono); font-size:.92em; letter-spacing:-.01em}
+.num{font-size:.92em; letter-spacing:-.01em; font-variant-numeric:tabular-nums}
+
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.row:focus-visible, .ghead:focus-visible, .tsheet .tsrow:focus-visible{outline-offset:-2px}
 .ic{width:14px; height:14px; flex:none; stroke:currentColor; fill:none; stroke-width:1.5;
     stroke-linecap:round; stroke-linejoin:round; vertical-align:-2px; margin-right:4px}
 
@@ -520,7 +523,7 @@ button{font:inherit; color:inherit; cursor:pointer}
     writing-mode:horizontal-tb; text-orientation:mixed;
     min-width:17px; height:17px; padding:0 5px; border-radius:999px;
     background:var(--accent); color:var(--on-accent);
-    font-family:var(--mono); font-size:10.5px; font-weight:600; line-height:17px;
+    font-size:10.5px; font-weight:600; line-height:17px; font-variant-numeric:tabular-nums;   
     letter-spacing:0; text-align:center;
   }
 
@@ -650,7 +653,7 @@ button{font:inherit; color:inherit; cursor:pointer}
   font-size:12px; color:var(--ink2); line-height:1.5;
 }
 .rdirh::before{content:""; flex:none; width:8px; height:8px; border-radius:2px; background:var(--dc,var(--ink3))}
-.rdirh .n{color:var(--ink3); font-family:var(--mono)}
+.rdirh .n{color:var(--ink3); font-variant-numeric:tabular-nums}   
 
 .results{padding:2px 14px 20px}
 
@@ -664,7 +667,7 @@ button{font:inherit; color:inherit; cursor:pointer}
   pointer-events:none;
 }
 
-.results > .grp > .row{content-visibility:auto; contain-intrinsic-size:auto 44.86px}
+.results > .grp > .row{content-visibility:auto; contain-intrinsic-size:auto 43.86px}
 
 .ghead{
   position:relative; display:flex; width:100%; align-items:center; gap:8px;
@@ -692,6 +695,11 @@ button{font:inherit; color:inherit; cursor:pointer}
 .ghead[aria-expanded=true] .chev{transform:rotate(0deg)}
 
 .results > .ghead:first-child{margin-top:0}
+
+.results > .lguide{margin:6px 0; font-size:12px; color:var(--ink3); line-height:1.6}
+.results > .lguide + .ghead{margin-top:0}
+
+.results > .lguide.hold{visibility:hidden}
 .ghead{
   position:sticky; top:var(--l1h); z-index:398; min-height:var(--l1h);
   border-bottom:0; box-shadow:inset 0 -1px 0 var(--hair);   
@@ -738,7 +746,10 @@ button{font:inherit; color:inherit; cursor:pointer}
   flex:none; align-self:center; border:1px solid var(--hair); background:var(--chip-bg);   
   width:26px; height:26px; border-radius:999px; font-size:14px; line-height:1;
   color:var(--ink3); padding:0;
+  position:relative;   
 }
+
+.add::after{content:""; position:absolute; inset:-10px}
 .add[data-in=true]{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
 
 @media (hover:hover){.add[data-in=true]:hover{color:var(--on-accent)!important; background-color:color-mix(in srgb, var(--accent) 88%, var(--ink))!important}}   
@@ -873,13 +884,15 @@ button{font:inherit; color:inherit; cursor:pointer}
 .setrow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 0 4px}
 .setrow .lab{font-size:12px; color:var(--ink3); letter-spacing:.06em}
 
-.backbit{font-size:12px; color:var(--ink3); white-space:nowrap}
-.backbit .num{font-family:var(--mono); color:var(--ink2)}
+.tback{padding:12px 0 2px}
+.tback .tbt{margin:0; font-size:18px; font-weight:600; line-height:1.35; color:var(--ink)}
+.tback .tbclock{font-variant-numeric:tabular-nums}
+.tback .tbs{margin:2px 0 0; font-size:13.5px; line-height:1.5; color:var(--ink2)}
 
 #start{
 
   border:1px solid var(--hair2); background:var(--bg); color:var(--ink2); border-radius:999px;
-  padding:2px 7px; font:inherit; font-size:16px; line-height:1.15; font-family:var(--mono);
+  padding:2px 7px; font:inherit; font-size:16px; line-height:1.15; font-variant-numeric:tabular-nums;   
   cursor:pointer; color-scheme:light;
 }
 
@@ -917,6 +930,10 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .mi .sep{line-height:0}
 
+.mi .adjw{font-size:.92em; flex:none; white-space:nowrap}
+.tnear .row .m .mi .adjw{font-size:inherit}
+
+.mi .sep + .adjw{margin-left:-3px}
 .tnear .row .m{flex-wrap:nowrap; min-width:0}
 .tnear .row .m .mi{min-width:0}
 .tnear .row .m .mi:first-child .sep{line-height:inherit; min-width:0; flex:0 1 auto;
@@ -966,21 +983,21 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .stop .no{
   flex:none; width:22px; height:22px; border-radius:999px; background:var(--accent); color:var(--on-accent);
-  font-size:11px; font-weight:700; text-align:center; line-height:22px; font-family:var(--mono);
+  font-size:11px; font-weight:700; text-align:center; line-height:22px; font-variant-numeric:tabular-nums;   
 }
 .stop .nm{border:0; background:none; padding:0; text-align:left; font-size:14px; font-weight:600; white-space:nowrap}
 @media (hover:hover){.stop button.nm:hover{color:var(--accent)}}
 
 @media (hover:hover){.stop .nm.jump:hover, .stop .no.jump:hover + .nm{color:var(--accent)}}
 
-.stop .win{font-size:12px; color:var(--ink2); font-family:var(--mono); white-space:nowrap}
+.stop .win{font-size:12px; color:var(--ink2); font-variant-numeric:tabular-nums; white-space:nowrap}   
 .stop .warn{font-size:11.5px; color:var(--warn)}
 
 .stepper{display:inline-flex; align-items:center; gap:2px; border:1px solid var(--hair); background:var(--chip-bg); border-radius:999px; padding:1px 2px}   
 .stepper button{border:0; background:none; color:var(--ink3); width:20px; height:20px; border-radius:999px; line-height:1; font-size:14px; padding:0}
 
 @media (hover:hover){.stepper button:hover{color:var(--accent)}}
-.stepper .v{font-size:11.5px; color:var(--ink2); font-family:var(--mono); min-width:52px; text-align:center; white-space:nowrap}
+.stepper .v{font-size:11.5px; color:var(--ink2); font-variant-numeric:tabular-nums; min-width:52px; text-align:center; white-space:nowrap}
 
 .stop.dstop{
   display:grid; grid-template-columns:minmax(0,1fr) 28px; column-gap:8px; row-gap:3px;
@@ -1056,7 +1073,7 @@ button{font:inherit; color:inherit; cursor:pointer}
     position:absolute; top:5px; left:calc(50% + 6px);
     min-width:17px; height:17px; padding:0 5px; border-radius:999px;
     background:var(--accent); color:var(--on-accent);
-    font-family:var(--mono); font-size:10.5px; font-weight:600; line-height:17px; text-align:center;
+    font-size:10.5px; font-weight:600; line-height:17px; text-align:center; font-variant-numeric:tabular-nums;   
   }
   .mnav .badge[hidden]{display:none}
   .mnav .badge.pulse{animation:badgepulse .45s ease-out}
@@ -1215,7 +1232,7 @@ html.sheeton .panel{overflow:hidden}
 }
 
 .tsheet .tsum{margin:8px 0 6px; font-size:13px; color:var(--ink); font-weight:600; line-height:1.5}
-.tsheet .tsum .clock{font-family:var(--mono); font-weight:400; color:var(--ink2); margin-left:8px}
+.tsheet .tsum .clock{font-variant-numeric:tabular-nums; font-weight:400; color:var(--ink2); margin-left:8px}
 .tsheet .tstops{list-style:none; margin:0; padding:0}
 .tsheet .tsrow{
   display:flex; align-items:center; gap:9px; width:100%; min-height:40px; padding:4px 4px;
@@ -1224,10 +1241,10 @@ html.sheeton .panel{overflow:hidden}
 @media (hover:hover){.tsheet .tsrow:hover{color:var(--accent)}}
 .tsheet .tsrow .no{
   flex:none; width:20px; height:20px; border-radius:999px; background:var(--accent); color:var(--on-accent);
-  font-family:var(--mono); font-size:11.5px; font-weight:600; display:grid; place-items:center;
+  font-size:11.5px; font-weight:600; display:grid; place-items:center; font-variant-numeric:tabular-nums;   
 }
 .tsheet .tsrow .nm{flex:1 1 auto; min-width:0; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.tsheet .tsrow .win{flex:none; font-family:var(--mono); font-size:12px; color:var(--ink2)}
+.tsheet .tsrow .win{flex:none; font-variant-numeric:tabular-nums; font-size:12px; color:var(--ink2)}
 .tsheet .tsrow .leg{flex:none; font-size:12px; color:var(--ink3); display:inline-flex; align-items:center; white-space:nowrap}
 .tsheet .tsback{display:flex; align-items:center; gap:9px; min-height:40px; padding:4px 4px; font-size:13px; color:var(--ink2)}
 .tsheet .tsback .home{
@@ -1385,7 +1402,7 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
 .plan-badge{
   position:absolute; top:-6px; right:-6px; min-width:16px; height:16px; padding:0 3px;
   border-radius:999px; background:var(--accent); color:var(--on-accent);
-  font-family:var(--mono); font-size:10px; font-weight:700; line-height:16px; text-align:center;
+  font-size:10px; font-weight:700; line-height:16px; text-align:center; font-variant-numeric:tabular-nums;   
   box-shadow:0 0 0 1.5px var(--panel); pointer-events:none;
 }
 
@@ -1686,8 +1703,9 @@ let STAY = {};                            // 每個點自訂的停留時數
 const TH = Object.fromEntries(THEMES.map(t=>[t.id,t]));
 const RT = Object.fromEntries(ROUTES.map(r=>[r.id,r]));
 const SYS = matchMedia("(prefers-color-scheme: dark)");
-let THEME = "auto";                       // auto | light | dark
-let DARK = SYS.matches;
+
+let THEME = "light";                      // auto | light | dark
+let DARK = false;
 const LIGHT_DIR = DIRS.map(d=>d.color);     // 記住原本的亮色值，切換時要換回來
 const LIGHT_TH = THEMES.map(t=>t.color);
 const DR = Object.fromEntries(DIRS.map(d=>[d.id,d]));
@@ -2563,6 +2581,27 @@ function todayNearList(level){
     if (ns && ns.min<=lim) out.push({p, ns});
   });
   out.sort((a,b)=>a.ns.min-b.ns.min);
+  return nearDiversify(out);
+}
+
+const TODAY_NEAR_SAME_PEN = 5;
+function nearDiversify(rows){
+  const rest=rows.slice(), out=[];
+  while (rest.length){
+    const prev = out.length ? out[out.length-1].p.theme : null;
+    let run=0;
+    for (let i=out.length-1; i>=0 && out[i].p.theme===prev; i--) run++;
+    let bi=0, bs=Infinity;
+    rest.forEach((o,i)=>{
+      const s = o.ns.min + (o.p.theme===prev ? TODAY_NEAR_SAME_PEN*run : 0);
+      if (s<bs){ bs=s; bi=i; }
+    });
+    out.push(rest.splice(bi,1)[0]);
+  }
+  if (out.length>=3 && out[0].p.theme===out[1].p.theme && out[1].p.theme===out[2].p.theme){
+    const j=out.findIndex((o,i)=>i>2 && o.p.theme!==out[0].p.theme);
+    if (j>0) out.splice(2, 0, out.splice(j,1)[0]);
+  }
   return out;
 }
 
@@ -2696,9 +2735,16 @@ function renderTrip(){
     START=(hh||0)*60+(mm||0); save(); renderTrip();
   };
   const lab=document.createElement("label"); lab.className="lab"; lab.textContent="出發"; lab.htmlFor="start";
-  const backbit=document.createElement("span"); backbit.className="backbit";
-  backbit.innerHTML=`→ 預計 <span class="num">${fmt(st.backTime)}</span> 回新竹`;
-  set.append(home,time,lab,backbit);
+
+  set.append(home,time,lab);
+
+  const tback=document.createElement("div"); tback.className="tback";
+  const tbt=document.createElement("p"); tbt.className="tbt";
+  tbt.innerHTML=`預計 <span class="tbclock">${fmt(st.backTime)}</span> 回到新竹`;
+  const tbs=document.createElement("p"); tbs.className="tbs";
+  tbs.textContent=`${st.ps.length} 站・停留 ${hmT(st.stayMin)}・開車約 ${estT(st.driveTotal)}`;
+  tbs.title=`車程合計 ${rawT(st.driveTotal)}`;
+  tback.append(tbt, tbs);
 
   const plan=document.createElement("div"); plan.className="plan";
 
@@ -2829,7 +2875,7 @@ function renderTrip(){
                  + "不含塞車與找停車位，停留時間可以自己加減。";
 
   const near=tripNearSection();
-  sheet.append(set,plan,sum);
+  sheet.append(tback,set,plan,sum);
   if (near) sheet.appendChild(near);
 
   go.appendChild(foot);
@@ -3572,6 +3618,7 @@ function dismissHint(fade){
   if (HINT_TIMER){ clearTimeout(HINT_TIMER); HINT_TIMER=null; }
   const h=document.querySelector(".fbhint");
   if (!S.tipSeen){ S.tipSeen=true; save(); }
+  document.querySelectorAll(".lguide.hold").forEach(g=>g.classList.remove("hold"));
   if (!h) return;
   if (!fade || RM.matches){ h.remove(); return; }
   h.classList.add("out");
@@ -3771,7 +3818,12 @@ function shortRef(s){
   return n.length > NEAR_REF_MAX ? n.slice(0, NEAR_REF_MAX) + "…" : n;
 }
 
+const NEAR_ADJ_MAX = 2;
 function legBit(p, rel){
+  if (rel && rel.min <= NEAR_ADJ_MAX)
+    return `<span class="mi adj" title="${rel.stop?`離${esc(rel.stop.name)} `:`車程 `}${rawT(rel.min, rel.km)}">${CAR_SVG}` +
+      (rel.stop ? `<span class="sep">就在${esc(shortRef(rel.stop.name))}</span><span class="adjw">旁邊</span>`
+                : `<span class="adjw">就在旁邊</span>`) + `</span>`;
   if (rel) return `<span class="mi" title="${rel.stop?`離${esc(rel.stop.name)} `:`車程 `}${rawT(rel.min, rel.km)}">${CAR_SVG}` +
     (rel.stop ? `<span class="sep">離${esc(shortRef(rel.stop.name))} </span>` : ``) +
     `${est(rel.min)}</span>`;
@@ -3940,6 +3992,12 @@ function renderList(){
     d.appendChild(h);
     wrap.appendChild(d); return wrap;
   }
+
+  if (!PLAN.length){
+    const gd=document.createElement("p"); gd.className = S.tipSeen ? "lguide" : "lguide hold";
+    gd.textContent="看到想去的按 ＋，就會排進今天的行程";
+    wrap.appendChild(gd);
+  }
   const cmp=(SORTS.find(s=>s.id===S.sort)||SORTS[0]).fn;
   const g={}; list.forEach(p=>(g[p.route]=g[p.route]||[]).push(p));
   ROUTES.filter(r=>g[r.id]).forEach(r=>{
@@ -4019,6 +4077,14 @@ function cvApply(box, carry){
   }
   if (done.length && Math.abs(box.clientWidth - carry.w) > 0.5) done.forEach(r=>{ r.style.containIntrinsicSize=""; });
 }
+
+function guideMark(lane){
+  if (!lane || isRail(lane)) return null;
+  const g=lane.querySelector(":scope > .results > .grp");
+  if (!g) return null;
+  return {had: !!lane.querySelector(":scope > .results > .lguide"),
+          y: g.getBoundingClientRect().top - lane.getBoundingClientRect().top + lane.scrollTop};
+}
 function renderPanel(){
   const panel=document.getElementById("panel");
   const two=isTwoLane();
@@ -4030,6 +4096,7 @@ function renderPanel(){
   if (oldToday && !isRail(oldToday)) LANE_KEEP.today=oldToday.scrollTop;
   if (LF_POP) fpopKeep();
   const cvCarry=cvRemember(cvHarvest(panel, oldExp));
+  const gMark=guideMark(oldExp);
   panel.innerHTML="";
   panel.classList.toggle("twolane", two);
 
@@ -4070,12 +4137,13 @@ function renderPanel(){
     const lg=document.createElement("div"); lg.className="legend";
     lg.innerHTML=THEMES.map(t=>`<span>${ico(t.id,t.color)}${t.name}</span>`).join("");
     box.appendChild(lg);
+
     const f=document.createElement("p"); f.className="foot";
     f.innerHTML =
-      "清單上的車程與停留都是估的；「今天的行程」的點間車程與「順路可搭」的距離會另外去算真實路線，" +
-      "算不到才退回估算值（會標「約」或「直線」）。" +
-      "山區路況、林道封閉、園區開放時間與店家公休都會變動，出發前請以官方公告與店家粉專為準；" +
-      "本頁僅供行程參考，不保證資訊正確或即時。底圖與圖磚為 OpenStreetMap 貢獻者所有。";
+      "清單與順遊的車程，是建置時用實際道路算好的估計；今天行程的點間車程算不到時會退回估算並標「約」。" +
+      "山區路況、林道封閉、園區開放時間與店家公休都會變動，出發前請以官方公告與店家粉專為準。" +
+      "本頁僅供行程參考，不保證資訊正確或即時。" +   // 免責句照原文保留（草稿漏了，2026-10-01 主棒補回）
+      "底圖與圖磚為 OpenStreetMap 貢獻者所有。";
     box.appendChild(f);
   }   // !mapOnly
 
@@ -4088,6 +4156,10 @@ function renderPanel(){
     SCROLL_RESET = false;
   } else {
     expLane.scrollTop = (MJUMP!=null) ? MJUMP : keep;
+    if (MJUMP==null && keep>0){
+      const gNow=guideMark(expLane);
+      if (gMark && gNow && gMark.had!==gNow.had) expLane.scrollTop = Math.max(0, keep + (gNow.y - gMark.y));
+    }
   }
   MJUMP=null;
   if (SCROLL_GROUP){
