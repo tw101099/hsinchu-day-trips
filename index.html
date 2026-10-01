@@ -223,7 +223,12 @@ button{font:inherit; color:inherit; cursor:pointer}
 .mi .num, .mi .adjw{line-height:17.672px}
 
 :focus-visible{outline:2px solid var(--accent); outline-offset:2px}
-.row:focus-visible, .ghead:focus-visible, .tsheet .tsrow:focus-visible{outline-offset:-2px}
+.ghead:focus-visible, .tsheet .tsrow:focus-visible{outline-offset:-2px}
+
+@supports selector(:has(*)){
+  .row > .rmain:focus-visible{outline:none}
+  .row:has(> .rmain:focus-visible){outline:2px solid var(--accent); outline-offset:-2px}
+}
 
 .sr-only{position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
   clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0}
@@ -758,6 +763,13 @@ button{font:inherit; color:inherit; cursor:pointer}
 @media (hover:hover){.row:hover{background-color:var(--hover-bg)}}
 
 .row .rbody{flex:1; min-width:0}
+
+.row > .rmain{
+  display:block; margin:0; padding:0; border:0; border-radius:inherit; background:none;
+  text-align:inherit; letter-spacing:inherit; word-spacing:inherit; text-transform:inherit; text-indent:inherit;
+  -webkit-appearance:none; appearance:none; overflow:visible;
+}
+.row > .rmain::after{content:""; position:absolute; inset:-1px; border-radius:inherit}
 .row .t{display:flex; gap:6px; align-items:center; font-size:14.5px; font-weight:600}
 
 .row .m{font-size:12px; color:var(--ink2); margin-top:1px; display:flex; align-items:baseline; flex-wrap:wrap}
@@ -4138,23 +4150,21 @@ function legBit(p, rel){
 
 function rowFor(p, extra, rel, onOpen){
   const open = onOpen || (()=>select(p.id, undefined, !rel));
+
   const b=document.createElement("div");
-  b.className="row place-summary"; b.dataset.id=p.id; b.setAttribute("aria-expanded", S.sel===p.id);
-  b.setAttribute("role","button"); b.tabIndex=0;
-  b.addEventListener("keydown", e=>{
-    if (e.target!==b) return;
-    if (e.key==="Enter" || e.key===" "){ e.preventDefault(); open(); }
-  });
+  b.className="row place-summary"; b.dataset.id=p.id;
   const off = !pass(p);
-  const body=document.createElement("div"); body.className="rbody";
+  const body=document.createElement("button"); body.type="button"; body.className="rbody rmain";
+  body.setAttribute("aria-expanded", S.sel===p.id);
+  body.setAttribute("aria-label", p.name + "，" + (EFFORT[p.diff]||p.diff) + (off ? "，不在篩選內" : ""));
   body.innerHTML =
-    `<div class="t">${ico(p.theme,(TH[p.theme]||{}).color)}` +
+    `<span class="t">${ico(p.theme,(TH[p.theme]||{}).color)}` +
     `<span>${esc(p.name)}</span>` +
     `<span class="tag ${HARD.has(p.diff)?"hard":""}">${EFFORT[p.diff]||p.diff}</span>` +
-    (off?`<span class="off">不在篩選內</span>`:"") + `</div>` +
-    `<div class="m">${rel?"":esc(p.town)+"　"}${legBit(p, rel)}　` +
+    (off?`<span class="off">不在篩選內</span>`:"") + `</span>` +
+    `<span class="m">${rel?"":esc(p.town)+"　"}${legBit(p, rel)}　` +
     `<span class="mi" title="停留">${HOURGLASS_SVG}<span class="num">${hmHT(p.stay_h)}</span></span>` +
-    `${extra||""}</div>`;
+    `${extra||""}</span>`;
   const add=document.createElement("button");
   add.className="add"; add.dataset.in=inPlan(p.id);
   add.textContent = inPlan(p.id) ? "✓" : "＋";
@@ -4166,6 +4176,30 @@ function rowFor(p, extra, rel, onOpen){
   b.addEventListener("mouseenter", ()=>emphasize(p.id,true));
   b.addEventListener("mouseleave", ()=>emphasize(p.id,false));
   return b;
+}
+
+function rowFocusKey(){
+  const a=document.activeElement;
+  if (!a || !a.classList || !(a.classList.contains("rmain") || a.classList.contains("add"))) return null;
+  try { if (!a.matches(":focus-visible")) return null; } catch(e){ return null; }
+  const row=a.parentElement;
+  if (!row || !row.classList.contains("row") || !row.dataset.id || row.closest("#sheetwrap")) return null;
+  return {id:row.dataset.id, k: a.classList.contains("add") ? "add" : "rmain", tnear: !!row.closest(".tnear")};
+}
+function rowFocusRestore(fk){
+  if (!fk) return;
+  const a=document.activeElement;
+  if (a && a!==document.body && a.isConnected) return;
+  const sel=[`.results > .grp > .place-card > .row[data-id="${fk.id}"]`, `.results > .grp > .row[data-id="${fk.id}"]`,
+             `.row[data-id="${fk.id}"]`];
+  if (fk.tnear) sel.unshift(`.tnear .row[data-id="${fk.id}"]`);
+  for (const s of sel){
+    for (const r of document.querySelectorAll(s)){
+      if (r.closest("#sheetwrap") || !r.getClientRects().length) continue;
+      const btn=r.querySelector(`:scope > .${fk.k}`);
+      if (btn){ btn.focus({preventScroll:true}); return; }
+    }
+  }
 }
 
 const NEAR_STEPS = [{min:15,n:5},{min:30,n:8},{min:45,n:10},{min:60,n:12}];
@@ -4876,6 +4910,7 @@ function render(){
 
   
   syncTodayNear();
+  const rowFk=rowFocusKey();   // 景點列兩顆鈕的焦點保位（2026-10-02 棒 EY，D3）：重建前記、收尾還，見 `rowFocusKey()`
   draw(); renderPanel(); renderTrip(); renderMapBtns(); renderMapCond(); updateTotop();
   syncReset();   // 頁首 ⟲ 是靜態節點，renderPanel 重建面板碰不到它（2026-09-12 棒 DA）
   syncMSearch(); // 手機頁首兩態＋搜尋鈕狀態點＋ #mcond 條件數（2026-09-12 棒 DB2）
@@ -4891,6 +4926,7 @@ function render(){
 
   fpopFit();
   syncAnnounce();   // 條件變了就念筆數（2026-10-01 C8，見 `announce()` 那段）
+  rowFocusRestore(rowFk);
   scheduleLabels();   // 標籤避讓（2026-10-01 C4）：浮層（條件摘要、Sheet、左下鈕）可能換了，圖釘沒換也要重排——浮層盒要不要重讀由簽章決定
 }
 
