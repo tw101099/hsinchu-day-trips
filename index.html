@@ -955,11 +955,18 @@ button{font:inherit; color:inherit; cursor:pointer}
   font-size:12px; color:var(--ink2);
 }
 .ttotal .tdet{display:block; font-variant-numeric:tabular-nums}
-.ttotal .tret{display:block; margin-top:2px; font-size:12px; color:var(--ink3)}
-.ttotal .tret .tclk{font-size:16px; font-weight:400; line-height:1.15; color:var(--ink); font-variant-numeric:tabular-nums}
+
+.ttotal .tret{display:flex; align-items:center; margin-top:10px; font-size:12px; color:var(--ink3)}
+.ttotal .tret .tpre{flex:none; width:30px}
+.ttotal .tret .tclk{
+  flex:none; display:inline-flex; align-items:center; box-sizing:border-box; height:28.8px; padding:0 9px; border:0; border-radius:999px;
+  background:var(--tint); font-size:16px; font-weight:400; line-height:1.15; color:var(--ink2); font-variant-numeric:tabular-nums; cursor:default;
+}
+.ttotal .tret .tpost{flex:none; margin-left:8px}
+.ttotal + .tnear{margin-top:10px}
 
 .ttotal.late, .ttotal.late .tret, .ttotal.late .tret .tclk{color:var(--warn)}
-.ttotal .warn{display:block; font-size:11.5px; color:var(--warn)}
+.ttotal .warn{display:block; margin-top:4px; font-size:11.5px; color:var(--warn)}
 
 .tnear{margin-top:11px; margin-bottom:11px; border-top:1px solid var(--hair); padding-top:8px}
 .tnear h3{margin:0 0 6px}
@@ -1558,8 +1565,12 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
 .egg{--eggred:#A8463A}
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .egg{--eggred:#D98D7E} }
 :root[data-theme="dark"] .egg{--eggred:#D98D7E}
-.egg .eggseal{display:block; width:max-content; margin:12px -16px -12px auto; line-height:0; color:var(--eggred)}
-.egg .eggseal svg{display:block; height:44px; width:auto; fill:currentColor}
+.egg .eggseal{
+  display:block; width:64px; height:56px; margin:12px -16px -12px auto; background-color:var(--eggred);
+  -webkit-mask-image:url("./icons/seal.webp"); -webkit-mask-size:contain; -webkit-mask-repeat:no-repeat; -webkit-mask-position:center;
+  mask-image:url("./icons/seal.webp"); mask-size:contain; mask-repeat:no-repeat; mask-position:center;
+}
+@supports not ((-webkit-mask-image:none) or (mask-image:none)){ .egg .eggseal{display:none} }
 
 @media (max-width:899px), (max-height:559px){
   .clear, .ghost, .acts a, .acts button, .trip .go a, .trip .go button, #qreset, .mfbtn{
@@ -3145,12 +3156,23 @@ function renderTrip(){
   if (mob) plan.appendChild(legRow(st.ps[st.ps.length-1].name, "新竹市", legText(st.back, st.backKm, st.backReal), rawT(st.back, st.backKm)));
 
   const sum=document.createElement("div"); sum.className="ttotal" + (late?" late":"");
+
   const sumv=document.createElement("div"); sumv.className="tdet";
-  sumv.textContent=`停留 ${hmT(st.stayMin)}・開車約 ${estT(st.driveTotal)}・共約 ${estT(st.totalMin)}`;
+  const dT=estT(st.driveTotal), sT=hmT(st.stayMin), tT=estT(st.totalMin);
+  const say=s=>s.replace(/(\d+(?:\.\d+)?)hr/g, "$1 小時 ").replace(/(\d+)m/g, "$1 分").trim();
+  const vis=document.createElement("span"); vis.setAttribute("aria-hidden", "true");
+  vis.innerHTML=`<span class="mi">${CAR_SVG}<span>${dT}</span></span>・` +
+    `<span class="mi">${HOURGLASS_SVG}<span>${sT}</span></span>・共約 ${tT}`;
+  const spk=document.createElement("span"); spk.className="sr-only";
+  spk.textContent=`開車約 ${say(dT)}、停留 ${say(sT)}、共約 ${say(tT)}`;
+  sumv.append(vis, spk);
   sumv.title=`車程合計 ${rawT(st.driveTotal)}　總時程 ${rawT(st.totalMin)}`;
+
   const ret=document.createElement("div"); ret.className="tret";
+  const pre=document.createElement("span"); pre.className="tpre"; pre.textContent="預計";
   const clk=document.createElement("span"); clk.className="tclk"; clk.textContent=fmt(st.backTime);
-  ret.append("預計 ", clk, " 回新竹");
+  const post=document.createElement("span"); post.className="tpost"; post.textContent="回新竹";
+  ret.append(pre, clk, post);
   sum.append(sumv, ret);
   if (late){
     const w=document.createElement("div"); w.className="warn";
@@ -5130,7 +5152,7 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
   const LINE1 = "我愛我那環海多山的國家";
   const FALLBACK = "Author: 行路有風溫柔閣驕傲的臺灣查某囝";
 
-  const SEAL_SVG = '<svg viewBox="0 0 469 440" focusable="false"><path fill-rule="evenodd" d="M144 139l-3 5-2 6 0 7 4 11 4 10 22 30 15 12 13 7 19 12 15 7 35 20 8 7 0 2-16 22-5 10-3 12-2 17 2 15 3 13 10 14 14 16 16 11 16 9 20 9 26 8 5 0 18 0 20 3 14 3 27 3 6 0 6-1 5-5 10-20 2-11 0-27-1-7-5-5-4-3-12-2-72-6-33-13-15-5-3-3-1-2 16-26 6-17 2-6-1-16-3-11-6-11-8-8-23-17-30-20-9-4-15-5-13-8-16-6-15-8-21-16-13-14-5-4-6-2-7 1-6 2zM267 230l15 6 29 17 4 4 6 11 0 9-4 14-4 7-10 15-5 17 1 12 5 7 11 9 7 4 12 3 13 6 13 3 15 6 27 3 18-1 22 4 0 16-3 13-16-1-16-5-20-4-22-1-16-7-19-5-10-4-25-17-7-7-6-7-2-4-4-18 0-6 3-11 10-15 8-16 2-10-1-13-1-3-7-10-11-9zM83 92l-8 7-7 9-14 24-4 11-10 16-13 14-7 10-16 16-3 8-1 9 1 7 2 7 4 5 7 4 17 7 17 5 20 2 18 1 17 3 9 0 20-3 21-5 16-3 2-2 2-3 0-5-1-5-4-4-13-9-8-8-6-9-9-11-6-15-4-17 0-7 1-10 6-15 0-5-2-5-11-14-11-8-4-2-7-2-7 1zM94 117l7 8-2 8-2 20 0 16 3 10 3 8 8 14 18 27-18 2-13-4-18-3-25 0-17-3-9-3 3-5 13-13 9-13 7-13 9-12 6-17 6-11 7-11zM224 6l-6 7-12 19-16 38-6 19-6 13-2 7 0 6 2 5 11 10 9 14 10 8 18 7 31 16 29 13 38 20 18 15 17 20 7 5 8 2 37 0 6-1 19-7 9-5 4-5 2-4 1-4-1-10-9-16-11-15-5-5-24-13-10-8-19-23-16-24-4-6-7-6-7-4-10-2-18 3-4-2-5-3-3-5-6-14-9-16-14-31-10-13-6-6-6-4-10-1-8 2zM239 31l7 9 7 14 5 19 17 30 16 15 6 3 12 2 20-1 2 1 13 14 8 12 20 24 20 16 19 13 13 17-8 4-8 3-8 0-12 1-13 0-24-28-12-8-13-12-24-14-21-8-14-7-18-8-16-11-14-5-4-4-11-14 12-21 6-23 9-20z"/></svg>';
+  const SEAL_SRC = "./icons/seal.webp";
 
   let total = null;      // 拿到過的總數（字串，已含千分位）；null＝還沒拿到
   let panel = null, closing = false;
@@ -5189,8 +5211,11 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     const seal = document.createElement("span");
     seal.className = "eggseal";
     seal.setAttribute("aria-hidden", "true");
-    seal.innerHTML = SEAL_SVG;
     card.appendChild(seal);
+    const probe = new Image();
+    probe.crossOrigin = "anonymous";   // 遮罩圖照規格以 CORS 模式抓；探針同模式才共用同一份快取（否則同一張圖抓兩次）
+    probe.onerror = function(){ if (seal.parentNode) seal.parentNode.removeChild(seal); };
+    probe.src = SEAL_SRC;
     panel.appendChild(card);
 
     card.addEventListener("click", function(e){ e.stopPropagation(); });

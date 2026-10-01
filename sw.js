@@ -78,7 +78,11 @@
 // v7→v8：2026-10-02 本人裁，favicon.svg／favicon-32.png 由台灣剪影換成一日遊圖示的山與溪流輪廓——檔名不變、
 // 內容變了，兩檔都是 cache-first 殼層資源，不推號的話裝過的人永遠拿到舊圖示（同 v1→v2 icons 那一次）。
 // 代價同檔頭：activate 清掉整份 v7，逾時閘門倚靠的頁面副本等下一次成功造訪才補回。
-const CACHE_VERSION = "v8";
+// v8→v9：2026-10-02 本人裁（6.148），favicon.svg／favicon-32.png 改成本人提供的朱印母稿的形狀（實心、主題色）——
+// 檔名不變、內容變了；彩蛋卡落款改成遮罩圖 seal.webp（只在開彩蛋時用到，列進來是為了離線開彩蛋也有）。
+// 內容變了的 cache-first 殼層資源不推號的話，裝過的人永遠拿到舊圖示（同 v1→v2 icons 那一次）。
+// 代價同檔頭：activate 清掉整份 v8，逾時閘門倚靠的頁面副本等下一次成功造訪才補回。
+const CACHE_VERSION = "v9";
 const CACHE_NAME = `hsinchu-day-trips-${CACHE_VERSION}`;
 
 // 殼層資源：install 時預熱，之後 cache-first。都是同源、幾乎不變的檔案。
@@ -93,6 +97,7 @@ const SHELL_ASSETS = [
   "./icons/favicon.svg",
   "./icons/favicon-32.png",
   "./icons/trip-empty.webp",
+  "./icons/seal.webp",
   // Leaflet 站內託管（v6，2026-09-25 棒 DM，效能 D4）。五張圖是 leaflet.css 的 `url(images/…)`
   // （layers／layers-2x／marker-icon）加上 Leaflet 預設圖示在 JS 裡會用到的另外兩張；站上的圖釘
   // 全是 `L.divIcon`，預設圖示目前用不到，但檔案跟著引擎走，預熱它們只多 3 KB（同多日遊 v7）。
