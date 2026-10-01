@@ -930,11 +930,6 @@ button{font:inherit; color:inherit; cursor:pointer}
 .setrow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 0 4px}
 .setrow .lab{font-size:12px; color:var(--ink3); letter-spacing:.06em}
 
-.tback{padding:12px 0 2px}
-.tback .tbt{margin:0; font-size:18px; font-weight:600; line-height:1.35; color:var(--ink)}
-.tback .tbclock{font-variant-numeric:tabular-nums}
-.tback .tbs{margin:2px 0 0; font-size:13.5px; line-height:1.5; color:var(--ink2)}
-
 #start{
 
   border:1px solid var(--hair2); background:var(--bg); color:var(--ink2); border-radius:999px;
@@ -956,12 +951,16 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 
 .ttotal{
-  display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
+  display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:2px 12px;
   margin-top:10px; padding-top:8px; border-top:0;
-  font-size:12.5px; color:var(--ink2);
+  font-size:12px; color:var(--ink2);
 }
-.ttotal.late{color:var(--warn)}
-.ttotal .warn{font-size:11.5px; color:var(--warn)}
+.ttotal .tdet{min-width:0; font-size:12px; color:var(--ink2); font-variant-numeric:tabular-nums}
+.ttotal .tret{min-width:0; font-size:12px; font-weight:600; color:var(--ink)}
+.ttotal .tret .tclk{font-variant-numeric:tabular-nums}
+
+.ttotal.late, .ttotal.late .tdet, .ttotal.late .tret{color:var(--warn)}
+.ttotal .warn{flex-basis:100%; font-size:11.5px; color:var(--warn)}
 
 .tnear{margin-top:11px; margin-bottom:11px; border-top:1px solid var(--hair); padding-top:8px}
 .tnear h3{margin:0 0 6px}
@@ -3071,14 +3070,6 @@ function renderTrip(){
 
   set.append(home,time,lab);
 
-  const tback=document.createElement("div"); tback.className="tback";
-  const tbt=document.createElement("p"); tbt.className="tbt";
-  tbt.innerHTML=`預計 <span class="tbclock">${fmt(st.backTime)}</span> 回到新竹`;
-  const tbs=document.createElement("p"); tbs.className="tbs";
-  tbs.textContent=`${st.ps.length} 站・停留 ${hmT(st.stayMin)}・開車約 ${estT(st.driveTotal)}`;
-  tbs.title=`車程合計 ${rawT(st.driveTotal)}`;
-  tback.append(tbt, tbs);
-
   const plan=document.createElement("div"); plan.className="plan";
 
   const legRow=(from, to, text, raw)=>{
@@ -3155,10 +3146,13 @@ function renderTrip(){
   if (mob) plan.appendChild(legRow(st.ps[st.ps.length-1].name, "新竹市", legText(st.back, st.backKm, st.backReal), rawT(st.back, st.backKm)));
 
   const sum=document.createElement("div"); sum.className="ttotal" + (late?" late":"");
-  const sumv=document.createElement("span");
-  sumv.textContent=`共約 ${estT(st.totalMin)}`;
+  const sumv=document.createElement("span"); sumv.className="tdet";
+  sumv.textContent=`停 ${hmT(st.stayMin)}・開車約 ${estT(st.driveTotal)}・共 ${estT(st.totalMin)}`;
   sumv.title=`車程合計 ${rawT(st.driveTotal)}　總時程 ${rawT(st.totalMin)}`;
-  sum.appendChild(sumv);
+  const ret=document.createElement("span"); ret.className="tret";
+  const clk=document.createElement("span"); clk.className="tclk"; clk.textContent=fmt(st.backTime);
+  ret.append("預計 ", clk, " 回新竹");
+  sum.append(sumv, ret);
   if (late){
     const w=document.createElement("span"); w.className="warn";
     w.textContent="天已經黑了，山路請留餘裕";
@@ -3208,7 +3202,7 @@ function renderTrip(){
                  + "不含塞車與找停車位，停留時間可以自己加減。";
 
   const near=tripNearSection();
-  sheet.append(tback,set,plan,sum);
+  sheet.append(set,plan,sum);
   if (near) sheet.appendChild(near);
 
   go.appendChild(foot);
