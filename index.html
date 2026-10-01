@@ -951,16 +951,15 @@ button{font:inherit; color:inherit; cursor:pointer}
 }
 
 .ttotal{
-  display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:2px 12px;
   margin-top:10px; padding-top:8px; border-top:0;
   font-size:12px; color:var(--ink2);
 }
-.ttotal .tdet{min-width:0; font-size:12px; color:var(--ink2); font-variant-numeric:tabular-nums}
-.ttotal .tret{min-width:0; font-size:12px; font-weight:600; color:var(--ink)}
-.ttotal .tret .tclk{font-variant-numeric:tabular-nums}
+.ttotal .tdet{display:block; font-variant-numeric:tabular-nums}
+.ttotal .tret{display:block; margin-top:2px; font-size:12px; color:var(--ink3)}
+.ttotal .tret .tclk{font-size:16px; font-weight:400; line-height:1.15; color:var(--ink); font-variant-numeric:tabular-nums}
 
-.ttotal.late, .ttotal.late .tdet, .ttotal.late .tret{color:var(--warn)}
-.ttotal .warn{flex-basis:100%; font-size:11.5px; color:var(--warn)}
+.ttotal.late, .ttotal.late .tret, .ttotal.late .tret .tclk{color:var(--warn)}
+.ttotal .warn{display:block; font-size:11.5px; color:var(--warn)}
 
 .tnear{margin-top:11px; margin-bottom:11px; border-top:1px solid var(--hair); padding-top:8px}
 .tnear h3{margin:0 0 6px}
@@ -3146,15 +3145,15 @@ function renderTrip(){
   if (mob) plan.appendChild(legRow(st.ps[st.ps.length-1].name, "新竹市", legText(st.back, st.backKm, st.backReal), rawT(st.back, st.backKm)));
 
   const sum=document.createElement("div"); sum.className="ttotal" + (late?" late":"");
-  const sumv=document.createElement("span"); sumv.className="tdet";
-  sumv.textContent=`停 ${hmT(st.stayMin)}・開車約 ${estT(st.driveTotal)}・共 ${estT(st.totalMin)}`;
+  const sumv=document.createElement("div"); sumv.className="tdet";
+  sumv.textContent=`停留 ${hmT(st.stayMin)}・開車約 ${estT(st.driveTotal)}・共約 ${estT(st.totalMin)}`;
   sumv.title=`車程合計 ${rawT(st.driveTotal)}　總時程 ${rawT(st.totalMin)}`;
-  const ret=document.createElement("span"); ret.className="tret";
+  const ret=document.createElement("div"); ret.className="tret";
   const clk=document.createElement("span"); clk.className="tclk"; clk.textContent=fmt(st.backTime);
   ret.append("預計 ", clk, " 回新竹");
   sum.append(sumv, ret);
   if (late){
-    const w=document.createElement("span"); w.className="warn";
+    const w=document.createElement("div"); w.className="warn";
     w.textContent="天已經黑了，山路請留餘裕";
     sum.appendChild(w);
   }
