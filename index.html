@@ -1444,6 +1444,10 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
 }
 .dotpin .pinlbl{left:32px; font-weight:400}
 
+.pinlbl.lf{left:auto; right:30px}
+.dotpin .pinlbl.lf{left:auto; right:32px}
+.pinlbl.lhide{visibility:hidden}
+
 #map.planon .leaflet-marker-icon:not(.hot) > .pin:not(.on):not(.cand),
 #map.planon .poidot:not(.hot):not(.on):not(.cand){opacity:.7}
 .leaflet-container{font:inherit}
@@ -2278,6 +2282,12 @@ function initOSM(why){
     zoom=z;
     if (crossed) draw();
   });
+
+  map.on("moveend zoomend", scheduleLabels);
+  map.on("resize", ()=>scheduleLabels(true));
+  if (window.MutationObserver)
+    new MutationObserver(()=>{ LBL_LIST=null; scheduleLabels(); })
+      .observe(map.getPane("markerPane"), {childList:true, subtree:true});
   ready=true;
   note(why ? "底圖用 OpenStreetMap：" + why : "");
 
@@ -2289,6 +2299,8 @@ function initOSM(why){
     if (S.sel && BY_ID[S.sel]) map.setView([BY_ID[S.sel].lat, BY_ID[S.sel].lng], 13, {animate:false});
     drawChunked();
   }
+  scheduleLabels(true);   // 建圖這一刻補排一次避讓（看不見的那條路會在 `placeLabels()` 第一道閘早退，C4）
+  lblWarm();              // 名字寬度閒置時先量好（C4，見 `lblWarm()`）
 }
 
 const pinState = (p, plan) => {
@@ -2559,6 +2571,165 @@ function addLocateControl(){
   };
   ctl.addTo(map);
 }
+
+let LBL_RAF=0, LBL_TO=0, LBL_MS=0;
+const LBL_EDGE=8, LBL_PAD=2, LBL_CELL=64;
+
+const LBL_D = {pin:31.5, stop:34};
+
+let LBL_OBS=null, LBL_LIST=null, LBL_OBS_SIG="", LBL_OBS_TO=0;
+
+function lblObsSig(){
+  const g=id=>document.getElementById(id);
+  const sw=g("sheetwrap"), mc=g("mcondsum"), mb=g("mapbtns"), tt=g("totop"), mn=g("mapnote"), mm=g("mapmsg");
+  return [S.tab, SHEET||"", S.sel||"",
+          sw ? sw.hasAttribute("data-open")+"/"+(sw.getAttribute("data-st")||"") : "",
+          mc ? mc.className+"/"+mc.textContent : "", mb ? mb.textContent : "",
+          tt ? tt.hidden+"/"+tt.className : "", mn ? mn.style.display+"/"+mn.textContent : "", mm ? mm.style.display : ""].join("|");
+}
+function scheduleLabels(obsDirty){
+  if (obsDirty===true) LBL_OBS_SIG="";
+  if (LBL_RAF || LBL_TO) return;
+  const run=()=>{ if (LBL_RAF) cancelAnimationFrame(LBL_RAF); clearTimeout(LBL_TO); LBL_RAF=0; LBL_TO=0; placeLabels(); };
+  LBL_RAF=requestAnimationFrame(run);
+  LBL_TO=setTimeout(run, 150);
+}
+
+let LBL_W=new Map(), LBL_H=0, LBL_FONT_CSS="", LBL_CTX=null;
+function lblBoxW(text){
+  let w=LBL_W.get(text);
+  if (w===undefined){
+    if (!LBL_FONT_CSS) LBL_FONT_CSS = "11.5px " + getComputedStyle(map.getContainer()).fontFamily;
+    if (!LBL_CTX){ const c=document.createElement("canvas"); LBL_CTX=c.getContext("2d"); }
+    if (LBL_CTX){ LBL_CTX.font=LBL_FONT_CSS; w=Math.ceil(LBL_CTX.measureText(text).width)+12; }
+    else w=12+text.length*11.5;
+    LBL_W.set(text, w);
+  }
+  return w;
+}
+if (document.fonts && document.fonts.addEventListener)
+  document.fonts.addEventListener("loadingdone", ()=>{ LBL_W=new Map(); LBL_H=0; LBL_FONT_CSS=""; lblWarm(); scheduleLabels(); });
+
+function lblObsRead(){
+  const size=map.getSize();
+  const mr=map.getContainer().getBoundingClientRect();
+  const o=[];
+  document.querySelectorAll("#map .leaflet-control, #mcondsum, #mapnote, #mapmsg, #mapbtns > *, #mapcard, #sheetwrap .bsheet, #totop")
+    .forEach(el=>{
+      const r=el.getBoundingClientRect();
+      if (!r.width || !r.height || r.right<=mr.left || r.left>=mr.right || r.bottom<=mr.top || r.top>=mr.bottom) return;
+      const cs=getComputedStyle(el);
+      if (cs.visibility==="hidden" || +cs.opacity===0) return;
+      o.push({x0:r.left-mr.left, x1:r.right-mr.left, y0:r.top-mr.top, y1:r.bottom-mr.top});
+    });
+  LBL_OBS=o;
+  LBL_OBS_SIG=lblObsSig()+"|"+size.x+"x"+size.y;
+  if (!LBL_H){
+    const e=map.getPane("markerPane").querySelector(".pinlbl");
+    if (e) LBL_H=e.getBoundingClientRect().height;
+  }
+}
+
+function lblObsLater(){
+  if (LBL_OBS_TO) return;
+  LBL_OBS_TO=setTimeout(()=>{
+    LBL_OBS_TO=0;
+    if (!map || !ready || !mapShown()) return;
+    const before=JSON.stringify(LBL_OBS), h0=LBL_H;
+    lblObsRead();
+    if (JSON.stringify(LBL_OBS)!==before || LBL_H!==h0) placeLabels();
+  }, 0);
+}
+function placeLabels(){
+  if (!map || !ready || !mapShown()) return;     // 手機地圖頁以外（地圖 display:none）不量，同 `draw()` 的第①條
+  const t0=performance.now();
+
+  if (!LBL_LIST){
+    LBL_LIST=[];
+    const all=map.getPane("markerPane").getElementsByClassName("pinlbl");
+    for (let i=0;i<all.length;i++){
+      const el=all[i], host=el.parentElement, icon=host && host.parentElement;
+      if (icon) LBL_LIST.push({el, host, icon});
+    }
+  }
+  const els=LBL_LIST, n=els.length;
+  if (!n){ LBL_MS=0; return; }
+
+  const size=map.getSize(), W=size.x, H=size.y;
+  if (!W || !H) return;
+  const off=L.DomUtil.getPosition(map.getPane("mapPane"));
+  const vx0=LBL_EDGE, vy0=LBL_EDGE, vx1=W-LBL_EDGE, vy1=H-LBL_EDGE;
+
+  const osig=lblObsSig()+"|"+W+"x"+H;
+  if (!LBL_OBS || osig!==LBL_OBS_SIG || !LBL_H) lblObsLater();
+  const obs=LBL_OBS || [], lh=LBL_H || 21.25;
+
+  const cand=[];
+  for (let i=0;i<n;i++){
+    const it=els[i], pos=it.icon._leaflet_pos;
+    if (!pos) continue;
+
+    const ax=pos.x+off.x, ay=pos.y+off.y;
+    if (ax<-340 || ax>W+340 || ay<-60 || ay>H+60) continue;
+    const el=it.el, hc=it.host.classList, stop=hc.contains("dotpin");
+    const bw = stop ? 28 : 26, d = stop ? LBL_D.stop : LBL_D.pin;
+    const x=ax-bw/2;
+    const lw=lblBoxW(el._lt || (el._lt=el.textContent));
+    const R={x0:x+d, x1:x+d+lw, y0:ay-lh/2, y1:ay+lh/2};
+    const Lb={x0:x+bw-d-lw, x1:x+bw-d, y0:R.y0, y1:R.y1};
+    if (R.y1<0 || R.y0>H || ((R.x1<0 || R.x0>W) && (Lb.x1<0 || Lb.x0>W))) continue;   // 兩側都碰不到地圖
+    const tier = hc.contains("on") ? 0 : stop ? 1 : hc.contains("cand") ? 2 : 3;
+    cand.push({el, tier, i, R, L:Lb});
+  }
+  cand.sort((a,b)=>a.tier-b.tier || a.i-b.i);
+
+  const hit=(a,b)=> a.x0<b.x1+LBL_PAD && b.x0<a.x1+LBL_PAD && a.y0<b.y1+LBL_PAD && b.y0<a.y1+LBL_PAD;
+  const grid=new Map();
+  const cells=(b,f)=>{
+    const gx0=Math.floor((b.x0-LBL_PAD)/LBL_CELL), gx1=Math.floor((b.x1+LBL_PAD)/LBL_CELL);
+    const gy0=Math.floor((b.y0-LBL_PAD)/LBL_CELL), gy1=Math.floor((b.y1+LBL_PAD)/LBL_CELL);
+    for (let gx=gx0; gx<=gx1; gx++) for (let gy=gy0; gy<=gy1; gy++){ if (f(gx*4096+gy)) return true; }
+    return false;
+  };
+  const free=b=> b.x0>=vx0 && b.x1<=vx1 && b.y0>=vy0 && b.y1<=vy1 && !obs.some(o=>hit(b,o));
+  const clash=b=> cells(b, k=>{ const a=grid.get(k); return !!a && a.some(p=>hit(b,p)); });
+  const put=b=> cells(b, k=>{ const a=grid.get(k); if (a) a.push(b); else grid.set(k,[b]); return false; });
+  for (const c of cand){
+    const prot=c.tier<=1;
+    let side=null;
+    if (free(c.R)) side = !clash(c.R) ? "R" : (prot && free(c.L) && !clash(c.L)) ? "L" : null;
+    else if (free(c.L) && !clash(c.L)) side="L";
+    c.side=side;
+    if (side) put(side==="R" ? c.R : c.L);
+  }
+
+  for (const c of cand){
+    const lf=c.side==="L", hid=!c.side, cl=c.el.classList;
+    if (cl.contains("lf")!==lf) cl.toggle("lf", lf);
+    if (cl.contains("lhide")!==hid) cl.toggle("lhide", hid);
+  }
+  LBL_MS=performance.now()-t0;
+}
+
+let LBL_WARMING=false;
+function lblWarm(){
+  if (LBL_WARMING || !map) return;
+  LBL_WARMING=true;
+  const texts=PLACES.map(p=>p.name).filter(t=>t && !LBL_W.has(t));
+  let i=0;
+  const step=()=>{
+    const end=Math.min(i+150, texts.length);
+    for (; i<end; i++) lblBoxW(texts[i]);
+    if (i<texts.length) whenIdle(step); else LBL_WARMING=false;
+  };
+  whenIdle(step);
+}
+
+(function(){
+  const sw=document.getElementById("sheetwrap");
+  const done=e=>{ if (e.target.classList && e.target.classList.contains("bsheet")) scheduleLabels(true); };
+  if (sw){ sw.addEventListener("animationend", done); sw.addEventListener("transitionend", done); }
+})();
 
 (function(){
   const mapEl = document.getElementById("map");
@@ -4540,6 +4711,7 @@ function enterMap(){
       map.setView(MAPKEEP.c, MAPKEEP.z, {animate:false});
     }
     showTiles();
+    scheduleLabels(true);   // 標籤避讓（2026-10-01 C4）：地圖剛露臉、容器剛重量，補排一次（預熱沿用的圖釘不會觸發 MutationObserver）
   }, 60);
 }
 
@@ -4719,6 +4891,7 @@ function render(){
 
   fpopFit();
   syncAnnounce();   // 條件變了就念筆數（2026-10-01 C8，見 `announce()` 那段）
+  scheduleLabels();   // 標籤避讓（2026-10-01 C4）：浮層（條件摘要、Sheet、左下鈕）可能換了，圖釘沒換也要重排——浮層盒要不要重讀由簽章決定
 }
 
 let Q_COMPOSING=false;
