@@ -72,7 +72,10 @@
 // 改前那份內嵌矩陣的整頁副本不必靠推號清：頁面副本存在不帶查詢字串的單一鑰匙（pageKey）底下，下一次
 // 成功導覽就被新版蓋掉。**同一刀補一個洞**：prunePageCopies 原本只排除殼層資源，`data/…?v=` 也帶
 // 查詢字串，不排除的話每次導覽都會把剛存的矩陣當成「帶查詢字串的頁面副本」清掉（離線就讀不到了）。
-const CACHE_VERSION = "v6";
+// v6→v7：2026-10-01 棒 CY（本人裁 C1／C2）`icons/` 多三個殼層資源——favicon.svg、favicon-32.png、
+// 行程頁空狀態扉頁圖 trip-empty.webp——列進 SHELL_ASSETS 走 cache-first，照檔頭規則推號（同 v5→v6）。
+// 代價同檔頭：activate 清掉整份 v6，逾時閘門倚靠的頁面副本等下一次成功造訪才補回。
+const CACHE_VERSION = "v7";
 const CACHE_NAME = `hsinchu-day-trips-${CACHE_VERSION}`;
 
 // 殼層資源：install 時預熱，之後 cache-first。都是同源、幾乎不變的檔案。
@@ -84,6 +87,9 @@ const SHELL_ASSETS = [
   "./icons/icon-192-maskable.png",
   "./icons/icon-512-maskable.png",
   "./icons/apple-touch-icon.png",
+  "./icons/favicon.svg",
+  "./icons/favicon-32.png",
+  "./icons/trip-empty.webp",
   // Leaflet 站內託管（v6，2026-09-25 棒 DM，效能 D4）。五張圖是 leaflet.css 的 `url(images/…)`
   // （layers／layers-2x／marker-icon）加上 Leaflet 預設圖示在 JS 裡會用到的另外兩張；站上的圖釘
   // 全是 `L.divIcon`，預設圖示目前用不到，但檔案跟著引擎走，預熱它們只多 3 KB（同多日遊 v7）。
