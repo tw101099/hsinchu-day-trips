@@ -209,10 +209,24 @@ body{
 }
 button{font:inherit; color:inherit; cursor:pointer}
 
-.num{font-size:.92em; letter-spacing:-.01em; font-variant-numeric:tabular-nums}
+.num{font-size:11px; letter-spacing:-.01em; font-variant-numeric:tabular-nums}
+.fsum .num, .ghead .num{font-size:11.5px}
+.facts .num, .tsback .num{font-size:12px}
+
+.mi .num, .mi .adjw{line-height:17.672px}
 
 :focus-visible{outline:2px solid var(--accent); outline-offset:2px}
 .row:focus-visible, .ghead:focus-visible, .tsheet .tsrow:focus-visible{outline-offset:-2px}
+
+.sr-only{position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+  clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0}
+.skip{
+  position:fixed; left:calc(10px + env(safe-area-inset-left)); top:calc(10px + env(safe-area-inset-top)); z-index:60000;
+  transform:translateY(calc(-100% - 24px)); background:var(--panel); color:var(--ink); border:1px solid var(--hair);
+  border-radius:999px; padding:6px 14px; font-size:13.5px; text-decoration:none; box-shadow:0 1px 6px rgba(var(--sh),.20);
+}
+.skip:focus{transform:none}
+.results[tabindex]:focus{outline:none}
 .ic{width:14px; height:14px; flex:none; stroke:currentColor; fill:none; stroke-width:1.5;
     stroke-linecap:round; stroke-linejoin:round; vertical-align:-2px; margin-right:4px}
 
@@ -763,6 +777,12 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .empty .ec{margin:7px 0 0; font-size:12.5px; line-height:1.7; color:var(--ink3)}
 .empty .ea{margin-top:12px; display:flex; flex-wrap:wrap; gap:7px}
+
+.empty .esug{margin:12px 0 0; align-items:center; gap:6px}
+.empty .esug .ek{font-size:12.5px; color:var(--ink3); margin-right:2px}
+.empty .ecr{margin-top:12px; display:flex; flex-wrap:wrap; gap:7px}
+.empty .ecb .k{color:var(--ink3)}
+.empty .ecb .x{margin-left:7px; font-size:15px; line-height:1; color:var(--ink3)}
 .ebtn{
   font-size:12.5px; line-height:1.5; color:var(--ink2); border:1px solid var(--hair);   
   border-radius:999px; padding:3px 10px; background:var(--chip-bg); font-family:inherit;
@@ -819,6 +839,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 .facts dd{margin:0}
 
 .detail .desc{font-size:14px; margin-top:0; margin-right:0; margin-bottom:9px; -webkit-user-select:text; user-select:text}
+
+.detail .desc, .flag, .gintro .gdesc, .foot{text-autospace:normal}
 
 .flag{
   display:flex; align-items:flex-start; gap:7px;
@@ -930,8 +952,8 @@ button{font:inherit; color:inherit; cursor:pointer}
 
 .mi .sep{line-height:0}
 
-.mi .adjw{font-size:.92em; flex:none; white-space:nowrap}
-.tnear .row .m .mi .adjw{font-size:inherit}
+.mi .adjw{font-size:11px; flex:none; white-space:nowrap}
+.tnear .row .m .mi .adjw{font-size:inherit; line-height:inherit}   
 
 .mi .sep + .adjw{margin-left:-3px}
 .tnear .row .m{flex-wrap:nowrap; min-width:0}
@@ -1322,7 +1344,8 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
 .fbhint.out{opacity:0}
 
 .mcondsum{
-  position:absolute; top:10px; left:calc(54px + env(safe-area-inset-left)); right:calc(10px + env(safe-area-inset-right));
+
+  position:absolute; top:10px; left:calc(64px + env(safe-area-inset-left)); right:calc(10px + env(safe-area-inset-right));
   z-index:500; display:none; flex-direction:column; align-items:stretch; gap:0;
 
   background-color:var(--surface-sheet); background-image:var(--paper-sheet); border:0; border-radius:0;
@@ -1368,7 +1391,7 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
   border:1.5px solid currentColor; box-shadow:0 1px 4px rgba(var(--sh),.28);
 }
 
-.pin, .hubpin, .mypin, .dotpin, .poidot .pd{
+.pin, .hubpin, .mypin, .poidot .pd{
   background-image:var(--pinfx) !important;
 }
 .pin svg{width:15px; height:15px; margin:0; stroke-width:1.6}
@@ -1399,18 +1422,16 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
 .leaflet-marker-icon .pin, .leaflet-marker-icon .dotpin, .poidot .pd{transition:transform .12s}
 .leaflet-marker-icon.hot .pin, .leaflet-marker-icon.hot .dotpin, .poidot.hot .pd{transform:scale(1.3)}
 
-.plan-badge{
-  position:absolute; top:-6px; right:-6px; min-width:16px; height:16px; padding:0 3px;
-  border-radius:999px; background:var(--accent); color:var(--on-accent);
-  font-size:10px; font-weight:700; line-height:16px; text-align:center; font-variant-numeric:tabular-nums;   
-  box-shadow:0 0 0 1.5px var(--panel); pointer-events:none;
-}
-
 .dotpin{
-  position:relative; width:20px !important; height:20px !important;
-  border-radius:999px;
-  border:2.5px solid #fff; box-shadow:0 1px 5px rgba(var(--sh),.36);
+  position:relative; display:grid; place-items:center; width:28px !important; height:28px !important;
+  border-radius:999px; background:var(--accent); color:var(--on-accent);
+  border:2px solid var(--panel); box-shadow:0 1px 5px rgba(var(--sh),.36);
+  font-size:13px; font-weight:700; font-variant-numeric:tabular-nums;
 }
+.dotpin .pinlbl{left:32px; font-weight:400}
+
+#map.planon .leaflet-marker-icon:not(.hot) > .pin:not(.on):not(.cand),
+#map.planon .poidot:not(.hot):not(.on):not(.cand){opacity:.7}
 .leaflet-container{font:inherit}
 .leaflet-popup-content{margin:9px 12px; font-size:13px; line-height:1.5}
 .leaflet-tooltip.tt{
@@ -1422,6 +1443,34 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
 .leaflet-tooltip.tt i{font-style:normal; color:var(--ink3); display:flex; align-items:baseline; flex-wrap:wrap; font-size:11.5px}
 
 :root .leaflet-tile{filter:var(--tile)}
+
+#map{background-color:var(--bg); background-image:var(--paper-bg); font-family:inherit}
+#map .leaflet-bar{
+  border:1px solid var(--hair); border-radius:999px; overflow:hidden; background-clip:padding-box;
+  background-color:var(--panel); background-image:var(--paper-panel); box-shadow:0 1px 6px rgba(var(--sh),.20);
+}
+#map .leaflet-bar a{
+  display:flex; align-items:center; justify-content:center; width:40px; height:40px; line-height:1;
+  background:none; border:0; border-bottom:1px solid var(--hair); border-radius:0;
+  font:inherit; text-indent:0; cursor:pointer;
+}
+#map .leaflet-bar a:last-child{border-bottom:0}
+#map .leaflet-bar a:not(.on){color:var(--ink2)}
+#map .leaflet-bar a svg{display:block; width:16px; height:16px; fill:none; stroke:currentColor;
+  stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+#map .leaflet-bar a:focus{background-color:transparent}
+@media (hover:hover){ #map .leaflet-bar a:hover{background-color:var(--hover-bg)}
+  #map .leaflet-bar a:not(.on):hover{color:var(--accent)} }
+#map .leaflet-bar a.leaflet-disabled{background-color:transparent; color:var(--ink3); opacity:.45; cursor:default}
+#map .leaflet-bar a:focus-visible{outline:2px solid var(--accent); outline-offset:-3px}
+@media (pointer:coarse), (max-width:899px), (max-height:559px){
+  #map .leaflet-bar a{width:44px; height:44px}
+}
+#map .leaflet-control-attribution{
+  font-family:inherit; font-size:11px; line-height:1.5; padding:0 6px; color:var(--ink3);
+  background:color-mix(in srgb, var(--bg) 78%, transparent);
+}
+#map .leaflet-control-attribution a{color:var(--ink2); text-decoration:underline; text-underline-offset:2px}
 
 .bar, .panel, .fbar, .trip, .loctip, .leaflet-tooltip.tt{
   background-image:var(--paper-panel);
@@ -1493,6 +1542,9 @@ a.sheetbtn{display:inline-flex; align-items:center; text-decoration:none}
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 </head>
 <body>
+
+<a class="skip" id="skip" href="#panel">跳到清單</a>
+<div class="sr-only" id="announce" aria-live="polite" aria-atomic="true"></div>
 <div class="app" id="app">
   <header class="bar">
 
@@ -1617,6 +1669,7 @@ function clearPlan(){
   CLR_UNDO={plan:PLAN.slice(), stay:Object.assign({}, STAY), timer:0};
   CLR_UNDO.timer=setTimeout(()=>dropClrUndo(true), CLR_UNDO_MS);
   PLAN=[]; STAY={}; save(); render();
+  announce("已清空，共 0 站", 1);   // 讀螢幕回饋（2026-10-01 C8，見 `announce()`）
   const u=document.querySelector(".trip .tundo");
   if (u) u.focus({preventScroll:true});
 }
@@ -1626,6 +1679,7 @@ function undoClear(){
   clearTimeout(snap.timer); CLR_UNDO=null;
   PLAN=snap.plan.filter(id=>BY_ID[id]); STAY=snap.stay;
   save(); render(); resizeMap();
+  announce(`已復原，共 ${planCount()} 站`, 1);   // 讀螢幕回饋（2026-10-01 C8，見 `announce()`）
   const c=document.querySelector(".trip .go .quiet");
   if (c) c.focus({preventScroll:true});
 }
@@ -1883,12 +1937,42 @@ function seasonNote(p){
 const gview = p => p.gmap_coord ? `${p.lat},${p.lng}` : (p.gmap || (p.name + " " + p.town));
 const gnav  = p => p.nav_target || gview(p);
 
+const NORM_S = "台温汤宁岭庙馆阳头东兰区门观湾滩园桥云龙凤乡镇县岛泽涧峡坝场车驿农渔鱼营栈线树红绿蓝黄宝寿华兴广长罗苏杨陈吴郑沟浅湿济关归怀鸟鹤莲纪铁矿盐历迹遗灯楼阁宫圣万两闽远进过边达运连叶猫鹰鹭虾乐爱碍径岗汇滨灵钟鸣雾风飞处时间设计览赏戏体验讲导艺术剧窑厂铺丝织缆栏难险级条规证许预约订购卖买钱费价当网页电话号码开闭业办节庆会礼献静净凉热养荣浊横丰内狮饼厅战鸡饭点圆发枫樱萤亲汉墙顶库闸书厕无义妈尝鲜酱烧卤猪鸭鹅饺锅盘骑单脚宠视现壮丽岚马龟贝壳麦仓货专厨炉纸笔画绘摄声轨复旧饮钓挂";
+const NORM_T = "臺溫湯寧嶺廟館陽頭東蘭區門觀灣灘園橋雲龍鳳鄉鎮縣島澤澗峽壩場車驛農漁魚營棧線樹紅綠藍黃寶壽華興廣長羅蘇楊陳吳鄭溝淺濕濟關歸懷鳥鶴蓮紀鐵礦鹽歷跡遺燈樓閣宮聖萬兩閩遠進過邊達運連葉貓鷹鷺蝦樂愛礙徑崗匯濱靈鐘鳴霧風飛處時間設計覽賞戲體驗講導藝術劇窯廠舖絲織纜欄難險級條規證許預約訂購賣買錢費價當網頁電話號碼開閉業辦節慶會禮獻靜淨涼熱養榮濁橫豐內獅餅廳戰雞飯點圓發楓櫻螢親漢牆頂庫閘書廁無義媽嚐鮮醬燒滷豬鴨鵝餃鍋盤騎單腳寵視現壯麗嵐馬龜貝殼麥倉貨專廚爐紙筆畫繪攝聲軌復舊飲釣掛";
+const NORM_MAP = {};
+for (let i=0; i<NORM_S.length; i++) NORM_MAP[NORM_S[i]] = NORM_T[i];
+const NORM_RE = new RegExp("[" + NORM_S + "]", "g");
+function norm(s){
+  return String(s==null ? "" : s)
+    .replace(/[！-～]/g, c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0))
+    .replace(NORM_RE, c=>NORM_MAP[c])
+    .replace(/\s+/g, "")
+    .toLowerCase();
+}
+
+const HAY=new Map();
+function hayOf(p){
+  let h=HAY.get(p.id);
+  if (!h){
+    h={all:norm(p.name+p.town+(p.desc||"")+(p.note||"")+(p.season||"")+(p.kind||"")+(p.tags||[]).join("")),
+       name:norm(p.name), tags:(p.tags||[]).map(norm)};
+    HAY.set(p.id, h);
+  }
+  return h;
+}
+let QN_KEY=null, QN={q:"", tags:[]};
+function qTermsN(){
+  const k=S.q + "\u0001" + S.qtags.join("\u0001");
+  if (k!==QN_KEY){ QN_KEY=k; QN={q:norm(S.q), tags:S.qtags.map(norm).filter(Boolean)}; }
+  return QN;
+}
 const TAGSET=new Set();
-PLACES.forEach(p=>(p.tags||[]).forEach(t=>TAGSET.add(String(t).toLowerCase())));
-function termHit(p, hay, t){
+PLACES.forEach(p=>(p.tags||[]).forEach(t=>TAGSET.add(norm(t))));
+
+function termHit(p, h, t){
   if (TAGSET.has(t))
-    return (p.tags||[]).some(x=>String(x).toLowerCase()===t) || p.name.toLowerCase().includes(t);
-  return hay.includes(t);
+    return h.tags.some(x=>x===t) || h.name.includes(t);
+  return h.all.includes(t);
 }
 
 const PASS_AXES = [
@@ -1901,9 +1985,9 @@ const PASS_AXES = [
 
 function matchQ(p){
   if (!(S.q || S.qtags.length)) return true;
-  const hay=(p.name+p.town+p.desc+p.note+p.season+p.kind+(p.tags||[]).join("")).toLowerCase();
-  if (S.q && !termHit(p, hay, S.q)) return false;
-  for (const t of S.qtags) if (!termHit(p, hay, t)) return false;
+  const n=qTermsN(), h=hayOf(p);
+  if (n.q && !termHit(p, h, n.q)) return false;
+  for (const t of n.tags) if (!termHit(p, h, t)) return false;
   return true;
 }
 
@@ -2133,7 +2217,14 @@ function showTiles(){ if (TILES && map && !map.hasLayer(TILES)) TILES.addTo(map)
 function initOSM(why){
   if (ready) return;
   engine="osm";
-  map=L.map("map",{zoomControl:true, preferCanvas:true}).setView([24.76,121.06],11);
+
+  map=L.map("map",{zoomControl:false, preferCanvas:true}).setView([24.76,121.06],11);
+  L.control.zoom({
+    zoomInText:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>',
+    zoomInTitle:"放大",
+    zoomOutText:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10"/></svg>',
+    zoomOutTitle:"縮小"
+  }).addTo(map);
 
   TILES=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",
               {maxZoom:18,
@@ -2145,10 +2236,11 @@ function initOSM(why){
   map.createPane("routes").style.zIndex=350;
   lines=L.layerGroup().addTo(map);
   pts=L.layerGroup().addTo(map);
-  L.marker([HOME.lat,HOME.lng],{icon:L.divIcon({className:"hubpin",
-    html:'<svg viewBox="0 0 16 16"><path d="M2.5 8.5 8 3l5.5 5.5M4 7v6h8V7"/></svg>'})})
+  const hub=L.marker([HOME.lat,HOME.lng],{icon:L.divIcon({className:"hubpin",
+    html:'<svg viewBox="0 0 16 16"><path d="M2.5 8.5 8 3l5.5 5.5M4 7v6h8V7"/></svg>'}), keyboard:false})
     .bindTooltip(HOME.name,{direction:"top",offset:[0,-11],className:"tt",opacity:1})
     .addTo(map);
+  if (hub._icon) hub._icon.setAttribute("aria-hidden","true");
   zoom=map.getZoom();
   addLocateControl();
 
@@ -2178,7 +2270,7 @@ function initOSM(why){
 const pinState = (p, plan) => {
   const sel = p.id===S.sel;
   const cand = !sel && !plan && TODAY_NEAR_SET && TODAY_NEAR_SET.has(p.id);
-  return (sel ? " on" : "") + ((sel || plan) ? " has-halo" : "") + (cand ? " cand" : "");
+  return (sel ? " on has-halo" : "") + (cand ? " cand" : "");
 };
 function markerHTML(p){
   const c=(TH[p.theme]||{}).color||"#888";
@@ -2188,15 +2280,15 @@ function markerHTML(p){
 }
 
 function planPinHTML(p, n){
-  const c=(TH[p.theme]||{}).color||"#888";
-  return `<div class="pin${pinState(p,true)}" style="color:${c}">` +
-         `<svg viewBox="0 0 16 16" class="ic" style="margin:0">${ICON[p.theme]||""}</svg>` +
-         `<span class="plan-badge">${n}</span>` +
-         `<span class="pinlbl">${esc(p.name)}</span></div>`;
+  return `<div class="dotpin${pinState(p,true)}">${n}<span class="pinlbl">${esc(p.name)}</span></div>`;
 }
 function planDotHTML(p, n){
-  const c=(TH[p.theme]||{}).color||"#888";
-  return `<div class="dotpin${pinState(p,true)}" style="background:${c}"><span class="plan-badge">${n}</span></div>`;
+  return `<div class="dotpin${pinState(p,true)}">${n}</div>`;
+}
+
+function syncPlanDim(){
+  const m=document.getElementById("map");
+  if (m) m.classList.toggle("planon", PLAN.some(id=>BY_ID[id]));
 }
 function tipHTML(p){
   return `<b>${esc(p.name)}</b>` +
@@ -2227,6 +2319,7 @@ function drawSig(list, asIcon){
 }
 const planNos = () => { const o={}; PLAN.forEach((id,i)=>{ o[id]=i+1; }); return o; };
 function draw(){
+  syncPlanDim();   // 有排站時淡化其他圖釘（2026-10-01 D7），容器 class，地圖建好之前也先掛上
   if (!ready) return;
   const list=drawList();
   const planRoutes=new Set();
@@ -2275,25 +2368,25 @@ function addMark(p, asIcon, planNo){
       const zoff = on ? Z_PLACE_ON : n ? Z_PLAN_STOP : Z_PLACE_NORMAL;
       let m;
 
+      
       if (n){
-        m = asIcon
-          ? L.marker([p.lat,p.lng], {icon:L.divIcon({className:"", html:planPinHTML(p,n), iconSize:[26,26], iconAnchor:[13,13]}),
-                                     zIndexOffset:zoff})
-          : L.marker([p.lat,p.lng], {icon:L.divIcon({className:"", html:planDotHTML(p,n), iconSize:[20,20], iconAnchor:[10,10]}),
-                                     zIndexOffset:zoff});
+        m = L.marker([p.lat,p.lng], {icon:L.divIcon({className:"", html:asIcon ? planPinHTML(p,n) : planDotHTML(p,n),
+                                                     iconSize:[28,28], iconAnchor:[14,14]}),
+                                     zIndexOffset:zoff, keyboard:false});
       } else if (asIcon){
         m = L.marker([p.lat,p.lng], {icon:L.divIcon({className:"", html:markerHTML(p), iconSize:[26,26], iconAnchor:[13,13]}),
-                                     zIndexOffset:zoff});
+                                     zIndexOffset:zoff, keyboard:false});
       } else {
 
         const c=(TH[p.theme]||{}).color||"#888";
         m = L.marker([p.lat,p.lng], {icon:L.divIcon({className:"poidot"+pinState(p,false), iconSize:[13,13], iconAnchor:[6.5,6.5],
                                                      html:`<span class="pd" style="background:${c}"></span>`}),
-                                     zIndexOffset:zoff});
+                                     zIndexOffset:zoff, keyboard:false});
       }
       m._zBase=zoff;   // `emphasize()` hover 完要退回的那一格
       m.addTo(pts);
-      m.bindTooltip(tipHTML(p), {direction:"top", offset:[0,asIcon?-14:-8], className:"tt", opacity:1});
+      if (m._icon) m._icon.setAttribute("aria-hidden","true");   // C8：讀螢幕不在無名圖釘上停留（見上）
+      m.bindTooltip(tipHTML(p), {direction:"top", offset:[0, n ? -16 : (asIcon?-14:-8)], className:"tt", opacity:1});
       m.on("mouseover", ()=>highlightRow(p.id,true));
       m.on("mouseout", ()=>highlightRow(p.id,false));
       m.on("click", ()=>select(p.id));
@@ -2416,7 +2509,8 @@ function toggleLocate(){
              'd="M20,12c-2,0-6,1-5,6s8,7,8,11-3,5-5,9,0,' +
              '7,3,8a6.8,6.8,0,0,0,8-4c1-3-.6-4.2,1-9,1-3,3-4,4-10C35.4,14.9,27,12,20,12Z"/>' +
              '</svg>'}),
-        interactive:false, zIndexOffset:Z_LOC}).addTo(map);   // 恆最上，見 Z_* 那張表
+        interactive:false, keyboard:false, zIndexOffset:Z_LOC}).addTo(map);   // 恆最上，見 Z_* 那張表
+      if (LOC.dot._icon) LOC.dot._icon.setAttribute("aria-hidden","true");
     } else {
       LOC.dot.setLatLng(ll); LOC.ring.setLatLng(ll); LOC.ring.setRadius(acc);
     }
@@ -2483,6 +2577,7 @@ function togglePlan(id){
   } else PLAN.splice(i,1);
   syncRouteView();   // 這個檢視以行程為前提，行程一動就重算（`syncNearView()` 棒 J5 退役）
   save(); render();
+  announce(i<0 ? `已加進今天，共 ${planCount()} 站` : `已移出今天，共 ${planCount()} 站`, 1);
 }
 
 function optimizePlan(){
@@ -2717,6 +2812,7 @@ function renderTrip(){
 
   const head=document.createElement("div");
   head.className="head";
+  head.setAttribute("role","heading"); head.setAttribute("aria-level","2");
   {
     const hint=document.createElement("span"); hint.className="hint";
     hint.textContent=`今天 · ${st.ps.length} 站`;
@@ -2842,11 +2938,11 @@ function renderTrip(){
   sh.textContent=shLabel;
   sh.onclick=()=>{
     const url=shareURL();
-    const done=()=>{ sh.textContent="連結已複製"; setTimeout(()=>{ sh.textContent=shLabel; },1800); };
+    const done=()=>{ sh.textContent="連結已複製"; announce("連結已複製", 1); setTimeout(()=>{ sh.textContent=shLabel; },1800); };
 
     const nocopy=()=>{
       history.replaceState(history.state, "", "#" + (url.split("#")[1]||""));
-      sh.textContent="請複製網址列"; setTimeout(()=>{ sh.textContent=shLabel; },1800);
+      sh.textContent="請複製網址列"; announce("請複製網址列", 1); setTimeout(()=>{ sh.textContent=shLabel; },1800);
     };
     const copy=()=>{
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done,nocopy);
@@ -3966,6 +4062,63 @@ function placeCard(summary, detail){
   return card;
 }
 
+const EMPTY_SUGG = ["步道","老街","咖啡","古道","瀑布","親子","溫泉","夜市"];
+function emptyFocusQ(e){
+  if (!(e && e.detail===0)) return;
+  const qi=document.getElementById("q");
+  if (qi && qi.offsetParent) qi.focus({preventScroll:true});
+}
+function emptyExits(d, hasQ){
+  if (hasQ){
+    const ea=document.createElement("div"); ea.className="ea";
+    const b=document.createElement("button");
+    b.type="button"; b.className="ebtn primary"; b.textContent="清除搜尋";
+    b.onclick=e=>{ e.stopPropagation(); resetQ(); filterChanged({nofit:true}); emptyFocusQ(e); };
+    ea.appendChild(b);
+    d.appendChild(ea);
+
+    const open=PLACES.filter(p=>!PASS_AXES.some(a=>a.blocks(p)));
+    const sug=EMPTY_SUGG.map(w=>{ const t=norm(w); return [w, open.filter(p=>termHit(p, hayOf(p), t)).length]; })
+      .filter(x=>x[1]>0);
+    const pick=sug.slice(0,3);   // 候選序取前三個有結果的（報告點名的三個優先），再依個數排
+    if (pick.length){
+      pick.sort((a,b)=>b[1]-a[1]);
+      const row=document.createElement("div"); row.className="tags esug";
+      const k=document.createElement("span"); k.className="ek"; k.textContent="試試"; row.appendChild(k);
+      pick.forEach(([w,n])=>{
+        const t=document.createElement("button");
+        t.type="button"; t.className="tag"; t.textContent=w;
+        t.title=`改搜「${w}」（目前條件下 ${n} 個景點）`;
+        t.onclick=e=>{
+          e.stopPropagation();
+          resetQ();
+          const qi=document.getElementById("q"); if (qi) qi.value=w;
+          S.q=w.trim().toLowerCase(); filterChanged(); emptyFocusQ(e);
+        };
+        row.appendChild(t);
+      });
+      d.appendChild(row);
+    }
+  }
+
+  const AX={"路段":"route", "往返路線":"route", "季節":"inseason", "時間":"budget", "費力":"diffs", "主題":"themes"};
+  const bits=condBits().filter(([k])=>AX[k]);
+  if (bits.length){
+    const row=document.createElement("div"); row.className="ecr";
+    bits.forEach(([k,v])=>{
+      const ax=PASS_AXES.find(a=>a.id===AX[k]);
+      if (!ax) return;
+      const b=document.createElement("button");
+      b.type="button"; b.className="ebtn ecb";
+      b.setAttribute("aria-label", `移除條件：${k} ${v}`); b.title=`移除這個條件（${k}：${v}）`;
+      b.innerHTML=`<span class="k">${esc(k)}｜</span><span class="v">${esc(v)}</span><span class="x" aria-hidden="true">×</span>`;
+      b.onclick=e=>{ e.stopPropagation(); ax.clear(); filterChanged(); emptyFocusQ(e); };
+      row.appendChild(b);
+    });
+    d.appendChild(row);
+  }
+}
+
 function renderList(){
   const wrap=document.createElement("div"); wrap.className="results";
   const list=shown();
@@ -3990,6 +4143,7 @@ function renderList(){
     const h=document.createElement("p"); h.className="eh";
     h.textContent = terms.length ? `找不到符合「${terms.join("、")}」的內容。` : "在目前條件下找不到內容";
     d.appendChild(h);
+    emptyExits(d, terms.length>0);   // 出路（2026-10-01 本人裁 C7，棒 BY），見那一支
     wrap.appendChild(d); return wrap;
   }
 
@@ -4019,6 +4173,11 @@ function renderList(){
       toggleSet(ROAD_OPEN, r.id); render();
     };
     wrap.appendChild(h);
+
+    const hh=document.createElement("div"); hh.className="sr-only";
+    hh.setAttribute("role","heading"); hh.setAttribute("aria-level","2");
+    hh.textContent=`${r.name}（${g[r.id].length} 個景點）`;
+    wrap.appendChild(hh);
     if (open) wrap.appendChild(gintroFor(r));   // 內容抽成 `gintroFor()`，與浮層同一支
 
     const gb=document.createElement("div"); gb.className="grp";
@@ -4298,7 +4457,11 @@ function select(id, mode, inPlace){
 let MOBILE_STATE=null;
 function syncViews(){
   MOBILE_STATE=isMobile();
-  document.querySelectorAll("#mnav button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.t===S.tab));
+  document.querySelectorAll("#mnav button").forEach(b=>{
+    const on=b.dataset.t===S.tab;
+    b.setAttribute("aria-pressed", on);
+    if (on) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current");
+  });
   document.getElementById("app").dataset.mtab = S.tab;
   document.getElementById("main").classList.toggle("nomap", MOBILE_STATE && S.tab!=="map");
   ensureMap();      // 地圖露臉才當場建（2026-09-25 棒 DM，效能 M2，見下面那支）
@@ -4467,6 +4630,37 @@ addEventListener("resize", ()=>{ if (PANEL_MAPONLY!==null && panelHidden()!==PAN
 document.getElementById("totop").onclick=()=>{
   scrollBox().scrollTo({top:0, behavior: RM.matches ? "auto" : "smooth"});
 };
+
+const ANN={tm:0, msg:"", prio:0, key:null};
+function announce(msg, prio){
+  prio=prio||0;
+  if (ANN.tm && prio<ANN.prio) return;
+  ANN.msg=msg; ANN.prio=prio;
+  clearTimeout(ANN.tm);
+  ANN.tm=setTimeout(()=>{
+    const el=document.getElementById("announce"), m=ANN.msg;
+    ANN.tm=0; ANN.prio=0;
+    if (!el) return;
+    el.textContent="";
+    setTimeout(()=>{ el.textContent=m; }, 40);
+  }, 400);
+}
+function listSay(){
+  const n=shown().length;
+  if (n) return `${n} 個景點`;
+  const terms=[...S.qtags].concat(S.q ? [S.q] : []);
+  const hits=terms.length ? PLACES.filter(matchQ).length : 0;
+  if (hits) return `目前條件內沒有結果，但全站另有 ${hits} 個符合項目。`;
+  return terms.length ? `找不到符合「${terms.join("、")}」的內容。` : "在目前條件下找不到內容";
+}
+function syncAnnounce(){
+  const key=JSON.stringify(condBits());
+  if (ANN.key===null){ ANN.key=key; return; }
+  if (key===ANN.key) return;
+  ANN.key=key;
+  announce(listSay(), 0);
+}
+const planCount = () => PLAN.filter(id=>BY_ID[id]).length;
 function render(){
 
   
@@ -4485,6 +4679,7 @@ function render(){
   stickpopSync(true);
 
   fpopFit();
+  syncAnnounce();   // 條件變了就念筆數（2026-10-01 C8，見 `announce()` 那段）
 }
 
 let Q_COMPOSING=false;
@@ -4509,6 +4704,16 @@ document.getElementById("qwrap").addEventListener("click", ()=>{
 });
 
 document.getElementById("qreset").onclick=e=>{ e.stopPropagation(); resetAll(); };
+
+document.getElementById("skip").onclick=e=>{
+  e.preventDefault();
+  if (isMobile() && S.tab!=="place"){ gotoTab("place"); render(); }
+  if (isTwoLane() && S.foldExplore) setLaneFold("explore", false);
+  const box=scrollBox(), res=box && box.querySelector(":scope > .results");
+  if (!res) return;
+  res.setAttribute("tabindex","-1");
+  res.focus({preventScroll:true});
+};
 
 document.getElementById("msearch").onclick=e=>{ e.stopPropagation(); openSearchMode(); };
 document.getElementById("msback").onclick=e=>{ e.stopPropagation(); exitSearchMode(); };
@@ -4671,6 +4876,7 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
 
   let total = null;      // 拿到過的總數（字串，已含千分位）；null＝還沒拿到
   let panel = null, closing = false;
+  let back = null;       // 開啟前焦點在哪（2026-10-01 C8：關閉時還原）
 
   function ping(){
     if (!BASE) return;
@@ -4708,8 +4914,12 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     panel.className = "egg";
     panel.setAttribute("role", "dialog");
     panel.setAttribute("aria-label", LINE1);
+
+    panel.setAttribute("aria-modal", "true");
+    back = document.activeElement;
     const card = document.createElement("div");
     card.className = "eggcard";
+    card.tabIndex = -1;
     const l1 = document.createElement("p");
     l1.className = "eggline";
     l1.textContent = LINE1;
@@ -4726,6 +4936,7 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
 
     void panel.offsetWidth;
     panel.classList.add("on");
+    try { card.focus({preventScroll:true}); } catch(e){}
 
     if (!total && BASE){
       fetchTotal().then(function(){
@@ -4743,6 +4954,8 @@ window.__iosStandaloneFix = { active:false, gap:null, screenH:null, appliedH:nul
     const p = panel;
     panel = null;
     p.classList.remove("on");
+    const b = back; back = null;
+    try { if (b && b !== document.body && b.isConnected && b.focus) b.focus({preventScroll:true}); } catch(e){}
 
     let done = false;
     function drop(){
