@@ -75,7 +75,10 @@
 // v6→v7：2026-10-01 棒 CY（本人裁 C1／C2）`icons/` 多三個殼層資源——favicon.svg、favicon-32.png、
 // 行程頁空狀態扉頁圖 trip-empty.webp——列進 SHELL_ASSETS 走 cache-first，照檔頭規則推號（同 v5→v6）。
 // 代價同檔頭：activate 清掉整份 v6，逾時閘門倚靠的頁面副本等下一次成功造訪才補回。
-const CACHE_VERSION = "v7";
+// v7→v8：2026-10-02 本人裁，favicon.svg／favicon-32.png 由台灣剪影換成一日遊圖示的山與溪流輪廓——檔名不變、
+// 內容變了，兩檔都是 cache-first 殼層資源，不推號的話裝過的人永遠拿到舊圖示（同 v1→v2 icons 那一次）。
+// 代價同檔頭：activate 清掉整份 v7，逾時閘門倚靠的頁面副本等下一次成功造訪才補回。
+const CACHE_VERSION = "v8";
 const CACHE_NAME = `hsinchu-day-trips-${CACHE_VERSION}`;
 
 // 殼層資源：install 時預熱，之後 cache-first。都是同源、幾乎不變的檔案。
